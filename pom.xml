@@ -3,21 +3,40 @@
   <groupId>com.gmail.calorious</groupId>
   <artifactId>MatchaMC-Merged</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+  <properties>
+       <spigot.version>1.18.2-R0.1-SNAPSHOT</spigot.version>
+       <bungee.version>1.18-R0.1-SNAPSHOT</bungee.version>
+  </properties>
   <repositories>
-    <!-- This adds the Spigot Maven repository to the build -->
-    	<repository>
+        <repository>
         	<id>spigot-repo</id>
         	<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
     	</repository>
-  </repositories>
-  
-  <dependencies>
-    <!--This adds the Spigot API artifact to the build -->
-    <dependency>
-           <groupId>org.spigotmc</groupId>
-           <artifactId>spigot-api</artifactId>
-           <version>1.18.2-R0.1-SNAPSHOT</version>
-           <scope>provided</scope>
-    </dependency>
-  </dependencies>
+    	<repository>
+            <id>bungeecord-repo</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+   </repositories>
+   <dependencies>
+    	<dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>${spigot.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-api</artifactId>
+            <version>${bungee.version}</version>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-api</artifactId>
+            <version>${bungee.version}</version>
+            <type>javadoc</type>
+            <scope>provided</scope>
+        </dependency>
+   </dependencies>
 </project>
