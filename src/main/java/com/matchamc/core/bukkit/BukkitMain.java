@@ -1,4 +1,4 @@
-package com.matchamc.bukkit;
+package com.matchamc.core.bukkit;
 
 import org.bukkit.plugin.java.JavaPlugin;
 

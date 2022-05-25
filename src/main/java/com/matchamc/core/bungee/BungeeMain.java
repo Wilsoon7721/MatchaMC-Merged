@@ -1,4 +1,4 @@
-package com.matchamc.bungeecord;
+package com.matchamc.core.bungee;
 
 import com.matchamc.shared.util.MsgUtils;
 
@@ -9,6 +9,6 @@ public class BungeeMain extends Plugin {
 	@Override
 	public void onEnable() {
 		MsgUtils.sendConsoleMessage("&aEnabling MatchaMC [Bungee] version " + getDescription().getVersion());
-	}
 
+	}
 }
