@@ -10,8 +10,6 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.plugin.Plugin;
-import net.md_5.bungee.config.ConfigurationProvider;
-import net.md_5.bungee.config.YamlConfiguration;
 
 public class BungeeMain extends Plugin {
 	public static final String CONSOLE_PLUGIN_NAME = "MatchaMC - Bungee";
@@ -27,9 +25,5 @@ public class BungeeMain extends Plugin {
 		getProxy().getPluginManager().registerCommand(this, new SendCmd());
 		getProxy().getPluginManager().registerCommand(this, new FindCmd());
 		getProxy().getPluginManager().registerCommand(this, new AlertCmd());
-	}
-
-	public void getConfig() {
-		ConfigurationProvider.getProvider(YamlConfiguration.class);
 	}
 }
