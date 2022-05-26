@@ -1,5 +1,6 @@
 package com.matchamc.core.bungee.commands;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -13,8 +14,9 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
+import net.md_5.bungee.api.plugin.TabExecutor;
 
-public class ServerCmd extends Command {
+public class ServerCmd extends Command implements TabExecutor {
 	private Map<String, ServerInfo> servers;
 
 	public ServerCmd() {
@@ -53,5 +55,13 @@ public class ServerCmd extends Command {
 		String serverList = servers.keySet().stream().collect(Collectors.joining(", "));
 		player.sendMessage(new ComponentBuilder().append(BungeeMain.PLUGIN_PREFIX).append(new ComponentBuilder("You must specify a server to connect to!").color(ChatColor.RED).create()).create());
 		player.sendMessage(new ComponentBuilder("Available servers: ").color(ChatColor.GOLD).append(new ComponentBuilder(serverList).color(ChatColor.WHITE).create()).create());
+	}
+
+	@Override
+	public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
+		if(args.length == 0) {
+			return servers.keySet().stream().filter(s -> s.startsWith(args[0])).collect(Collectors.toSet());
+		}
+		return Collections.emptyList();
 	}
 }

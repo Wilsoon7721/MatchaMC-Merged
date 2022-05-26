@@ -1,5 +1,8 @@
 package com.matchamc.core.bungee;
 
+import com.matchamc.core.bungee.commands.FindCmd;
+import com.matchamc.core.bungee.commands.SendCmd;
+import com.matchamc.core.bungee.commands.ServerCmd;
 import com.matchamc.shared.util.MsgUtils;
 
 import net.md_5.bungee.api.ChatColor;
@@ -19,6 +22,9 @@ public class BungeeMain extends Plugin {
 	@Override
 	public void onEnable() {
 		MsgUtils.sendBungeeConsoleMessage("&aEnabling MatchaMC [Bungee] version " + getDescription().getVersion());
+		getProxy().getPluginManager().registerCommand(this, new ServerCmd());
+		getProxy().getPluginManager().registerCommand(this, new SendCmd());
+		getProxy().getPluginManager().registerCommand(this, new FindCmd());
 	}
 
 	public void getConfig() {
