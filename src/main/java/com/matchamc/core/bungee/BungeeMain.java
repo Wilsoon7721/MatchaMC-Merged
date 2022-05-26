@@ -1,5 +1,6 @@
 package com.matchamc.core.bungee;
 
+import com.matchamc.core.bungee.commands.AlertCmd;
 import com.matchamc.core.bungee.commands.FindCmd;
 import com.matchamc.core.bungee.commands.SendCmd;
 import com.matchamc.core.bungee.commands.ServerCmd;
@@ -25,6 +26,7 @@ public class BungeeMain extends Plugin {
 		getProxy().getPluginManager().registerCommand(this, new ServerCmd());
 		getProxy().getPluginManager().registerCommand(this, new SendCmd());
 		getProxy().getPluginManager().registerCommand(this, new FindCmd());
+		getProxy().getPluginManager().registerCommand(this, new AlertCmd());
 	}
 
 	public void getConfig() {
