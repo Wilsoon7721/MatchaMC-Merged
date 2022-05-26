@@ -13,9 +13,12 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ServerConnectEvent.Reason;
 
 public class ServerManager {
-	private ServerManager() {}
+	private ServerManager() {
+	}
+
 	private static final Map<String, ServerInfo> servers = ProxyServer.getInstance().getServers();
 
+	// Check for permissions before joining
 	public static void joinServer(ProxiedPlayer player, ServerInfo server) {
 		if(!canAccess(player, server)) {
 			player.sendMessage(new ComponentBuilder().append(BungeeMain.PLUGIN_PREFIX).append(new ComponentBuilder("You are restricted from accessing this server.").color(ChatColor.RED).create()).create());
@@ -24,6 +27,7 @@ public class ServerManager {
 		player.connect(server, new ServerConnectionFailCallback(player, false), Reason.COMMAND);
 	}
 
+	// No permission check, force player to be sent to server despite having no permission as they are being summoned.
 	public static void sendToServer(ProxiedPlayer target, ServerInfo server) {
 		ServerConnectRequest request = ServerConnectRequest.builder().reason(Reason.PLUGIN).target(server).build();
 		target.connect(request);

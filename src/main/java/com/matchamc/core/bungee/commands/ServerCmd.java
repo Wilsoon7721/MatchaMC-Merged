@@ -16,6 +16,7 @@ import net.md_5.bungee.api.plugin.Command;
 
 public class ServerCmd extends Command {
 	private Map<String, ServerInfo> servers;
+
 	public ServerCmd() {
 		super("server");
 		servers = ProxyServer.getInstance().getServers();
@@ -40,6 +41,10 @@ public class ServerCmd extends Command {
 			return;
 		}
 		String serverName = args[0];
+		if(!ServerManager.serverExists(serverName)) {
+			sender.sendMessage(new ComponentBuilder().append(BungeeMain.PLUGIN_PREFIX).append(new ComponentBuilder("This server does not exist.").color(ChatColor.RED).create()).create());
+			return;
+		}
 		ServerInfo server = ProxyServer.getInstance().getServerInfo(serverName);
 		ServerManager.joinServer(player, server);
 	}
