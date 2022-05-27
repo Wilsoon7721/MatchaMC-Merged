@@ -3,12 +3,14 @@ package com.matchamc.core.bungee;
 import com.matchamc.core.bungee.commands.AlertCmd;
 import com.matchamc.core.bungee.commands.FindCmd;
 import com.matchamc.core.bungee.commands.SendCmd;
+import com.matchamc.core.bungee.commands.SendToAllCmd;
 import com.matchamc.core.bungee.commands.ServerCmd;
 import com.matchamc.shared.util.MsgUtils;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public class BungeeMain extends Plugin {
@@ -21,9 +23,14 @@ public class BungeeMain extends Plugin {
 	@Override
 	public void onEnable() {
 		MsgUtils.sendBungeeConsoleMessage("&aEnabling MatchaMC [Bungee] version " + getDescription().getVersion());
-		getProxy().getPluginManager().registerCommand(this, new ServerCmd());
-		getProxy().getPluginManager().registerCommand(this, new SendCmd());
-		getProxy().getPluginManager().registerCommand(this, new FindCmd());
-		getProxy().getPluginManager().registerCommand(this, new AlertCmd());
+		registerCommand(new ServerCmd());
+		registerCommand(new SendCmd());
+		registerCommand(new FindCmd());
+		registerCommand(new AlertCmd());
+		registerCommand(new SendToAllCmd());
+	}
+
+	private void registerCommand(Command executor) {
+		getProxy().getPluginManager().registerCommand(this, executor);
 	}
 }
