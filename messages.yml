@@ -1,0 +1,9 @@
+bukkit:
+     no_permission_error: "&cYou do not have permission to run this command."
+     insufficient_parameters_error: "&cInsufficient parameters!"
+     commands:
+         clear_chat:
+             global: "&3The chat has been cleared by &b%player%&3." # Message to send to all players upon clear
+         mute_chat:
+             chat_muted: "&cThe chat has been muted by %player%."
+             chat_unmuted: "&aThe chat has been unmuted by %player%."
