@@ -3,6 +3,7 @@ package com.matchamc.core.bungee.commands;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Collections;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
@@ -13,8 +14,9 @@ import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.plugin.Command;
+import net.md_5.bungee.api.plugin.TabExecutor;
 
-public class SendToAllCmd extends Command {
+public class SendToAllCmd extends Command implements TabExecutor {
 	// Issue a command to all servers
 	public SendToAllCmd() {
 		super("sendtoall");
@@ -50,6 +52,11 @@ public class SendToAllCmd extends Command {
 		out.write(msgbytearray);
 		sender.sendMessage(new ComponentBuilder("Successfully ran '").color(ChatColor.GREEN).append(new ComponentBuilder(data).color(ChatColor.YELLOW).create()).append(new ComponentBuilder("' on ").color(ChatColor.GREEN).create()).append(new ComponentBuilder(String.valueOf(ProxyServer.getInstance().getServers().keySet().size())).color(ChatColor.YELLOW).append(new ComponentBuilder(" servers on the network.").color(ChatColor.GREEN).create()).create()).create());
 
+	}
+
+	@Override
+	public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
+		return Collections.emptyList();
 	}
 
 }

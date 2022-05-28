@@ -1,0 +1,5 @@
+name: MatchaMC-Bungee
+main: com.matchamc.core.bungee.BungeeMain
+version: 0.1
+description: Base plugin for server - Bungee
+author: [Wilsoon, ironinventor]

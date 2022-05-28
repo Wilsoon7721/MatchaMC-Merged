@@ -22,7 +22,7 @@ public class BungeeMain extends Plugin {
 
 	@Override
 	public void onEnable() {
-		MsgUtils.sendBungeeConsoleMessage("&aEnabling MatchaMC [Bungee] version " + getDescription().getVersion());
+		MsgUtils.sendBungeeConsoleMessage("&aEnabling MatchaMC [Bungee] version " + getDescription().getVersion() + "...");
 		registerCommand(new ServerCmd());
 		registerCommand(new SendCmd());
 		registerCommand(new FindCmd());

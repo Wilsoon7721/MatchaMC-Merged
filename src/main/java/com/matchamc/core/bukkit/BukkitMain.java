@@ -52,7 +52,6 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		String[] fullData = data.split(" ");
 		if(!fullData[0].equals("data_1VSGK")) {
 			MsgUtils.sendBukkitConsoleMessage("&c[MatchaMC - Bungee-Spigot] The plugin received a plugin message from the Bungeecord instance. However, the data received does not match the format issued by the /sendtoall command.");
-			MsgUtils.sendBukkitConsoleMessage("&c[MatchaMC - Bungee-Spigot] Please check for any interceptions towards plugin messaging.");
 			return;
 		}
 		String[] modifiedFullData = Arrays.copyOfRange(fullData, 1, fullData.length);
