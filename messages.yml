@@ -1,9 +1,53 @@
-bukkit:
-     no_permission_error: "&cYou do not have permission to run this command."
-     insufficient_parameters_error: "&cInsufficient parameters!"
-     commands:
-         clear_chat:
-             global: "&3The chat has been cleared by &b%player%&3." # Message to send to all players upon clear
-         mute_chat:
-             chat_muted: "&cThe chat has been muted by %player%."
-             chat_unmuted: "&aThe chat has been unmuted by %player%."
+no_permission_error: "&cYou do not have permission &8(&7%permission%&8) &cto run this command."
+non_player_error: "&cYou must be a player to run this command."
+insufficient_parameters_error: "&cInsufficient parameters!"
+commands:
+     clear_chat:
+         global: "&3The chat has been cleared by &b%player%&3." # Message to send to all players upon clear
+     mute_chat:
+         chat_muted: "&cThe chat has been muted by %player%."
+         chat_unmuted: "&aThe chat has been unmuted by %player%."
+     messaging:
+         format:
+             sending: "&7(To &e%player%&7) &e%message%"
+             receiving: "&7(From &e%player%&7) &e%message%"
+     feed: "&aYou have been fed."
+     heal: "&aYou have been healed."
+     fly:
+         enabled: "&eYour flight has been &aenabled&e."
+         disabled: "&eYour flight has been &cdisabled&e."
+     speed:
+         walk: "&eYour walk speed has been updated to &a%speed%&e."
+         fly: "&eYour fly speed has been updated to &a%speed%&e."
+         invalid: "&cYou have specified an invalid speed."
+     god:
+         enabled: "&eYour god mode has been &aenabled&e."
+         disabled: "&eYour god mode has been &cdisabled&e."
+     gamemode:
+         updated: "&eYour gamemode has been updated to &a%gamemode%&e."
+         invalid: "&cYou have specified an invalid gamemode."
+     night_vision:
+         enabled: "&aYou have been given night vision."
+         disabled: "&cYour night vision has been removed."
+     skull: "&eYou have been given the skull of &a%player%&e."
+     staffchat:
+         format:
+             staff: "&b[S] &3[%server%] &b%playerName%&7: &b%message%"
+             admin: "&c[A] &3[%server%] &b%playerName%&7: &b%message%"
+             # Management includes: (Senior Admin, Developer, Owner/Co-Owners)
+             management: "&4[M] &3[%server%] &b%playerName%&7: &b%message%"
+         enabled: "&eYou have enabled %chat% chat."
+         disabled: "&eYou have disabled %chat% chat."
+     teleport:
+         coordinates: "&eYou have been teleported to X:&a%x-coord%&e, Y:&a%y-coord%&e, Z:&a%z-coord%&e.
+         player:
+             success: "&eYou have been teleported to &a%player%&e."
+             player_offline: "&eThe player is offline."
+     teleporthere:
+         executor: "&eYou have teleported &a%player% &eto your location."
+         target: "&eYou have been teleported to &a%player%&e's location."
+     time: "&eYou have set the world time to %time%."
+     weather:
+         self: "&eYou have set your own weather to &a%weather%&e."
+         world: "&eYou have set the weather to &a%weather%&e."
+         invalid: "&cYou have specified an invalid weather."

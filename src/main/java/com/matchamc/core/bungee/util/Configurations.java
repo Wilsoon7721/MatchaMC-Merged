@@ -14,10 +14,10 @@ import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
 
-public class ConfigUtil {
+public class Configurations {
 	private Plugin plugin;
 
-	public ConfigUtil(Plugin plugin) {
+	public Configurations(Plugin plugin) {
 		this.plugin = plugin;
 	}
 
@@ -43,14 +43,16 @@ public class ConfigUtil {
 					parentFile.mkdirs();
 				if(stream != null) {
 					Files.copy(stream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-					MsgUtils.sendBungeeConsoleMessage("&a[" + BungeeMain.CONSOLE_PLUGIN_NAME + "] Successfully created file '" + file.getName() + "' ");
+					MsgUtils.sendBungeeConsoleMessage("&a[" + BungeeMain.CONSOLE_PLUGIN_NAME + "] Successfully copied the file '" + file.getName() + "' from the JAR to the data folder.");
 					return;
 				} else {
 					file.createNewFile();
+					MsgUtils.sendBungeeConsoleMessage("&a[" + BungeeMain.CONSOLE_PLUGIN_NAME + "] Successfully created the file '" + file.getName() + "'.");
 				}
 			}
 		} catch(IOException ex) {
 			MsgUtils.sendBungeeConsoleMessage("&c[" + BungeeMain.CONSOLE_PLUGIN_NAME + "] Failed to create configuration file.");
+			ex.printStackTrace();
 		}
 	}
 }
