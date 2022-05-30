@@ -18,7 +18,7 @@ public class ClearChatCmd extends CoreCommand {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if(!sender.hasPermission(permissionNode)) {
-			sender.sendMessage(BukkitMain.NO_PERMISSION_ERROR);
+			sender.sendMessage(instance.formatNoPermsMsg(permissionNode));
 			return true;
 		}
 		for(Player player : Bukkit.getOnlinePlayers()) {

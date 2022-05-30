@@ -2,25 +2,46 @@ package com.matchamc.core.bukkit.commands;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import com.matchamc.core.bukkit.BukkitMain;
 import com.matchamc.core.bukkit.util.CoreCommand;
+import com.matchamc.core.bukkit.util.Staffs;
 import com.matchamc.shared.util.MsgUtils;
 
-public class MuteChatCmd extends CoreCommand {
-
-	public MuteChatCmd(BukkitMain instance, String permissionNode) {
+public class MuteChatCmd extends CoreCommand implements Listener {
+	private boolean chatMuted = false;
+	private Staffs staffs;
+	public MuteChatCmd(BukkitMain instance, String permissionNode, Staffs staffs) {
 		super(instance, permissionNode);
+		this.staffs = staffs;
 	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if(!(sender.hasPermission(permissionNode))) {
-			sender.sendMessage(MsgUtils.color(BukkitMain.NO_PERMISSION_ERROR.replace("%permission%", permissionNode)));
+			sender.sendMessage(instance.formatNoPermsMsg(permissionNode));
 			return true;
 		}
 		// TODO MuteChat
+		if(chatMuted) {
+			chatMuted = false;
+			sender.sendMessage(MsgUtils.color(instance.messages().getString("commands.mute_chat.chat_unmuted").replace("%player%", sender.getName())));
+			return true;
+		}
+		chatMuted = true;
+		sender.sendMessage(MsgUtils.color(instance.messages().getString("commands.mute_chat.chat_muted").replace("%player%", sender.getName())));
 		return true;
 	}
 
+	@EventHandler
+	public void onPlayerChat(AsyncPlayerChatEvent event) {
+		if(event.getPlayer().hasPermission(permissionNode + ".bypass"))
+			return;
+		if(!chatMuted)
+			return;
+		if(staffs
+	}
 }

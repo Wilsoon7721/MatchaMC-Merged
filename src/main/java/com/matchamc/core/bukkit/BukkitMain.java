@@ -14,13 +14,16 @@ import org.bukkit.plugin.messaging.PluginMessageListener;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 import com.matchamc.core.bukkit.commands.ClearChatCmd;
+import com.matchamc.core.bukkit.commands.MuteChatCmd;
 import com.matchamc.core.bukkit.util.Configurations;
+import com.matchamc.core.bukkit.util.Staffs;
 import com.matchamc.shared.util.MsgUtils;
 
 public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 	public static final String CONSOLE_PLUGIN_NAME = "MatchaMC - Bukkit";
 	public static String NON_PLAYER_ERROR, NO_PERMISSION_ERROR, INSUFFICIENT_PARAMETERS_ERROR;
 	private static Configurations configurations;
+	private static Staffs staffs;
 	private static YamlConfiguration messages;
 	private static BukkitMain instance;
 	@Override
@@ -28,10 +31,12 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		MsgUtils.sendBukkitConsoleMessage("&aEnabling MatchaMC [Bukkit/Spigot] version " + getDescription().getVersion());
 		instance = this;
 		configurations = new Configurations(this);
+		staffs = new Staffs(this, configurations);
 		configurations.create("messages.yml");
 		getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 		getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", this);
 		getCommand("clearchat").setExecutor(new ClearChatCmd(this, "core.clearchat"));
+		getCommand("mutechat").setExecutor(new MuteChatCmd(this, "core.mutechat"));
 		reloadMessages();
 	}
 
@@ -83,5 +88,9 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		String receivedCommand = String.join(" ", modifiedFullData).trim();
 		MsgUtils.sendBukkitConsoleMessage("&e[MatchaMC - Spigot] Sending command '" + receivedCommand + "' - Received from /sendtoall in BungeeCord network.");
 		Bukkit.dispatchCommand(getServer().getConsoleSender(), receivedCommand);
+	}
+
+	public String formatNoPermsMsg(String permission) {
+		return MsgUtils.color(NO_PERMISSION_ERROR.replace("%permission%", permission));
 	}
 }

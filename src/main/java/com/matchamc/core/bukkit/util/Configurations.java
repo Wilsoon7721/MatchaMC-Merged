@@ -50,4 +50,16 @@ public class Configurations {
 			ex.printStackTrace();
 		}
 	}
+
+	public void plainCreate(String fileName) {
+		File file = new File(plugin.getDataFolder(), fileName);
+		if(!file.exists())
+			try {
+				file.createNewFile();
+			} catch(IOException ex) {
+				MsgUtils.sendBukkitConsoleMessage("&c[" + BukkitMain.CONSOLE_PLUGIN_NAME + "] Failed to create configuration file.");
+				ex.printStackTrace();
+				return;
+			}
+	}
 }
