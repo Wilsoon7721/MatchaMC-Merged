@@ -6,8 +6,10 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
@@ -16,8 +18,8 @@ import com.google.common.io.ByteStreams;
 import com.matchamc.core.bukkit.commands.ClearChatCmd;
 import com.matchamc.core.bukkit.commands.MuteChatCmd;
 import com.matchamc.core.bukkit.util.Configurations;
-import com.matchamc.core.bukkit.util.Staffs;
 import com.matchamc.shared.util.MsgUtils;
+import com.matchamc.shared.util.Staffs;
 
 public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 	public static final String CONSOLE_PLUGIN_NAME = "MatchaMC - Bukkit";
@@ -36,7 +38,7 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 		getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", this);
 		getCommand("clearchat").setExecutor(new ClearChatCmd(this, "core.clearchat"));
-		getCommand("mutechat").setExecutor(new MuteChatCmd(this, "core.mutechat"));
+		registerCommandAndListener("mutechat", new MuteChatCmd(this, staffs, "core.mutechat"));
 		reloadMessages();
 	}
 
@@ -92,5 +94,12 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 
 	public String formatNoPermsMsg(String permission) {
 		return MsgUtils.color(NO_PERMISSION_ERROR.replace("%permission%", permission));
+	}
+
+	private <T> void registerCommandAndListener(String command, T object) {
+		if(!(object instanceof CommandExecutor) || !(object instanceof Listener))
+			throw new RuntimeException("registerCommandAndListener() refused the argument given which is of class: " + object.getClass().getCanonicalName() + ". Superclasses: " + object.getClass().getEnclosingClass().getCanonicalName() + ". The command and listeners attached to this class was not registered.");
+		getCommand(command).setExecutor((CommandExecutor) object);
+		Bukkit.getPluginManager().registerEvents((Listener) object, this);
 	}
 }

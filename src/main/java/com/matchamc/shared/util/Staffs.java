@@ -1,4 +1,4 @@
-package com.matchamc.core.bukkit.util;
+package com.matchamc.shared.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,9 +10,11 @@ import java.util.stream.Collectors;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 import com.matchamc.core.bukkit.BukkitMain;
-import com.matchamc.shared.util.MsgUtils;
+import com.matchamc.core.bukkit.util.Configurations;
 
 public class Staffs {
 	private BukkitMain instance;
@@ -71,6 +73,10 @@ public class Staffs {
 		return success;
 	}
 
+	public boolean isStaff(Player player) {
+		return staff.contains(player.getUniqueId());
+	}
+
 	public void saveToFile() {
 		List<String> uuids = staff.stream().map(UUID::toString).collect(Collectors.toList());
 		YamlConfiguration yc = YamlConfiguration.loadConfiguration(staffFile);
@@ -82,5 +88,12 @@ public class Staffs {
 			MsgUtils.sendBukkitConsoleMessage("&c[" + BukkitMain.CONSOLE_PLUGIN_NAME + "] Could not save Staffs: The YML file (staffs.yml) could not be saved.");
 			ex.printStackTrace();
 		}
+	}
+
+	@EventHandler
+	public void onStaffJoin(PlayerJoinEvent event) {
+		if(!staff.contains(event.getPlayer().getUniqueId()) && event.getPlayer().hasPermission("core.bukkit.staff"))
+			staff.add(event.getPlayer().getUniqueId());
+		return;
 	}
 }

@@ -8,13 +8,14 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import com.matchamc.core.bukkit.BukkitMain;
 import com.matchamc.core.bukkit.util.CoreCommand;
-import com.matchamc.core.bukkit.util.Staffs;
 import com.matchamc.shared.util.MsgUtils;
+import com.matchamc.shared.util.Staffs;
 
 public class MuteChatCmd extends CoreCommand implements Listener {
 	private boolean chatMuted = false;
 	private Staffs staffs;
-	public MuteChatCmd(BukkitMain instance, String permissionNode, Staffs staffs) {
+
+	public MuteChatCmd(BukkitMain instance, Staffs staffs, String permissionNode) {
 		super(instance, permissionNode);
 		this.staffs = staffs;
 	}
@@ -42,6 +43,9 @@ public class MuteChatCmd extends CoreCommand implements Listener {
 			return;
 		if(!chatMuted)
 			return;
-		if(staffs
+		if(staffs.isStaff(event.getPlayer()))
+			return;
+		event.setCancelled(true);
+		event.getPlayer().sendMessage(MsgUtils.color(instance.messages().getString("commands.mute_chat.message_while_muted")));
 	}
 }

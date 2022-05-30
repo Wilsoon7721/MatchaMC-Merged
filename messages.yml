@@ -5,6 +5,7 @@ commands:
      clear_chat:
          global: "&3The chat has been cleared by &b%player%&3." # Message to send to all players upon clear
      mute_chat:
+         message_while_muted: "&cYou are unable to send a message while the server chat is muted."
          chat_muted: "&cThe chat has been muted by %player%."
          chat_unmuted: "&aThe chat has been unmuted by %player%."
      messaging:
