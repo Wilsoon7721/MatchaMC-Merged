@@ -16,16 +16,20 @@ import org.bukkit.plugin.messaging.PluginMessageListener;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 import com.matchamc.core.bukkit.commands.ClearChatCmd;
+import com.matchamc.core.bukkit.commands.MsgCmd;
 import com.matchamc.core.bukkit.commands.MuteChatCmd;
+import com.matchamc.core.bukkit.commands.staff.SocialspyCmd;
 import com.matchamc.core.bukkit.util.Configurations;
+import com.matchamc.core.bukkit.util.Messenger;
 import com.matchamc.shared.util.MsgUtils;
 import com.matchamc.shared.util.Staffs;
 
 public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 	public static final String CONSOLE_PLUGIN_NAME = "MatchaMC - Bukkit";
-	public static String NON_PLAYER_ERROR, NO_PERMISSION_ERROR, INSUFFICIENT_PARAMETERS_ERROR;
+	public static String NON_PLAYER_ERROR, NO_PERMISSION_ERROR, INSUFFICIENT_PARAMETERS_ERROR, PLAYER_OFFLINE;
 	private static Configurations configurations;
 	private static Staffs staffs;
+	private static Messenger messenger;
 	private static YamlConfiguration messages;
 	private static BukkitMain instance;
 	@Override
@@ -34,10 +38,13 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		instance = this;
 		configurations = new Configurations(this);
 		staffs = new Staffs(this, configurations);
+		messenger = new Messenger(this);
 		configurations.create("messages.yml");
 		getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 		getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", this);
 		getCommand("clearchat").setExecutor(new ClearChatCmd(this, "core.clearchat"));
+		getCommand("socialspy").setExecutor(new SocialspyCmd(this, messenger, "core.staff.socialspy"));
+		getCommand("message").setExecutor(new MsgCmd(this, messenger, "core.bukkit.message"));
 		registerCommandAndListener("mutechat", new MuteChatCmd(this, staffs, "core.mutechat"));
 		reloadMessages();
 	}
@@ -47,6 +54,7 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		NON_PLAYER_ERROR = messages.getString("non_player_error");
 		NO_PERMISSION_ERROR = messages.getString("no_permission_error");
 		INSUFFICIENT_PARAMETERS_ERROR = messages.getString("insufficient_parameters_error");
+		PLAYER_OFFLINE = messages.getString("player_offline");
 	}
 
 	public YamlConfiguration messages() {
