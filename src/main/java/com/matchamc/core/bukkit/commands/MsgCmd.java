@@ -5,11 +5,14 @@ import org.bukkit.command.CommandSender;
 
 import com.matchamc.core.bukkit.BukkitMain;
 import com.matchamc.core.bukkit.util.CoreCommand;
+import com.matchamc.core.bukkit.util.Messenger;
 
 public class MsgCmd extends CoreCommand {
+	private Messenger messenger;
 
-	public MsgCmd(BukkitMain instance, String permissionNode) {
+	public MsgCmd(BukkitMain instance, Messenger messenger, String permissionNode) {
 		super(instance, permissionNode);
+		this.messenger = messenger;
 	}
 
 	// Include a /r command too
