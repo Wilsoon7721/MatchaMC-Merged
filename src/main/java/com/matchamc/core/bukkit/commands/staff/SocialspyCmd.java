@@ -1,5 +1,9 @@
 package com.matchamc.core.bukkit.commands.staff;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -7,7 +11,7 @@ import org.bukkit.entity.Player;
 import com.matchamc.core.bukkit.BukkitMain;
 import com.matchamc.core.bukkit.util.CoreCommand;
 import com.matchamc.core.bukkit.util.Messenger;
-import com.matchamc.shared.util.MsgUtils;
+import com.matchamc.shared.MsgUtils;
 
 public class SocialspyCmd extends CoreCommand {
 	private Messenger messenger;
@@ -60,5 +64,12 @@ public class SocialspyCmd extends CoreCommand {
 			}
 		}
 		return true;
+	}
+
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+		if(args.length == 0)
+			return Arrays.asList("ON", "OFF");
+		return Collections.emptyList();
 	}
 }

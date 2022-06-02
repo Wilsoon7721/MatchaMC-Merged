@@ -10,7 +10,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.matchamc.core.bukkit.BukkitMain;
-import com.matchamc.shared.util.MsgUtils;
+import com.matchamc.shared.MsgUtils;
 
 public class Configurations {
 	private JavaPlugin plugin;

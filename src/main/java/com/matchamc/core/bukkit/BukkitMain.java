@@ -16,13 +16,17 @@ import org.bukkit.plugin.messaging.PluginMessageListener;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 import com.matchamc.core.bukkit.commands.ClearChatCmd;
+import com.matchamc.core.bukkit.commands.FeedCmd;
+import com.matchamc.core.bukkit.commands.HealCmd;
 import com.matchamc.core.bukkit.commands.MsgCmd;
 import com.matchamc.core.bukkit.commands.MuteChatCmd;
+import com.matchamc.core.bukkit.commands.ReplyCmd;
+import com.matchamc.core.bukkit.commands.SpeedCmd;
 import com.matchamc.core.bukkit.commands.staff.SocialspyCmd;
 import com.matchamc.core.bukkit.util.Configurations;
 import com.matchamc.core.bukkit.util.Messenger;
-import com.matchamc.shared.util.MsgUtils;
-import com.matchamc.shared.util.Staffs;
+import com.matchamc.shared.MsgUtils;
+import com.matchamc.shared.Staffs;
 
 public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 	public static final String CONSOLE_PLUGIN_NAME = "MatchaMC - Bukkit";
@@ -43,9 +47,13 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 		getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", this);
 		getCommand("clearchat").setExecutor(new ClearChatCmd(this, "core.clearchat"));
-		getCommand("socialspy").setExecutor(new SocialspyCmd(this, messenger, "core.staff.socialspy"));
-		getCommand("message").setExecutor(new MsgCmd(this, messenger, "core.bukkit.message"));
 		registerCommandAndListener("mutechat", new MuteChatCmd(this, staffs, "core.mutechat"));
+		getCommand("socialspy").setExecutor(new SocialspyCmd(this, messenger, "core.staff.socialspy"));
+		getCommand("message").setExecutor(new MsgCmd(this, messenger, "core.message"));
+		getCommand("reply").setExecutor(new ReplyCmd(this, messenger, "core.reply"));
+		getCommand("heal").setExecutor(new HealCmd(this, "core.heal"));
+		getCommand("feed").setExecutor(new FeedCmd(this, "core.feed"));
+		getCommand("speed").setExecutor(new SpeedCmd(this, "core.speed"));
 		reloadMessages();
 	}
 

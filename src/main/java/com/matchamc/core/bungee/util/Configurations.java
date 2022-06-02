@@ -7,7 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
 import com.matchamc.core.bungee.BungeeMain;
-import com.matchamc.shared.util.MsgUtils;
+import com.matchamc.shared.MsgUtils;
 
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;

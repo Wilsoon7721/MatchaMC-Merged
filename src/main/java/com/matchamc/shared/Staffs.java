@@ -1,4 +1,4 @@
-package com.matchamc.shared.util;
+package com.matchamc.shared;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,6 +42,10 @@ public class Staffs {
 		staff.addAll(yc.getStringList("staff").stream().map(s -> UUID.fromString(s)).collect(Collectors.toList()));
 	}
 	
+	public boolean isStaffChatMessage(String msg) {
+		return msg.startsWith("#");
+	}
+
 	public boolean addPlayer(Player player) {
 		boolean success = staff.add(player.getUniqueId());
 		return success;

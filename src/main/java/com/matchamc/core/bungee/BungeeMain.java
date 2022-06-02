@@ -5,7 +5,7 @@ import com.matchamc.core.bungee.commands.FindCmd;
 import com.matchamc.core.bungee.commands.SendCmd;
 import com.matchamc.core.bungee.commands.SendToAllCmd;
 import com.matchamc.core.bungee.commands.ServerCmd;
-import com.matchamc.shared.util.MsgUtils;
+import com.matchamc.shared.MsgUtils;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;

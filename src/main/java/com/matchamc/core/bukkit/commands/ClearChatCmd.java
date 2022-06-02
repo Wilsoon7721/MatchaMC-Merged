@@ -1,5 +1,8 @@
 package com.matchamc.core.bukkit.commands;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -7,7 +10,7 @@ import org.bukkit.entity.Player;
 
 import com.matchamc.core.bukkit.BukkitMain;
 import com.matchamc.core.bukkit.util.CoreCommand;
-import com.matchamc.shared.util.MsgUtils;
+import com.matchamc.shared.MsgUtils;
 
 public class ClearChatCmd extends CoreCommand {
 	public ClearChatCmd(BukkitMain instance, String permissionNode) {
@@ -28,5 +31,10 @@ public class ClearChatCmd extends CoreCommand {
 			player.sendMessage(MsgUtils.color(instance.messages().getString("commands.clear_chat.global").replace("%player%", sender.getName())));
 		}
 		return true;
+	}
+
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+		return Collections.emptyList();
 	}
 }

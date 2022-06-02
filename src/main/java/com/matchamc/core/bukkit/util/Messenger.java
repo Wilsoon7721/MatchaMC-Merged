@@ -1,6 +1,8 @@
 package com.matchamc.core.bukkit.util;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -9,12 +11,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.matchamc.core.bukkit.BukkitMain;
-import com.matchamc.shared.util.MsgUtils;
+import com.matchamc.shared.MsgUtils;
 
 public class Messenger {
 	private BukkitMain instance;
 	private String sendingFormat, receivingFormat, socialSpyFormat;
 	private Set<UUID> socialspyEnabled = new HashSet<>();
+	private Map<UUID, UUID> lastMessagedPlayers = new HashMap<>();
 	public Messenger(BukkitMain instance) {
 		this.instance = instance;
 		this.sendingFormat = this.instance.messages().getString("commands.messaging.format.sending");
@@ -28,16 +31,24 @@ public class Messenger {
 		fromPlayer.sendMessage(MsgUtils.color(sendingFormat.replace("%player%", toPlayer.getDisplayName()).replace("%message%", message)));
 		toPlayer.sendMessage(MsgUtils.color(receivingFormat.replace("%player%", fromPlayer.getName()).replace("%message%", message)));
 		for(Player player : Bukkit.getOnlinePlayers()) {
-			if(!socialSpyEnabled(player))
+			if(!getSocialspyState(player))
 				continue;
 			player.sendMessage(MsgUtils.color(socialSpyFormat.replace("%sender%", fromPlayer.getName()).replace("%receiver%", toPlayer.getDisplayName()).replace("%message%", message)));
 		}
 	}
 
-	public boolean socialSpyEnabled(Player player) {
-		if(socialspyEnabled.contains(player.getUniqueId()))
-			return true;
-		return false;
+	public UUID getLastMessagedPlayer(Player player) {
+		return lastMessagedPlayers.get(player.getUniqueId());
+	}
+
+	public void setLastMessagedPlayer(Player player, Player target) {
+		if(lastMessagedPlayers.get(player.getUniqueId()) != null)
+			lastMessagedPlayers.remove(player.getUniqueId());
+		if(target == null) {
+			lastMessagedPlayers.remove(player.getUniqueId());
+			return;
+		}
+		lastMessagedPlayers.put(player.getUniqueId(), target.getUniqueId());
 	}
 
 	public boolean getSocialspyState(Player player) {

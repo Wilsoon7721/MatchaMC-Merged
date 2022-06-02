@@ -1,4 +1,4 @@
-package com.matchamc.shared.util;
+package com.matchamc.shared;
 
 import org.bukkit.Bukkit;
 

@@ -1,6 +1,5 @@
 package com.matchamc.core.bukkit.commands;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,34 +11,41 @@ import org.bukkit.entity.Player;
 
 import com.matchamc.core.bukkit.BukkitMain;
 import com.matchamc.core.bukkit.util.CoreCommand;
-import com.matchamc.core.bukkit.util.Messenger;
 import com.matchamc.shared.MsgUtils;
 
-public class MsgCmd extends CoreCommand {
-	private Messenger messenger;
+public class FeedCmd extends CoreCommand {
 
-	public MsgCmd(BukkitMain instance, Messenger messenger, String permissionNode) {
+	public FeedCmd(BukkitMain instance, String permissionNode) {
 		super(instance, permissionNode);
-		this.messenger = messenger;
 	}
 
 	@Override
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		if(!(sender.hasPermission(permissionNode))) { 
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		if(!sender.hasPermission(permissionNode)) {
 			sender.sendMessage(instance.formatNoPermsMsg(permissionNode));
 			return true;
 		}
-		if(args.length >= 0 && args.length < 2) {
-			sender.sendMessage(BukkitMain.INSUFFICIENT_PARAMETERS_ERROR);
+		if(args.length == 0) {
+			if(!(sender instanceof Player)) {
+				sender.sendMessage(BukkitMain.NON_PLAYER_ERROR);
+				return true;
+			}
+			((Player) sender).setFoodLevel(20);
+			sender.sendMessage(MsgUtils.color(instance.messages().getString("commands.feed.main_message")));
 			return true;
 		}
-		String message = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+		if(!sender.hasPermission(permissionNode + ".others")) {
+			sender.sendMessage(instance.formatNoPermsMsg(permissionNode + ".others"));
+			return true;
+		}
 		Player target = Bukkit.getPlayer(args[0]);
 		if(target == null) {
 			sender.sendMessage(BukkitMain.PLAYER_OFFLINE);
 			return true;
 		}
-		messenger.sendMessage(sender, target, MsgUtils.color(message));
+		target.setFoodLevel(20);
+		target.sendMessage(MsgUtils.color(instance.messages().getString("commands.feed.main_message")));
+		sender.sendMessage(MsgUtils.color(instance.messages().getString("commands.feed.fed_others")));
 		return true;
 	}
 
@@ -49,4 +55,5 @@ public class MsgCmd extends CoreCommand {
 			return Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(s -> s.startsWith(args[0])).collect(Collectors.toList());
 		return Collections.emptyList();
 	}
+
 }

@@ -13,24 +13,36 @@ commands:
          format:
              sending: "&7(To &e%player%&7) &e%message%"
              receiving: "&7(From &e%player%&7) &e%message%"
-     feed: "&aYou have been fed."
-     heal: "&aYou have been healed."
+     feed: 
+         main_message: "&aYou have been fed."
+         fed_others: "&aYou have fed &e%player%&a."
+     heal: 
+         main_message: "&aYou have been healed."
+         healed_others: "&aYou have healed &e%player%&a."
      fly:
-         enabled: "&eYour flight has been &aenabled&e."
-         disabled: "&eYour flight has been &cdisabled&e."
+         main_message:
+             enabled: "&eYour flight has been &aenabled&e."
+             disabled: "&eYour flight has been &cdisabled&e."
+         fly_others: "&eYou have &r%state% &efly mode for &a%player%&e."
      speed:
-         walk: "&eYour walk speed has been updated to &a%speed%&e."
-         fly: "&eYour fly speed has been updated to &a%speed%&e."
-         invalid: "&cYou have specified an invalid speed."
+         update_speed: "&eYour %type% speed has been updated to &a%speed%&e."
+         update_speed_others: "&a%player%&e's &e%type% speed has been updated to &a%speed%&e."
+         invalid_section: "&cYou have specified an invalid section, only 'fly' and 'walk' is accepted."
+         invalid_speed: "&cYou have specified an invalid speed."
      god:
          enabled: "&eYour god mode has been &aenabled&e."
          disabled: "&eYour god mode has been &cdisabled&e."
      gamemode:
          updated: "&eYour gamemode has been updated to &a%gamemode%&e."
+         updated_others: "&eYou have set the gamemode of &a%player% &eto &a%gamemode%&e."
          invalid: "&cYou have specified an invalid gamemode."
      night_vision:
          enabled: "&aYou have been given night vision."
          disabled: "&cYour night vision has been removed."
+     reply: 
+         last_messaged_player: "&aYour last messaged player is &e%player%&a."
+         player_now_offline: "&cThe player you are trying to message has gone offline."
+         no_previous_player: "&cYou did not message anyone previously."
      skull: "&eYou have been given the skull of &a%player%&e."
      socialspy:
          enabled: "&aSocialspy enabled."
