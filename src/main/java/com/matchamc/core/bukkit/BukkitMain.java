@@ -17,6 +17,8 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 import com.matchamc.core.bukkit.commands.ClearChatCmd;
 import com.matchamc.core.bukkit.commands.FeedCmd;
+import com.matchamc.core.bukkit.commands.GamemodeCmd;
+import com.matchamc.core.bukkit.commands.GodCmd;
 import com.matchamc.core.bukkit.commands.HealCmd;
 import com.matchamc.core.bukkit.commands.MsgCmd;
 import com.matchamc.core.bukkit.commands.MuteChatCmd;
@@ -38,7 +40,8 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 	private static BukkitMain instance;
 	@Override
 	public void onEnable() {
-		MsgUtils.sendBukkitConsoleMessage("&aEnabling MatchaMC [Bukkit/Spigot] version " + getDescription().getVersion());
+		// MsgUtils.sendBukkitConsoleMessage("&aEnabling MatchaMC [Bukkit/Spigot] version " + getDescription().getVersion());
+		printIcon();
 		instance = this;
 		configurations = new Configurations(this);
 		staffs = new Staffs(this, configurations);
@@ -54,6 +57,8 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		getCommand("heal").setExecutor(new HealCmd(this, "core.heal"));
 		getCommand("feed").setExecutor(new FeedCmd(this, "core.feed"));
 		getCommand("speed").setExecutor(new SpeedCmd(this, "core.speed"));
+		getCommand("gamemode").setExecutor(new GamemodeCmd(this, "core.gamemode"));
+		registerCommandAndListener("god", new GodCmd(this, "core.god"));
 		reloadMessages();
 	}
 
@@ -117,5 +122,52 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 			throw new RuntimeException("registerCommandAndListener() refused the argument given which is of class: " + object.getClass().getCanonicalName() + ". Superclasses: " + object.getClass().getEnclosingClass().getCanonicalName() + ". The command and listeners attached to this class was not registered.");
 		getCommand(command).setExecutor((CommandExecutor) object);
 		Bukkit.getPluginManager().registerEvents((Listener) object, this);
+	}
+
+	private void printIcon() {
+		// The escape codes messes up the perfect icon, but in the console it looks good - i think.
+		String serverVersion = getServerVersion();
+		MsgUtils.sendBukkitConsoleMessage("&a   __     ___     _____________       &3|");
+		MsgUtils.sendBukkitConsoleMessage("&a  /  \\   /   \\   /   __________|    &3|");
+		MsgUtils.sendBukkitConsoleMessage("&a | /\\ \\_/ /\\  |  |  /              &3|");
+		MsgUtils.sendBukkitConsoleMessage("&a | | \\   /  | |  |  |                &3|");
+		MsgUtils.sendBukkitConsoleMessage("&a | |  | |   | |  |  |                 &3|    Running &bBukkit/Spigot v" + serverVersion);
+		MsgUtils.sendBukkitConsoleMessage("&a | |  | |   | |  |  |                 &3|     &b" + getDescription().getName() + " &3version &b" + getDescription().getVersion());
+		MsgUtils.sendBukkitConsoleMessage("&a | |  |_|   | |  |  |                 &3|         &aThe plugin is enabling...");
+		MsgUtils.sendBukkitConsoleMessage("&a | |        | |  |  |                 &3|");
+		MsgUtils.sendBukkitConsoleMessage("&a | |        | |  |  \\___________     &3|");
+		MsgUtils.sendBukkitConsoleMessage("&a |_|        |_|  \\______________|    &3|");
+	}
+
+	private String getServerVersion() {
+		if(Bukkit.getVersion().contains("1.8"))
+			return "1.8";
+		if(Bukkit.getVersion().contains("1.9"))
+			return "1.9";
+		if(Bukkit.getVersion().contains("1.10"))
+			return "1.10";
+		if(Bukkit.getVersion().contains("1.11"))
+			return "1.11";
+		if(Bukkit.getVersion().contains("1.12"))
+			return "1.12";
+		if(Bukkit.getVersion().contains("1.13"))
+			return "1.13";
+		if(Bukkit.getVersion().contains("1.14"))
+			return "1.14";
+		if(Bukkit.getVersion().contains("1.15"))
+			return "1.15";
+		if(Bukkit.getVersion().contains("1.16"))
+			return "1.16";
+		if(Bukkit.getVersion().contains("1.17"))
+			return "1.17";
+		if(Bukkit.getVersion().contains("1.18"))
+			return "1.18";
+		if(Bukkit.getVersion().contains("1.19"))
+			return "1.19";
+		if(Bukkit.getVersion().contains("1.20"))
+			return "1.20";
+		if(Bukkit.getVersion().contains("1.21"))
+			return "1.21";
+		return "[Unknown Version!]";
 	}
 }

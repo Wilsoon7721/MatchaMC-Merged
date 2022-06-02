@@ -32,6 +32,7 @@ commands:
      god:
          enabled: "&eYour god mode has been &aenabled&e."
          disabled: "&eYour god mode has been &cdisabled&e."
+         others: "&eYou have set the god mode of &a%player% &eto &r%state%&e."
      gamemode:
          updated: "&eYour gamemode has been updated to &a%gamemode%&e."
          updated_others: "&eYou have set the gamemode of &a%player% &eto &a%gamemode%&e."
