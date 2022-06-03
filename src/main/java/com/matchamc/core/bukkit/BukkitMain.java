@@ -22,11 +22,15 @@ import com.matchamc.core.bukkit.commands.GodCmd;
 import com.matchamc.core.bukkit.commands.HealCmd;
 import com.matchamc.core.bukkit.commands.MsgCmd;
 import com.matchamc.core.bukkit.commands.MuteChatCmd;
+import com.matchamc.core.bukkit.commands.NightVisionCmd;
+import com.matchamc.core.bukkit.commands.OverrideCmd;
 import com.matchamc.core.bukkit.commands.ReplyCmd;
 import com.matchamc.core.bukkit.commands.SpeedCmd;
+import com.matchamc.core.bukkit.commands.WhitelistCmd;
 import com.matchamc.core.bukkit.commands.staff.SocialspyCmd;
 import com.matchamc.core.bukkit.util.Configurations;
 import com.matchamc.core.bukkit.util.Messenger;
+import com.matchamc.core.bukkit.util.ServerWhitelist;
 import com.matchamc.shared.MsgUtils;
 import com.matchamc.shared.Staffs;
 
@@ -34,17 +38,22 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 	public static final String CONSOLE_PLUGIN_NAME = "MatchaMC - Bukkit";
 	public static String NON_PLAYER_ERROR, NO_PERMISSION_ERROR, INSUFFICIENT_PARAMETERS_ERROR, PLAYER_OFFLINE;
 	private static Configurations configurations;
-	private static Staffs staffs;
-	private static Messenger messenger;
 	private static YamlConfiguration messages;
 	private static BukkitMain instance;
+	private Staffs staffs;
+	private Messenger messenger;
+	private ServerWhitelist whitelist;
+
 	@Override
 	public void onEnable() {
 		// MsgUtils.sendBukkitConsoleMessage("&aEnabling MatchaMC [Bukkit/Spigot] version " + getDescription().getVersion());
 		printIcon();
+		saveDefaultConfig();
+		reloadConfig();
 		instance = this;
 		configurations = new Configurations(this);
 		staffs = new Staffs(this, configurations);
+		whitelist = new ServerWhitelist(this, staffs);
 		messenger = new Messenger(this);
 		configurations.create("messages.yml");
 		getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
@@ -53,12 +62,15 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		registerCommandAndListener("mutechat", new MuteChatCmd(this, staffs, "core.mutechat"));
 		getCommand("socialspy").setExecutor(new SocialspyCmd(this, messenger, "core.staff.socialspy"));
 		getCommand("message").setExecutor(new MsgCmd(this, messenger, "core.message"));
+		getCommand("nightvision").setExecutor(new NightVisionCmd(this, "core.nightvision"));
+		getCommand("override").setExecutor(new OverrideCmd(this, whitelist));
 		getCommand("reply").setExecutor(new ReplyCmd(this, messenger, "core.reply"));
 		getCommand("heal").setExecutor(new HealCmd(this, "core.heal"));
 		getCommand("feed").setExecutor(new FeedCmd(this, "core.feed"));
 		getCommand("speed").setExecutor(new SpeedCmd(this, "core.speed"));
 		getCommand("gamemode").setExecutor(new GamemodeCmd(this, "core.gamemode"));
 		registerCommandAndListener("god", new GodCmd(this, "core.god"));
+		registerCommandAndListener("whitelist", new WhitelistCmd(this, whitelist, "core.whitelist"));
 		reloadMessages();
 	}
 

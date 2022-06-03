@@ -1,0 +1,4 @@
+# Who can join the server while the server is whitelisted?
+whitelist:
+     active: false
+     players: []

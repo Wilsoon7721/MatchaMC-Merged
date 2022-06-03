@@ -21,6 +21,7 @@ public class Staffs {
 	private Configurations configurations;
 	private Set<UUID> staff;
 	private File staffFile;
+
 	public Staffs(BukkitMain instance, Configurations configurations) {
 		this.instance = instance;
 		this.configurations = configurations;
@@ -79,6 +80,10 @@ public class Staffs {
 
 	public boolean isStaff(Player player) {
 		return staff.contains(player.getUniqueId());
+	}
+
+	public Set<UUID> getAllStaff() {
+		return staff;
 	}
 
 	public void saveToFile() {
