@@ -25,6 +25,7 @@ import com.matchamc.core.bukkit.commands.MuteChatCmd;
 import com.matchamc.core.bukkit.commands.NightVisionCmd;
 import com.matchamc.core.bukkit.commands.OverrideCmd;
 import com.matchamc.core.bukkit.commands.ReplyCmd;
+import com.matchamc.core.bukkit.commands.SkullCmd;
 import com.matchamc.core.bukkit.commands.SpeedCmd;
 import com.matchamc.core.bukkit.commands.WhitelistCmd;
 import com.matchamc.core.bukkit.commands.staff.SocialspyCmd;
@@ -36,7 +37,7 @@ import com.matchamc.shared.Staffs;
 
 public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 	public static final String CONSOLE_PLUGIN_NAME = "MatchaMC - Bukkit";
-	public static String NON_PLAYER_ERROR, NO_PERMISSION_ERROR, INSUFFICIENT_PARAMETERS_ERROR, PLAYER_OFFLINE;
+	public static String NON_PLAYER_ERROR, NO_PERMISSION_ERROR, INSUFFICIENT_PARAMETERS_ERROR, PLAYER_OFFLINE, INSUFFICIENT_INVENTORY_SPACE;
 	private static Configurations configurations;
 	private static YamlConfiguration messages;
 	private static BukkitMain instance;
@@ -68,6 +69,7 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		getCommand("heal").setExecutor(new HealCmd(this, "core.heal"));
 		getCommand("feed").setExecutor(new FeedCmd(this, "core.feed"));
 		getCommand("speed").setExecutor(new SpeedCmd(this, "core.speed"));
+		getCommand("skull").setExecutor(new SkullCmd(this, "core.skull"));
 		getCommand("gamemode").setExecutor(new GamemodeCmd(this, "core.gamemode"));
 		registerCommandAndListener("god", new GodCmd(this, "core.god"));
 		registerCommandAndListener("whitelist", new WhitelistCmd(this, whitelist, "core.whitelist"));
@@ -79,6 +81,7 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		NON_PLAYER_ERROR = messages.getString("non_player_error");
 		NO_PERMISSION_ERROR = messages.getString("no_permission_error");
 		INSUFFICIENT_PARAMETERS_ERROR = messages.getString("insufficient_parameters_error");
+		INSUFFICIENT_INVENTORY_SPACE = messages.getString("insufficient_inventory_space");
 		PLAYER_OFFLINE = messages.getString("player_offline");
 	}
 

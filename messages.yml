@@ -2,6 +2,7 @@ no_permission_error: "&cYou do not have permission &8(&7%permission%&8) &cto run
 player_offline: "&cThis player is offline."
 non_player_error: "&cYou must be a player to run this command."
 insufficient_parameters_error: "&cInsufficient parameters!"
+insufficient_inventory_space: "&cThere is not enough space in your inventory, so the item was dropped."
 commands:
      clear_chat:
          global: "&3The chat has been cleared by &b%player%&3." # Message to send to all players upon clear
