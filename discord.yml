@@ -1,0 +1,8 @@
+token: ""
+server: 705158597381718167
+error-output-channel: 745754984271839262
+help-channel:
+     next-ticket-number: 1
+     # Message ID to check for reactions, the reaction will trigger a ticket
+     message-to-check: [EXPECT LONG VALUE]
+     text-channel-of-message: [EXPECT LONG VALUE]

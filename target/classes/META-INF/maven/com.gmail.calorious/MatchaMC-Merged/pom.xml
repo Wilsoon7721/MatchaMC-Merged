@@ -6,6 +6,7 @@
   <properties>
        <spigot.version>1.18.2-R0.1-SNAPSHOT</spigot.version>
        <bungee.version>1.18-R0.1-SNAPSHOT</bungee.version>
+       <javacord.version>3.4.0</javacord.version>
   </properties>
   <repositories>
         <repository>
@@ -38,5 +39,39 @@
             <type>javadoc</type>
             <scope>provided</scope>
         </dependency>
+		<dependency>
+    		<groupId>org.javacord</groupId>
+    		<artifactId>javacord</artifactId>
+    		<version>${javacord.version}</version>
+    		<type>pom</type>
+		</dependency>
    </dependencies>
+   <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.3.0</version>
+        <configuration>
+          <filters>
+             <filter>
+                <artifact>org.javacord:javacord</artifact>
+                <includes>
+                    <include>org/javacord/**</include>
+                </includes>
+             </filter>
+          </filters>
+          <createDependencyReducedPom>false</createDependencyReducedPom>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
