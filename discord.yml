@@ -6,3 +6,4 @@ help-channel:
      # Message ID to check for reactions, the reaction will trigger a ticket
      message-to-check: [EXPECT LONG VALUE]
      text-channel-of-message: [EXPECT LONG VALUE]
+     create-ticket-in-category-id: 759406185560014869
