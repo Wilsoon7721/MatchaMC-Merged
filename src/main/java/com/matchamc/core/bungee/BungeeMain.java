@@ -28,8 +28,6 @@ public class BungeeMain extends Plugin {
 	public void onEnable() {
 		MsgUtils.sendBungeeConsoleMessage("&aEnabling MatchaMC [Bungee] version " + getDescription().getVersion() + "...");
 		configurations = new Configurations(this);
-		discordBot = new MatchaMC_Discord(configurations);
-		discordBot.setup();
 		registerCommand(new ServerCmd());
 		registerCommand(new SendCmd());
 		registerCommand(new FindCmd());

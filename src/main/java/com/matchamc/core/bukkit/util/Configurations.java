@@ -51,6 +51,17 @@ public class Configurations {
 		}
 	}
 
+	public File getFile(String fileName) {
+		return new File(plugin.getDataFolder(), fileName);
+	}
+
+	public boolean exists(String fileName) {
+		File file = new File(plugin.getDataFolder(), fileName);
+		if(!file.exists())
+			return false;
+		return true;
+	}
+
 	public void plainCreate(String fileName) {
 		File file = new File(plugin.getDataFolder(), fileName);
 		if(!file.exists())
