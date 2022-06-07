@@ -152,4 +152,20 @@ public class MatchaMC_Discord {
 	public YamlConfiguration getDiscordConfig() {
 		return configurations.get("discord.yml");
 	}
+
+	public int getTicketNumberAndIncrement() {
+		File file = configurations.getFile("discord.yml");
+		YamlConfiguration config = getDiscordConfig();
+		int ticketNo = config.getInt("ticket.next_ticket_no");
+		config.set("ticket.next_ticket_no", (ticketNo + 1));
+		try {
+			config.save(file);
+		} catch(IOException ex) {
+			MsgUtils.sendBukkitConsoleMessage("&cFailed to increment ticket number - the file could not save.");
+			ex.printStackTrace();
+			return ticketNo;
+		}
+		YamlConfiguration.loadConfiguration(file);
+		return ticketNo;
+	}
 }
