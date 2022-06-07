@@ -23,6 +23,7 @@ public class MatchaMC_Discord {
 	private List<PermissionType> requiredPermissions = Arrays.asList(PermissionType.MANAGE_MESSAGES);
 	private boolean enabled = false;
 	public MatchaMC_Discord(Configurations configurations) {
+		this.configurations = configurations;
 		if(!(this.configurations.exists("discord.yml"))) {
 			MsgUtils.sendBukkitConsoleMessage("&e[MatchaMC - Discord] The discord component has been disabled as 'discord.yml' was not found. If this is the first time the plugin is running, please ignore this message as the file will be created.");
 			enabled = false;
@@ -35,7 +36,7 @@ public class MatchaMC_Discord {
 			MsgUtils.sendBukkitConsoleMessage("&e[MatchaMC - Discord] Skipping Discord initialization as it is already active on another server instance. Check config if this is in error.");
 			return;
 		}
-		boolean verificationResult = verifyConfig();
+		boolean verificationResult = verifyFiles();
 		if(!verificationResult) {
 			MsgUtils.sendBukkitConsoleMessage("&c[MatchaMC - Discord] The component cannot be enabled as one or more configuration values failed the check. Please verify the 'discord.yml' file.");
 			enabled = false;
@@ -82,6 +83,10 @@ public class MatchaMC_Discord {
 		return api;
 	}
 
+	public File getTicketsDirectory() {
+		return configurations.getFile("/discord/tickets/");
+	}
+
 	public boolean hasAllRequiredPermissions() {
 		Server server = getServer();
 		if(server == null)
@@ -96,8 +101,9 @@ public class MatchaMC_Discord {
 		return api.getServerById(getDiscordConfig().getLong("listen-to-server-id")).orElse(null);
 	}
 
-	private boolean verifyConfig() {
+	private boolean verifyFiles() {
 		boolean failed = false;
+		File ticketsFolder = getTicketsDirectory();
 		YamlConfiguration yc = this.configurations.get("discord.yml");
 		String botToken = yc.getString("bot-token");
 		Long serverId = yc.getLong("listen-to-server-id");
@@ -108,6 +114,8 @@ public class MatchaMC_Discord {
 		String emoteMentionTag = yc.getString("ticket.trigger.reaction.emote-mention-tag");
 		String emoteReactionTag = yc.getString("ticket.trigger.reaction.emote-reaction-tag");
 		String ticketChannelFormat = yc.getString("ticket.creation.ticket-channel-format");
+		if(!ticketsFolder.exists())
+			ticketsFolder.mkdirs();
 		if(botToken == null || botToken.isBlank()) {
 			MsgUtils.sendBukkitConsoleMessage("&c[MatchaMC - Discord] 'bot-token' - configuration value missing or empty!");
 			failed = true;

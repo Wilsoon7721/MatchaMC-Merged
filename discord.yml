@@ -7,6 +7,7 @@ listen-to-server-id: null #LONG
 server-error-output-channel-id: null #LONG  U
 ticket: 
      next_ticket_no: 1
+     staff-role-id: null # LONG
      trigger:
          reaction:
              emote-mention-tag: "<:mail:759413078843719750>"
