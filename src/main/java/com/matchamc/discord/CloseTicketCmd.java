@@ -32,6 +32,9 @@ public class CloseTicketCmd extends DiscordCmd {
 			event.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle("Error").setDescription("This is not a ticket!").setFooter("Channel format does not match the stripped ticket channel format! | MatchaMail")).exceptionally(ExceptionLogger.get()).thenAccept(msg -> event.getApi().getThreadPool().getScheduler().schedule(() -> msg.delete(), 10, TimeUnit.SECONDS));
 			return;
 		}
+		if(args.length == 0) {
+
+		}
 	}
 
 }
