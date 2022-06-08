@@ -2,6 +2,7 @@ discord:
      bot-started: false
      started-on-server: ""
      
+prefix: "!"   
 bot-token: ""
 listen-to-server-id: null #LONG
 server-error-output-channel-id: null #LONG  U

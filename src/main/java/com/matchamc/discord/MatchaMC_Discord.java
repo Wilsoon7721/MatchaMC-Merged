@@ -18,6 +18,7 @@ import com.matchamc.core.bukkit.util.Configurations;
 import com.matchamc.shared.MsgUtils;
 
 public class MatchaMC_Discord {
+	public String prefix;
 	private Configurations configurations;
 	private DiscordApi api;
 	private List<PermissionType> requiredPermissions = Arrays.asList(PermissionType.MANAGE_MESSAGES);
@@ -65,6 +66,7 @@ public class MatchaMC_Discord {
 		// TODO Change 'discord' properties - To tell other bukkit instances not to run discord bot again. Change back when all instances stop
 		File discordConfig = configurations.getFile("discord.yml");
 		YamlConfiguration yc = YamlConfiguration.loadConfiguration(discordConfig);
+		this.prefix = yc.getString("prefix");
 		yc.set("discord.bot-started", true);
 		yc.set("started-on-server", "UNKNOWN");
 		try {

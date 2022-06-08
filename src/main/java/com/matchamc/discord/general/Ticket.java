@@ -102,7 +102,7 @@ public class Ticket {
 			if(message.length > 0)
 				message[0].edit(new EmbedBuilder().setColor(Color.GREEN).setTitle("Ticket Created!").setDescription("Your ticket has been created on the server as " + channel.getMentionTag() + "."));
 			channel.sendMessage(new EmbedBuilder().setColor(Color.CYAN).setFooter("MatchaMail").setTitle("Ticket Details").addField("Player IGN", ign).addField("Support Type Needed", supportType)).exceptionally(ExceptionLogger.get());
-			channel.sendMessage(new EmbedBuilder().setColor(Color.YELLOW).setTitle("Please wait patiently...").setDescription(ticketCreator.getMentionTag() + ", please wait patiently and a staff will be here to assist you")).exceptionally(ExceptionLogger.get()).thenAccept(msg -> instance.api().getThreadPool().getScheduler().schedule(() -> msg.delete(), 30, TimeUnit.SECONDS));
+			channel.sendMessage(new EmbedBuilder().setColor(Color.YELLOW).setTitle("Please wait patiently...").setDescription(ticketCreator.getMentionTag() + ", please wait patiently and a staff will be here to assist you.")).exceptionally(ExceptionLogger.get()).thenAccept(msg -> instance.api().getThreadPool().getScheduler().schedule(() -> msg.delete(), 30, TimeUnit.SECONDS));
 			return;
 		}
 		return;
