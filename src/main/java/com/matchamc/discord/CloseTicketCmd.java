@@ -17,8 +17,11 @@ public class CloseTicketCmd extends DiscordCmd {
 		this.strippedChannelFormat = this.instance.getDiscordConfig().getString("ticket.creation.ticket-channel-format").replace("%id%", "");
 	}
 
+//TODO CLOSE TICKET
 	@Override
 	public void onMessageCreate(MessageCreateEvent event) {
+		if(event.getMessageAuthor().isBotUser() || event.getMessageAuthor().isWebhook())
+			return;
 		if(!event.getMessageContent().startsWith(prefix + "close"))
 			return;
 		if(event.getChannel().asServerTextChannel().isEmpty()) {
@@ -33,7 +36,8 @@ public class CloseTicketCmd extends DiscordCmd {
 			return;
 		}
 		if(args.length == 0) {
-
+			event.getChannel().sendMessage(new EmbedBuilder().setTitle("Closing Ticket...").setFooter("Initiated by " + event.getMessageAuthor().getDiscriminatedName(), event.getMessageAuthor().getAvatar()).setDescription("This ticket will be closed in 10 seconds. Send a message to cancel ticket closure.")).exceptionally(ExceptionLogger.get());
+			return;
 		}
 	}
 

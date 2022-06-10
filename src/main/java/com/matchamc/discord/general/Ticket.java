@@ -1,13 +1,25 @@
 package com.matchamc.discord.general;
 
 import java.awt.Color;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.MessageAttachment;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.permission.Permissions;
@@ -101,10 +113,13 @@ public class Ticket {
 			ServerTextChannel channel = instance.getServer().createTextChannelBuilder().setName(config.getString("ticket.creation.ticket-channel-format").replace("%id%", String.format("%02d", this.id))).setCategory(instance.api().getChannelById(config.getLong("ticket.creation.category-id-to-create-ticket")).get().asChannelCategory().get()).addPermissionOverwrite(instance.api().getRoleById(config.getLong("ticket.staff-role-id")).get(), permissions).addPermissionOverwrite(ticketCreator, permissions).addPermissionOverwrite(instance.api().getYourself(), new PermissionsBuilder().setAllAllowed().build()).addPermissionOverwrite(instance.getServer().getEveryoneRole(), new PermissionsBuilder().setAllDenied().build()).create().join();
 			if(message.length > 0)
 				message[0].edit(new EmbedBuilder().setColor(Color.GREEN).setTitle("Ticket Created!").setDescription("Your ticket has been created on the server as " + channel.getMentionTag() + "."));
+			channel.sendMessage("!== DO NOT EDIT OR DELETE THIS LINE ==! \nTicket Number: " + String.format("%02d", id)).exceptionally(ExceptionLogger.get());
 			channel.sendMessage(new EmbedBuilder().setColor(Color.CYAN).setFooter("MatchaMail").setTitle("Ticket Details").addField("Player IGN", ign).addField("Support Type Needed", supportType)).exceptionally(ExceptionLogger.get());
 			channel.sendMessage(new EmbedBuilder().setColor(Color.YELLOW).setTitle("Please wait patiently...").setDescription(ticketCreator.getMentionTag() + ", please wait patiently and a staff will be here to assist you.")).exceptionally(ExceptionLogger.get()).thenAccept(msg -> instance.api().getThreadPool().getScheduler().schedule(() -> msg.delete(), 30, TimeUnit.SECONDS));
 			return;
 		}
+		if(stage == Stage.CLOSED)
+			throw new UnsupportedOperationException("Ticket is at CLOSED stage and does not have an operation applicable at this stage!");
 		return;
 	}
 
@@ -189,6 +204,60 @@ public class Ticket {
 		return cancelled;
 	}
 
+	public void closeTicket(User closedBy, String reason) {
+		if(reason == null || reason.isBlank())
+			reason = "No reason provided.";
+		if(closedBy == null)
+			return;
+		stage = Stage.CLOSED;
+		updated = true;
+		String role = instance.getServer().getHighestRole(closedBy).get().getName();
+		File ticketLog = new File(this.instance.getTicketsDirectory(), String.format("%02d", id) + ".txt");
+		ticketCreator.openPrivateChannel().join().sendMessage(new EmbedBuilder().setTitle("Ticket Closed").addField("#", String.valueOf(id)).addField("Closed By", closedBy.getDiscriminatedName()).addInlineField("Role", role).addField("Reason", reason).setColor(Color.GREEN).setFooter("MatchaMail")).exceptionally(ExceptionLogger.get());
+		writeChannelToFile(ticketLog);
+	}
+
+	public void writeChannelToFile(File file) {
+		if(!file.exists())
+			try {
+				file.createNewFile();
+			} catch(IOException ex) {
+				MsgUtils.sendBukkitConsoleMessage("&c[MatchaMC - Discord] Ticket: Failed to write channel to file - File could not be created.");
+				ex.printStackTrace();
+				return;
+			}
+		if(!(file.getName().equalsIgnoreCase(".log")) || !file.getName().equalsIgnoreCase(".txt") || !file.getName().equalsIgnoreCase(".text")) {
+			MsgUtils.sendBukkitConsoleMessage("&c[MatchaMC - Discord] Ticket: Failed to write channel to file - File is not of '.log' or '.txt' file format.");
+			return;
+		}
+		ServerTextChannel ticketChannel = getTicketChannel();
+		String writeFormat = "[%DATETIME%] (%USERID%) %TAGGEDNAME%: %READABLEMESSAGE% %ATTACHMENTS%";
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss z").withZone(ZoneId.of("UTC"));
+		instance.api().getThreadPool().getScheduler().schedule(() -> {
+			LinkedList<Message> messagesList = ticketChannel.getMessagesAsStream().collect(Collectors.toCollection(LinkedList::new)); // newest to oldest
+			Collections.reverse(messagesList); // reverse to oldest to newest
+			try(FileWriter fw = new FileWriter(file, true); BufferedWriter bw = new BufferedWriter(fw); PrintWriter out = new PrintWriter(bw)){
+				for(Message message : messagesList) {
+					if(message.getAuthor().isWebhook() || message.getAuthor().isYourself())
+						continue;
+					List<MessageAttachment> attachments = message.getAttachments();
+					String text = writeFormat.replace("%DATETIME%", formatter.format(message.getCreationTimestamp())).replace("%USERID%", message.getAuthor().getIdAsString()).replace("%TAGGEDNAME%", message.getAuthor().getDiscriminatedName()).replace("%READABLEMESSAGE%", message.getReadableContent());
+					if(!attachments.isEmpty())
+						text = text.replace("%ATTACHMENTS%", "[ATTACH: " + attachments.stream().map(MessageAttachment::getFileName).collect(Collectors.joining(", ")) + "]");
+					else
+						text = text.replace("%ATTACHMENTS%", "");
+					out.println(text);
+				}
+				out.close();
+			} catch(IOException ex) {
+				MsgUtils.sendBukkitConsoleMessage("&c[MatchaMC - Discord] Ticket: Failed to write channel to file - FileWriter error.");
+				ex.printStackTrace();
+				return;
+			}
+		}, 1, TimeUnit.MILLISECONDS);
+		ticketCreator.openPrivateChannel().join().sendMessage("The ticket log can be viewed here.", file).exceptionally(ExceptionLogger.get());
+	}
+
 	public boolean cancelTicket(User canceller, boolean sendCancellationMessage) {
 		if(isCancelled())
 			return false;
@@ -200,6 +269,16 @@ public class Ticket {
 			else
 				ticketCreator.sendMessage(new EmbedBuilder().setTitle("Ticket Cancelled").setDescription("Ticket #" + id + " has been cancelled by " + canceller.getDiscriminatedName() + ".").setColor(Color.CYAN).setFooter("MatchaMail"));
 		return true;
+	}
+
+	public ServerTextChannel getTicketChannel() {
+		Collection<ServerTextChannel> channels = instance.api().getServerTextChannelsByName(instance.getDiscordConfig().getString("ticket.creation.ticket-channel-format").replace("%id%", String.valueOf(id)));
+		if(channels.size() == 1)
+			return channels.iterator().next();
+		Optional<ServerTextChannel> filter = channels.stream().filter(tc -> tc.getCategory().isPresent()).filter(tc -> tc.getCategory().get().getId() == instance.getDiscordConfig().getLong("ticket.creation.category-id-to-create-ticket")).findFirst();
+		if(!filter.isPresent())
+			return null;
+		return filter.get();
 	}
 
 	public static enum Stage {
