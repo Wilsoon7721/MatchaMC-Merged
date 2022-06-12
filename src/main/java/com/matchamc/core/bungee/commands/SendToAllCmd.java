@@ -20,7 +20,6 @@ public class SendToAllCmd extends Command implements TabExecutor {
 	// Issue a command to all servers
 	public SendToAllCmd() {
 		super("sendtoall");
-
 	}
 
 	@Override

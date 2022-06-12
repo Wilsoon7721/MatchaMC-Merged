@@ -17,6 +17,10 @@
             <id>bungeecord-repo</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
    </repositories>
    <dependencies>
     	<dependency>
@@ -45,6 +49,12 @@
     		<version>${javacord.version}</version>
     		<type>pom</type>
 		</dependency>
+		<dependency>
+		    <groupId>com.gitlab.ruany</groupId>
+		    <artifactId>LiteBansAPI</artifactId>
+		    <version>0.3.5</version>
+		    <scope>provided</scope>
+		</dependency>    
    </dependencies>
    <build>
     <plugins>

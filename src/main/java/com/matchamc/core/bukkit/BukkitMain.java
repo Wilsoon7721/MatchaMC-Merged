@@ -31,6 +31,7 @@ import com.matchamc.core.bukkit.commands.WhitelistCmd;
 import com.matchamc.core.bukkit.commands.staff.SocialspyCmd;
 import com.matchamc.core.bukkit.util.Configurations;
 import com.matchamc.core.bukkit.util.Messenger;
+import com.matchamc.core.bukkit.util.PlayerRegistrar;
 import com.matchamc.core.bukkit.util.ServerWhitelist;
 import com.matchamc.shared.MsgUtils;
 import com.matchamc.shared.Staffs;
@@ -42,6 +43,7 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 	private static YamlConfiguration messages;
 	private static BukkitMain instance;
 	private Staffs staffs;
+	private PlayerRegistrar registrar;
 	private Messenger messenger;
 	private ServerWhitelist whitelist;
 
@@ -54,11 +56,13 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		instance = this;
 		configurations = new Configurations(this);
 		staffs = new Staffs(this, configurations);
+		registrar = new PlayerRegistrar(this, configurations, "staffcore.logininfo");
 		whitelist = new ServerWhitelist(this, staffs);
 		messenger = new Messenger(this);
 		configurations.create("messages.yml");
 		getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 		getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", this);
+		Bukkit.getPluginManager().registerEvents(staffs, this);
 		getCommand("clearchat").setExecutor(new ClearChatCmd(this, "core.clearchat"));
 		registerCommandAndListener("mutechat", new MuteChatCmd(this, staffs, "core.mutechat"));
 		getCommand("socialspy").setExecutor(new SocialspyCmd(this, messenger, "core.staff.socialspy"));
@@ -68,10 +72,11 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		getCommand("reply").setExecutor(new ReplyCmd(this, messenger, "core.reply"));
 		getCommand("heal").setExecutor(new HealCmd(this, "core.heal"));
 		getCommand("feed").setExecutor(new FeedCmd(this, "core.feed"));
-		getCommand("speed").setExecutor(new SpeedCmd(this, "core.speed"));
-		getCommand("skull").setExecutor(new SkullCmd(this, "core.skull"));
 		getCommand("gamemode").setExecutor(new GamemodeCmd(this, "core.gamemode"));
 		registerCommandAndListener("god", new GodCmd(this, "core.god"));
+		registerCommandAndListener("logininfo", registrar);
+		getCommand("speed").setExecutor(new SpeedCmd(this, "core.speed"));
+		getCommand("skull").setExecutor(new SkullCmd(this, "core.skull"));
 		registerCommandAndListener("whitelist", new WhitelistCmd(this, whitelist, "core.whitelist"));
 		reloadMessages();
 	}
@@ -119,7 +124,8 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		}
 		String[] fullData = data.split(" ");
 		if(!fullData[0].equals("data_1VSGK")) {
-			MsgUtils.sendBukkitConsoleMessage("&c[MatchaMC - Bungee-Spigot] The plugin received a plugin message from the Bungeecord instance. However, the data received does not match the format issued by the /sendtoall command.");
+			MsgUtils.sendBukkitConsoleMessage("&e[MatchaMC - Bungee-Spigot] The plugin received a plugin message from the Bungeecord instance. However, the data received does not match the format issued by the /sendtoall command.");
+			MsgUtils.sendBukkitConsoleMessage("&e[MatchaMC - Bungee-Spigot] Perhaps another plugin is using the 'Forward' plugin channel?");
 			return;
 		}
 		String[] modifiedFullData = Arrays.copyOfRange(fullData, 1, fullData.length);

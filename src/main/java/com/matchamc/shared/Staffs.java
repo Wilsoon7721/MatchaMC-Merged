@@ -2,6 +2,7 @@ package com.matchamc.shared;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -11,15 +12,17 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import com.matchamc.core.bukkit.BukkitMain;
 import com.matchamc.core.bukkit.util.Configurations;
 
-public class Staffs {
+public class Staffs implements Listener {
 	private BukkitMain instance;
 	private Configurations configurations;
 	private Set<UUID> staff;
+	private Set<UUID> staffChatEnabled = new HashSet<>();
 	private File staffFile;
 
 	public Staffs(BukkitMain instance, Configurations configurations) {

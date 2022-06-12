@@ -49,7 +49,7 @@ commands:
      socialspy:
          enabled: "&aSocialspy enabled."
          disabled: "&cSocialspy disabled."
-         format: "&7&l[&6&lSS&7&l] &r%sender% -> %receiver%&7&l: &r%message%"
+         format: "&c&lSPY &8&l| &r%sender% &8&l-> &r%receiver%&7&l: &r%message%"
      staffchat:
          format:
              staff: "&b[S] &3[%server%] &b%playerName%&7: &b%message%"

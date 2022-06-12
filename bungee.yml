@@ -1,5 +1,6 @@
-name: MatchaMC-Bungee
+name: MatchaMC
 main: com.matchamc.core.bungee.BungeeMain
 version: 0.1
 description: Base plugin for server - Bungee
+softDepends: [LiteBans]
 author: [Wilsoon, ironinventor]
