@@ -81,6 +81,16 @@ public class Staffs implements Listener {
 		return success;
 	}
 
+	public boolean setStaffChatEnabled(Player player, boolean enabled) {
+		if(enabled)
+			return staffChatEnabled.add(player.getUniqueId());
+		return staffChatEnabled.remove(player.getUniqueId());
+	}
+
+	public boolean isStaffChatEnabled(Player player) {
+		return staffChatEnabled.contains(player.getUniqueId());
+	}
+
 	public boolean isStaff(Player player) {
 		return staff.contains(player.getUniqueId());
 	}
