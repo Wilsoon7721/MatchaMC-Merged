@@ -60,11 +60,6 @@ public class Staffs implements Listener {
 		return success;
 	}
 
-	public boolean addPlayer(OfflinePlayer offlinePlayer) {
-		boolean success = staff.add(offlinePlayer.getUniqueId());
-		return success;
-	}
-
 	public boolean removePlayer(Player player) {
 		boolean success = staff.remove(player.getUniqueId());
 		return success;

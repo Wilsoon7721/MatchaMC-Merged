@@ -3,7 +3,6 @@ package com.matchamc.core.bukkit;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.Arrays;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
@@ -51,6 +50,7 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 	public void onEnable() {
 		// MsgUtils.sendBukkitConsoleMessage("&aEnabling MatchaMC [Bukkit/Spigot] version " + getDescription().getVersion());
 		printIcon();
+		checkBungee();
 		saveDefaultConfig();
 		reloadConfig();
 		instance = this;
@@ -60,8 +60,6 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		whitelist = new ServerWhitelist(this, staffs);
 		messenger = new Messenger(this);
 		configurations.create("messages.yml");
-		getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
-		getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", this);
 		Bukkit.getPluginManager().registerEvents(staffs, this);
 		getCommand("clearchat").setExecutor(new ClearChatCmd(this, "core.clearchat"));
 		registerCommandAndListener("mutechat", new MuteChatCmd(this, staffs, "core.mutechat"));
@@ -99,39 +97,44 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		instance.reloadConfig();
 	}
 
-	// All subservers must have this plugin or else they are unable to receive messages from /sendtoall.
-	// SEND TO ALL MESSAGES ARE SENT IN THE FORMAT - data_1VSGK (command)
+	private void checkBungee() {
+		if(!getServer().spigot().getConfig().getBoolean("settings.bungeecord")) {
+			MsgUtils.sendBukkitConsoleMessage("&cThis server is not connected to BungeeCord.");
+			MsgUtils.sendBukkitConsoleMessage("&cIf this is an error, please check your spigot.yml and change 'bungeecord' to true.");
+			return;
+		}
+		getServer().getMessenger().registerOutgoingPluginChannel(this, "MatchaMC_ServerPlugin");
+		getServer().getMessenger().registerIncomingPluginChannel(this, "MatchaMC_ServerPlugin", this);
+	}
+
 	@Override
 	public void onPluginMessageReceived(String channel, Player player, byte[] message) {
-		if(!channel.equals("BungeeCord"))
+		if(!channel.equals("MatchaMC_ServerPlugin"))
 			return;
 		ByteArrayDataInput in = ByteStreams.newDataInput(message);
 		String subchannel = in.readUTF();
-		if(!subchannel.equals("Forward"))
-			return;
-		short len = in.readShort();
-		byte[] msgbytes = new byte[len];
-		in.readFully(msgbytes);
+		if(subchannel.equals("Forward")) {
+			short len = in.readShort();
+			byte[] msgbytes = new byte[len];
+			in.readFully(msgbytes);
 
-		DataInputStream msgin = new DataInputStream(new ByteArrayInputStream(msgbytes));
-		String data;
-		try {
-			data = msgin.readUTF();
-		} catch(IOException e) {
-			MsgUtils.sendBukkitConsoleMessage("&c[MatchaMC - Bungee-Spigot] The plugin received a plugin message from the Bungeecord instance. However, the data could not be read.");
-			e.printStackTrace();
+			DataInputStream msgin = new DataInputStream(new ByteArrayInputStream(msgbytes));
+			String data;
+			try {
+				data = msgin.readUTF();
+			} catch(IOException e) {
+				MsgUtils.sendBukkitConsoleMessage("&c[MatchaMC - Bungee-Spigot] The plugin received a plugin message from the Bungeecord instance. However, the data could not be read.");
+				e.printStackTrace();
+				return;
+			}
+			String receivedCommand = String.join(" ", data).trim();
+			MsgUtils.sendBukkitConsoleMessage("&e[MatchaMC - Spigot] Sending command &a" + receivedCommand + " &e- Received from /sendtoall in BungeeCord network.");
+			Bukkit.dispatchCommand(getServer().getConsoleSender(), receivedCommand);
 			return;
 		}
-		String[] fullData = data.split(" ");
-		if(!fullData[0].equals("data_1VSGK")) {
-			MsgUtils.sendBukkitConsoleMessage("&e[MatchaMC - Bungee-Spigot] The plugin received a plugin message from the Bungeecord instance. However, the data received does not match the format issued by the /sendtoall command.");
-			MsgUtils.sendBukkitConsoleMessage("&e[MatchaMC - Bungee-Spigot] Perhaps another plugin is using the 'Forward' plugin channel?");
-			return;
+		if(subchannel.equals("GetServer")) {
+
 		}
-		String[] modifiedFullData = Arrays.copyOfRange(fullData, 1, fullData.length);
-		String receivedCommand = String.join(" ", modifiedFullData).trim();
-		MsgUtils.sendBukkitConsoleMessage("&e[MatchaMC - Spigot] Sending command '" + receivedCommand + "' - Received from /sendtoall in BungeeCord network.");
-		Bukkit.dispatchCommand(getServer().getConsoleSender(), receivedCommand);
 	}
 
 	public String formatNoPermsMsg(String permission) {
