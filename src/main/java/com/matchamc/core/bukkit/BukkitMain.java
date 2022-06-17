@@ -41,6 +41,7 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 	private static Configurations configurations;
 	private static YamlConfiguration messages;
 	private static BukkitMain instance;
+	public boolean bungee = false;
 	private Staffs staffs;
 	private PlayerRegistrar registrar;
 	private Messenger messenger;
@@ -105,6 +106,7 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		}
 		getServer().getMessenger().registerOutgoingPluginChannel(this, "MatchaMC_ServerPlugin");
 		getServer().getMessenger().registerIncomingPluginChannel(this, "MatchaMC_ServerPlugin", this);
+		bungee = true;
 	}
 
 	@Override
@@ -131,9 +133,6 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 			MsgUtils.sendBukkitConsoleMessage("&e[MatchaMC - Spigot] Sending command &a" + receivedCommand + " &e- Received from /sendtoall in BungeeCord network.");
 			Bukkit.dispatchCommand(getServer().getConsoleSender(), receivedCommand);
 			return;
-		}
-		if(subchannel.equals("GetServer")) {
-
 		}
 	}
 

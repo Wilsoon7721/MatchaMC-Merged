@@ -18,6 +18,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import com.matchamc.core.bukkit.BukkitMain;
 import com.matchamc.core.bukkit.util.Configurations;
 
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+
 public class Staffs implements Listener {
 	private BukkitMain instance;
 	private Configurations configurations;
@@ -50,20 +52,9 @@ public class Staffs implements Listener {
 		return msg.startsWith("#");
 	}
 
-	public boolean addPlayer(Player player) {
-		boolean success = staff.add(player.getUniqueId());
-		return success;
-	}
-
 	public boolean addPlayer(UUID uuid) {
 		boolean success = staff.add(uuid);
 		return success;
-	}
-
-	public boolean removePlayer(Player player) {
-		boolean success = staff.remove(player.getUniqueId());
-		return success;
-
 	}
 
 	public boolean removePlayer(UUID uuid) {
@@ -76,18 +67,22 @@ public class Staffs implements Listener {
 		return success;
 	}
 
-	public boolean setStaffChatEnabled(Player player, boolean enabled) {
+	public boolean setStaffChatEnabled(ProxiedPlayer player, boolean enabled) {
 		if(enabled)
 			return staffChatEnabled.add(player.getUniqueId());
 		return staffChatEnabled.remove(player.getUniqueId());
 	}
 
-	public boolean isStaffChatEnabled(Player player) {
+	public boolean isStaffChatEnabled(ProxiedPlayer player) {
 		return staffChatEnabled.contains(player.getUniqueId());
 	}
 
 	public boolean isStaff(Player player) {
 		return staff.contains(player.getUniqueId());
+	}
+
+	public boolean isStaff(UUID uuid) {
+		return staff.contains(uuid);
 	}
 
 	public Set<UUID> getAllStaff() {
