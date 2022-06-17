@@ -28,12 +28,13 @@ import com.matchamc.core.bukkit.commands.SkullCmd;
 import com.matchamc.core.bukkit.commands.SpeedCmd;
 import com.matchamc.core.bukkit.commands.WhitelistCmd;
 import com.matchamc.core.bukkit.commands.staff.SocialspyCmd;
+import com.matchamc.core.bukkit.util.Chat;
 import com.matchamc.core.bukkit.util.Configurations;
 import com.matchamc.core.bukkit.util.Messenger;
 import com.matchamc.core.bukkit.util.PlayerRegistrar;
 import com.matchamc.core.bukkit.util.ServerWhitelist;
+import com.matchamc.core.bukkit.util.Staffs;
 import com.matchamc.shared.MsgUtils;
-import com.matchamc.shared.Staffs;
 
 public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 	public static final String CONSOLE_PLUGIN_NAME = "MatchaMC - Bukkit";
@@ -43,6 +44,7 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 	private static BukkitMain instance;
 	public boolean bungee = false;
 	private Staffs staffs;
+	private Chat chat = null;
 	private PlayerRegistrar registrar;
 	private Messenger messenger;
 	private ServerWhitelist whitelist;
@@ -106,6 +108,8 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		}
 		getServer().getMessenger().registerOutgoingPluginChannel(this, "MatchaMC_ServerPlugin");
 		getServer().getMessenger().registerIncomingPluginChannel(this, "MatchaMC_ServerPlugin", this);
+		chat = new Chat(this, staffs, "core.bukkit.chat");
+		registerCommandAndListener("chat", chat);
 		bungee = true;
 	}
 

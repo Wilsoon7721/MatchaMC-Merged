@@ -50,14 +50,6 @@ commands:
          enabled: "&aSocialspy enabled."
          disabled: "&cSocialspy disabled."
          format: "&c&lSPY &8&l| &r%sender% &8&l-> &r%receiver%&7&l: &r%message%"
-     staffchat:
-         format:
-             staff: "&b[S] &3[%server%] &b%playerName%&7: &b%message%"
-             admin: "&c[A] &3[%server%] &b%playerName%&7: &b%message%"
-             # Management includes: (Senior Admin, Developer, Owner/Co-Owners)
-             management: "&4[M] &3[%server%] &b%playerName%&7: &b%message%"
-         enabled: "&eYou have enabled %chat% chat."
-         disabled: "&eYou have disabled %chat% chat."
      teleport:
          coordinates: "&eYou have been teleported to X:&a%x-coord%&e, Y:&a%y-coord%&e, Z:&a%z-coord%&e.
          player:

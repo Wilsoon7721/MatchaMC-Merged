@@ -1,8 +1,7 @@
-package com.matchamc.shared;
+package com.matchamc.core.bukkit.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -16,15 +15,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import com.matchamc.core.bukkit.BukkitMain;
-import com.matchamc.core.bukkit.util.Configurations;
-
-import net.md_5.bungee.api.connection.ProxiedPlayer;
+import com.matchamc.shared.MsgUtils;
 
 public class Staffs implements Listener {
 	private BukkitMain instance;
 	private Configurations configurations;
 	private Set<UUID> staff;
-	private Set<UUID> staffChatEnabled = new HashSet<>();
 	private File staffFile;
 
 	public Staffs(BukkitMain instance, Configurations configurations) {
@@ -65,16 +61,6 @@ public class Staffs implements Listener {
 	public boolean removePlayer(OfflinePlayer offlinePlayer) {
 		boolean success = staff.remove(offlinePlayer.getUniqueId());
 		return success;
-	}
-
-	public boolean setStaffChatEnabled(ProxiedPlayer player, boolean enabled) {
-		if(enabled)
-			return staffChatEnabled.add(player.getUniqueId());
-		return staffChatEnabled.remove(player.getUniqueId());
-	}
-
-	public boolean isStaffChatEnabled(ProxiedPlayer player) {
-		return staffChatEnabled.contains(player.getUniqueId());
 	}
 
 	public boolean isStaff(Player player) {

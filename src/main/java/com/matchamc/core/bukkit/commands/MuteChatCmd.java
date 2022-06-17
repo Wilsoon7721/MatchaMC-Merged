@@ -11,8 +11,8 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import com.matchamc.core.bukkit.BukkitMain;
 import com.matchamc.core.bukkit.util.CoreCommand;
+import com.matchamc.core.bukkit.util.Staffs;
 import com.matchamc.shared.MsgUtils;
-import com.matchamc.shared.Staffs;
 
 public class MuteChatCmd extends CoreCommand implements Listener {
 	private boolean chatMuted = false;

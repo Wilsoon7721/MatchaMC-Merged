@@ -12,7 +12,6 @@ import org.bukkit.entity.Player;
 
 import com.matchamc.core.bukkit.BukkitMain;
 import com.matchamc.shared.MsgUtils;
-import com.matchamc.shared.Staffs;
 
 public class ServerWhitelist {
 	private BukkitMain instance;
