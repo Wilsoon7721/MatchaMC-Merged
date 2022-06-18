@@ -51,7 +51,7 @@ commands:
          disabled: "&cSocialspy disabled."
          format: "&c&lSPY &8&l| &r%sender% &8&l-> &r%receiver%&7&l: &r%message%"
      teleport:
-         coordinates: "&eYou have been teleported to X:&a%x-coord%&e, Y:&a%y-coord%&e, Z:&a%z-coord%&e.
+         coordinates: "&eYou have been teleported to &a%x-coord%&e, &a%y-coord%&e, &a%z-coord%&e.
          player:
              success: "&eYou have been teleported to &a%player%&e."
              player_offline: "&eThe player is offline."
