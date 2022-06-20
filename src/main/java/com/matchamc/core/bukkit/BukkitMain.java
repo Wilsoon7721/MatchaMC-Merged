@@ -26,6 +26,9 @@ import com.matchamc.core.bukkit.commands.OverrideCmd;
 import com.matchamc.core.bukkit.commands.ReplyCmd;
 import com.matchamc.core.bukkit.commands.SkullCmd;
 import com.matchamc.core.bukkit.commands.SpeedCmd;
+import com.matchamc.core.bukkit.commands.TeleportCmd;
+import com.matchamc.core.bukkit.commands.TeleportHereCmd;
+import com.matchamc.core.bukkit.commands.TimeCmd;
 import com.matchamc.core.bukkit.commands.WhitelistCmd;
 import com.matchamc.core.bukkit.commands.staff.SocialspyCmd;
 import com.matchamc.core.bukkit.util.Chat;
@@ -78,6 +81,9 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		registerCommandAndListener("logininfo", registrar);
 		getCommand("speed").setExecutor(new SpeedCmd(this, "core.speed"));
 		getCommand("skull").setExecutor(new SkullCmd(this, "core.skull"));
+		getCommand("teleport").setExecutor(new TeleportCmd(this, "core.teleport"));
+		getCommand("teleporthere").setExecutor(new TeleportHereCmd(this, "core.teleporthere"));
+		getCommand("time").setExecutor(new TimeCmd(this, "core.time"));
 		registerCommandAndListener("whitelist", new WhitelistCmd(this, whitelist, "core.whitelist"));
 		reloadMessages();
 	}

@@ -11,16 +11,21 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-public class SelectorUtil {
+import com.matchamc.shared.MsgUtils;
 
+public class SelectorUtil {
+	public static final String SELECTOR_USAGE_PERMISSION = "core.command.selectors";
+	public static final String SELECTOR_USAGE_PERMISSION_MESSAGE = MsgUtils.color("&cYou do not have permission to use selectors.");
 	private SelectorUtil() {}
 
-	public static Player getNearestPlayer(Location location) {
+	public static Player getNearestPlayer(Location location, Collection<UUID> exclusions) {
 		Player result = null;
 		double lastDistance = Double.MAX_VALUE;
 		for(Player p : location.getWorld().getPlayers()) {
-			if(p.getLocation().getBlockX() == p.getLocation().getBlockX() && p.getLocation().getBlockY() == p.getLocation().getBlockY() && p.getLocation().getBlockZ() == p.getLocation().getBlockZ())
-				continue;
+			if(exclusions != null) {
+				if(exclusions.contains(p.getUniqueId()))
+					continue;
+			}
 
 			double distance = location.distance(p.getLocation());
 			if(distance < lastDistance) {
