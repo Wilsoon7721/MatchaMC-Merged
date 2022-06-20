@@ -13,10 +13,12 @@ import com.matchamc.core.bukkit.BukkitMain;
 import com.matchamc.core.bukkit.util.CoreCommand;
 import com.matchamc.shared.MsgUtils;
 
-public class TimeCmd extends CoreCommand {
-
-	public TimeCmd(BukkitMain instance, String permissionNode) {
+public class PlayerTimeCmd extends CoreCommand {
+	private String permissionSet, permissionReset;
+	public PlayerTimeCmd(BukkitMain instance, String permissionNode) {
 		super(instance, permissionNode);
+		permissionSet = permissionNode + ".set";
+		permissionReset = permissionNode + ".reset";
 	}
 
 	@Override
@@ -25,29 +27,37 @@ public class TimeCmd extends CoreCommand {
 			sender.sendMessage(BukkitMain.NON_PLAYER_ERROR);
 			return true;
 		}
+		Player p = (Player) sender;
 		if(args.length == 0) {
-			sender.sendMessage(BukkitMain.INSUFFICIENT_PARAMETERS_ERROR);
-			sender.sendMessage(MsgUtils.color("&cUsage: /time <time in ticks/day/night>"));
+			if(!(sender.hasPermission(permissionReset))) {
+				sender.sendMessage(instance.formatNoPermsMsg(permissionReset));
+				return true;
+			}
+			p.resetPlayerTime();
+			p.sendMessage(MsgUtils.color("&eYour player time has been reset."));
 			return true;
 		}
-		Player p = (Player) sender;
+		if(!(sender.hasPermission(permissionSet))) {
+			sender.sendMessage(instance.formatNoPermsMsg(permissionSet));
+			return true;
+		}
 		switch(args[0].toLowerCase()) {
 		case "day":
 		case "daytime":
 		case "morning":
 		case "dawn":
-			p.getWorld().setTime(1000L);
-			sender.sendMessage(MsgUtils.color(instance.messages().getString("commands.time.world").replace("%time%", "1000")));
+			p.setPlayerTime(1000L, false);
+			sender.sendMessage(MsgUtils.color(instance.messages().getString("commands.time.self").replace("%time%", "1000")));
 			break;
 		case "night":
 		case "nighttime":
 		case "dusk":
-			p.getWorld().setTime(13000L);
-			sender.sendMessage(MsgUtils.color(instance.messages().getString("commands.time.world").replace("%time%", "13000")));
+			p.setPlayerTime(13000L, false);
+			sender.sendMessage(MsgUtils.color(instance.messages().getString("commands.time.self").replace("%time%", "13000")));
 			break;
 		case "midnight":
-			p.getWorld().setTime(18000L);
-			sender.sendMessage(MsgUtils.color(instance.messages().getString("commands.time.world").replace("%time%", "18000")));
+			p.setPlayerTime(18000L, false);
+			sender.sendMessage(MsgUtils.color(instance.messages().getString("commands.time.self").replace("%time%", "18000")));
 			break;
 		default:
 			Integer i;
@@ -57,8 +67,8 @@ public class TimeCmd extends CoreCommand {
 				sender.sendMessage(MsgUtils.color("&cAn invalid value has been given."));
 				return true;
 			}
-			p.getWorld().setTime(i.longValue());
-			sender.sendMessage(MsgUtils.color(instance.messages().getString("commands.time.world").replace("%time%", String.valueOf(i))));
+			p.setPlayerTime(i.longValue(), false);
+			sender.sendMessage(MsgUtils.color(instance.messages().getString("commands.time.self").replace("%time%", String.valueOf(i))));
 			break;
 		}
 		return true;

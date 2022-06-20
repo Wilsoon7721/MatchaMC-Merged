@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.bukkit.WeatherType;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -14,13 +15,14 @@ import com.matchamc.core.bukkit.BukkitMain;
 import com.matchamc.core.bukkit.util.CoreCommand;
 import com.matchamc.shared.MsgUtils;
 
-public class WeatherCmd extends CoreCommand {
-	private String permissionClear, permissionRain, permissionStorm;
-	public WeatherCmd(BukkitMain instance, String permissionNode) {
+public class PlayerWeatherCmd extends CoreCommand {
+	private String permissionSet, permissionClear, permissionRain, permissionReset;
+	public PlayerWeatherCmd(BukkitMain instance, String permissionNode) {
 		super(instance, permissionNode);
-		permissionClear = permissionNode + ".sun";
-		permissionRain = permissionNode + ".rain";
-		permissionStorm = permissionNode + ".storm";
+		permissionSet = permissionNode + ".set";
+		permissionReset = permissionNode + ".reset";
+		permissionClear = permissionSet + ".sun";
+		permissionRain = permissionSet + ".rain";
 	}
 
 	@Override
@@ -33,12 +35,20 @@ public class WeatherCmd extends CoreCommand {
 			sender.sendMessage(BukkitMain.NON_PLAYER_ERROR);
 			return true;
 		}
+		Player p = (Player) sender;
 		if(args.length == 0) {
-			sender.sendMessage(BukkitMain.INSUFFICIENT_PARAMETERS_ERROR);
-			sender.sendMessage(MsgUtils.color("&cUsage: /weather <clear/rain/thunder>"));
+			if(!(sender.hasPermission(permissionReset))) {
+				sender.sendMessage(instance.formatNoPermsMsg(permissionReset));
+				return true;
+			}
+			p.resetPlayerWeather();
+			p.sendMessage(MsgUtils.color("&eYour player weather has been reset."));
 			return true;
 		}
-		Player p = (Player) sender;
+		if(!(sender.hasPermission(permissionSet))) {
+			sender.sendMessage(instance.formatNoPermsMsg(permissionSet));
+			return true;
+		}
 		switch(args[0].toLowerCase()) {
 		case "day":
 		case "clear":
@@ -47,9 +57,8 @@ public class WeatherCmd extends CoreCommand {
 				sender.sendMessage(instance.formatNoPermsMsg(permissionClear));
 				return true;
 			}
-			p.getWorld().setThundering(false);
-			p.getWorld().setStorm(false);
-			sender.sendMessage(MsgUtils.color(instance.messages().getString("commands.weather.world").replace("%weather%", "sun")));
+			p.setPlayerWeather(WeatherType.CLEAR);
+			sender.sendMessage(MsgUtils.color(instance.messages().getString("commands.weather.self").replace("%weather%", "sun")));
 			break;
 		case "rain":
 		case "precipitation":
@@ -57,20 +66,18 @@ public class WeatherCmd extends CoreCommand {
 				sender.sendMessage(instance.formatNoPermsMsg(permissionRain));
 				return true;
 			}
-			p.getWorld().setStorm(true);
-			p.getWorld().setThundering(false);
-			sender.sendMessage(MsgUtils.color(instance.messages().getString("commands.weather.world").replace("%weather%", "rain")));
+			p.setPlayerWeather(WeatherType.DOWNFALL);
+			sender.sendMessage(MsgUtils.color(instance.messages().getString("commands.weather.self").replace("%weather%", "rain")));
 			break;
 		case "thunder":
 		case "storm":
-		case "lightning":
-			if(!(sender.hasPermission(permissionStorm))) {
-				sender.sendMessage(instance.formatNoPermsMsg(permissionStorm));
+			if(!(sender.hasPermission(permissionRain))) {
+				sender.sendMessage(instance.formatNoPermsMsg(permissionRain));
 				return true;
 			}
-			p.getWorld().setStorm(true);
-			p.getWorld().setThundering(true);
-			sender.sendMessage(MsgUtils.color(instance.messages().getString("commands.weather.world").replace("%weather%", "storm")));
+			p.setPlayerWeather(WeatherType.DOWNFALL);
+			sender.sendMessage(MsgUtils.color(instance.messages().getString("commands.weather.self").replace("%weather%", "rain")));
+			sender.sendMessage(MsgUtils.color("&cThe player weather cannot be changed to thunderstorm."));
 			break;
 		default:
 			if(!(sender.hasPermission(permissionClear))) {
@@ -79,7 +86,7 @@ public class WeatherCmd extends CoreCommand {
 			}
 			p.getWorld().setThundering(false);
 			p.getWorld().setStorm(false);
-			sender.sendMessage(MsgUtils.color(instance.messages().getString("commands.weather.world").replace("%weather%", "sun")));
+			sender.sendMessage(MsgUtils.color(instance.messages().getString("commands.weather.self").replace("%weather%", "sun")));
 			break;
 		}
 		return true;
@@ -88,7 +95,7 @@ public class WeatherCmd extends CoreCommand {
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
 		if(args.length == 0)
-			return StringUtil.copyPartialMatches(args[0], Arrays.asList("sun", "rain", "thunder"), new ArrayList<>());
+			return StringUtil.copyPartialMatches(args[0], Arrays.asList("sun", "rain"), new ArrayList<>());
 		return Collections.emptyList();
 	}
 

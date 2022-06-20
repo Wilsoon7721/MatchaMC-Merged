@@ -59,5 +59,9 @@ commands:
              success_others: "&eYou have teleported &a%player% &eto &a%target%&e."
              player_offline: "&eThe player is offline."
      teleporthere: "&eYou have teleported &a%player% &eto your location."
-     time: "&eYou have set the world time to %time%."
-     weather: "&eYou have set the weather to &a%weather%&e."
+     time: 
+         self: "&eYou have set your own time to &a%time%&e."
+         world: "&eYou have set the world time to &a%time%&e."
+     weather: 
+         self: "&eYou have set your own weather to &a%weather%&e."
+         world: "&eYou have set the world weather to &a%weather%&e."

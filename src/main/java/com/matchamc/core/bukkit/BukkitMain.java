@@ -23,12 +23,15 @@ import com.matchamc.core.bukkit.commands.MsgCmd;
 import com.matchamc.core.bukkit.commands.MuteChatCmd;
 import com.matchamc.core.bukkit.commands.NightVisionCmd;
 import com.matchamc.core.bukkit.commands.OverrideCmd;
+import com.matchamc.core.bukkit.commands.PlayerTimeCmd;
+import com.matchamc.core.bukkit.commands.PlayerWeatherCmd;
 import com.matchamc.core.bukkit.commands.ReplyCmd;
 import com.matchamc.core.bukkit.commands.SkullCmd;
 import com.matchamc.core.bukkit.commands.SpeedCmd;
 import com.matchamc.core.bukkit.commands.TeleportCmd;
 import com.matchamc.core.bukkit.commands.TeleportHereCmd;
 import com.matchamc.core.bukkit.commands.TimeCmd;
+import com.matchamc.core.bukkit.commands.WeatherCmd;
 import com.matchamc.core.bukkit.commands.WhitelistCmd;
 import com.matchamc.core.bukkit.commands.staff.SocialspyCmd;
 import com.matchamc.core.bukkit.util.Chat;
@@ -73,6 +76,8 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		getCommand("message").setExecutor(new MsgCmd(this, messenger, "core.message"));
 		getCommand("nightvision").setExecutor(new NightVisionCmd(this, "core.nightvision"));
 		getCommand("override").setExecutor(new OverrideCmd(this, whitelist));
+		getCommand("ptime").setExecutor(new PlayerTimeCmd(this, "core.playertime"));
+		getCommand("pweather").setExecutor(new PlayerWeatherCmd(this, "core.playerweather"));
 		getCommand("reply").setExecutor(new ReplyCmd(this, messenger, "core.reply"));
 		getCommand("heal").setExecutor(new HealCmd(this, "core.heal"));
 		getCommand("feed").setExecutor(new FeedCmd(this, "core.feed"));
@@ -84,6 +89,7 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		getCommand("teleport").setExecutor(new TeleportCmd(this, "core.teleport"));
 		getCommand("teleporthere").setExecutor(new TeleportHereCmd(this, "core.teleporthere"));
 		getCommand("time").setExecutor(new TimeCmd(this, "core.time"));
+		getCommand("weather").setExecutor(new WeatherCmd(this, "core.weather"));
 		registerCommandAndListener("whitelist", new WhitelistCmd(this, whitelist, "core.whitelist"));
 		reloadMessages();
 	}

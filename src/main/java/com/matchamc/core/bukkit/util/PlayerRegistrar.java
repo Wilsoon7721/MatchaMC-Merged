@@ -41,16 +41,18 @@ public class PlayerRegistrar extends CoreCommand implements Listener {
 		formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:MM:ss").withZone(ZoneId.of("UTC"));
 		if(!(configurations.exists("players.yml"))) {
 			configurations.plainCreate("players.yml");
-			YamlConfiguration yc = configurations.get("players.yml");
-			yc.createSection("players");
-			try {
-				yc.save(file);
-			} catch(IOException ex) {
-				MsgUtils.sendBukkitConsoleMessage("&cFailed to write to player database file.");
-				ex.printStackTrace();
-				return;
-			}
-			YamlConfiguration.loadConfiguration(file);
+			Bukkit.getScheduler().runTask(this.instance, () -> {
+				YamlConfiguration yc = configurations.get("players.yml");
+				yc.createSection("players");
+				try {
+					yc.save(file);
+				} catch(IOException ex) {
+					MsgUtils.sendBukkitConsoleMessage("&cFailed to write to player database file.");
+					ex.printStackTrace();
+					return;
+				}
+				YamlConfiguration.loadConfiguration(file);
+			});
 		}
 	}
 
