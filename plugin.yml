@@ -2,5 +2,5 @@ main: com.matchamc.core.bukkit.BukkitMain
 name: MatchaMC
 version: 0.1
 description: Base plugin for server - Spigot/Paper
-softdepend: [LiteBans]
+softdepend: [LiteBans, AntiAura]
 author: [Wilsoon, ironinventor]

@@ -33,10 +33,17 @@ import com.matchamc.core.bukkit.commands.TeleportHereCmd;
 import com.matchamc.core.bukkit.commands.TimeCmd;
 import com.matchamc.core.bukkit.commands.WeatherCmd;
 import com.matchamc.core.bukkit.commands.WhitelistCmd;
+import com.matchamc.core.bukkit.commands.staff.NoteCmd;
+import com.matchamc.core.bukkit.commands.staff.NotesCmd;
 import com.matchamc.core.bukkit.commands.staff.SocialspyCmd;
+import com.matchamc.core.bukkit.util.AntiCheatDragbackHook;
+import com.matchamc.core.bukkit.util.AntiCheatHook;
+import com.matchamc.core.bukkit.util.AntiCheatTrigger;
+import com.matchamc.core.bukkit.util.BanWave;
 import com.matchamc.core.bukkit.util.Chat;
 import com.matchamc.core.bukkit.util.Configurations;
 import com.matchamc.core.bukkit.util.Messenger;
+import com.matchamc.core.bukkit.util.Notes;
 import com.matchamc.core.bukkit.util.PlayerRegistrar;
 import com.matchamc.core.bukkit.util.ServerWhitelist;
 import com.matchamc.core.bukkit.util.Staffs;
@@ -50,8 +57,10 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 	private static BukkitMain instance;
 	public boolean bungee = false;
 	private Staffs staffs;
+	private BanWave banwave;
 	private Chat chat = null;
 	private PlayerRegistrar registrar;
+	private Notes notes;
 	private Messenger messenger;
 	private ServerWhitelist whitelist;
 
@@ -68,6 +77,8 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		registrar = new PlayerRegistrar(this, configurations, "staffcore.logininfo");
 		whitelist = new ServerWhitelist(this, staffs);
 		messenger = new Messenger(this);
+		banwave = new BanWave(this, registrar, "staffcore.banwave");
+		notes = new Notes(this);
 		configurations.create("messages.yml");
 		Bukkit.getPluginManager().registerEvents(staffs, this);
 		getCommand("clearchat").setExecutor(new ClearChatCmd(this, "core.clearchat"));
@@ -91,6 +102,14 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		getCommand("time").setExecutor(new TimeCmd(this, "core.time"));
 		getCommand("weather").setExecutor(new WeatherCmd(this, "core.weather"));
 		registerCommandAndListener("whitelist", new WhitelistCmd(this, whitelist, "core.whitelist"));
+
+		// STAFFCORE
+		Bukkit.getPluginManager().registerEvents(new AntiCheatTrigger(), this);
+		registerCommandAndListener("alerts", new AntiCheatHook(this, banwave, "staffcore.alerts"));
+		getCommand("banwave").setExecutor(banwave);
+		registerCommandAndListener("dbalerts", new AntiCheatDragbackHook(this, "staffcore.dbalerts"));
+		getCommand("note").setExecutor(new NoteCmd(this, notes, "staffcore.note"));
+		getCommand("notes").setExecutor(new NotesCmd(this, notes, "staffcore.notes"));
 		reloadMessages();
 	}
 

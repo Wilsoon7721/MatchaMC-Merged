@@ -2,4 +2,12 @@
 whitelist:
      active: false
      players: []
+
+# Banwave settings
+banwave:
+     duration: 5m 
+     # Who should be excluded from all banwaves? Exclusions are in UUID
+     exclusions: []
      
+     
+ notes:

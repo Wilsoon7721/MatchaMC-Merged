@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.matchamc.core.bungee.BungeeMain;
@@ -29,9 +30,17 @@ public class Staffs implements Listener {
 		if(!file.exists()) {
 			try { 
 				file.createNewFile();
-				Configuration config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(file);
-				config.set("staffs", new ArrayList<>());
-				ConfigurationProvider.getProvider(YamlConfiguration.class).save(config, file);
+				instance.getProxy().getScheduler().schedule(this.instance, () -> {
+					try {
+						Configuration config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(file);
+						config.set("staffs", new ArrayList<>());
+						ConfigurationProvider.getProvider(YamlConfiguration.class).save(config, file);
+					} catch(IOException ex) {
+						MsgUtils.sendBungeeConsoleMessage("&cStaffs first time setup failed - Could not create/load the staffs.yml file.");
+						ex.printStackTrace();
+						return;
+					}
+				}, 15, TimeUnit.MILLISECONDS);
 			} catch(IOException ex) {
 				MsgUtils.sendBungeeConsoleMessage("&cStaffs first time setup failed - Could not create/load the staffs.yml file.");
 				ex.printStackTrace();

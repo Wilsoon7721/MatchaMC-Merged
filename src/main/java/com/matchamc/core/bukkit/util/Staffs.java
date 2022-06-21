@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -29,16 +30,18 @@ public class Staffs implements Listener {
 		staffFile = new File(this.instance.getDataFolder(), "staffs.yml");
 		if(!(staffFile.exists())) {
 			this.configurations.plainCreate("staffs.yml");
-			YamlConfiguration yc = YamlConfiguration.loadConfiguration(staffFile);
-			yc.createSection("staff");
-			try {
-				yc.save(staffFile);
-				YamlConfiguration.loadConfiguration(staffFile);
-			} catch(IOException ex) {
-				MsgUtils.sendBukkitConsoleMessage("&c[" + BukkitMain.CONSOLE_PLUGIN_NAME + "] Could not load Staffs: The YML file (staffs.yml) could not be saved.");
-				ex.printStackTrace();
-				return;
-			}
+			Bukkit.getScheduler().runTask(this.instance, () -> {
+				YamlConfiguration yc = YamlConfiguration.loadConfiguration(staffFile);
+				yc.createSection("staff");
+				try {
+					yc.save(staffFile);
+					YamlConfiguration.loadConfiguration(staffFile);
+				} catch(IOException ex) {
+					MsgUtils.sendBukkitConsoleMessage("&c[" + BukkitMain.CONSOLE_PLUGIN_NAME + "] Could not load Staffs: The YML file (staffs.yml) could not be saved.");
+					ex.printStackTrace();
+					return;
+				}
+			});
 		}
 		YamlConfiguration yc = YamlConfiguration.loadConfiguration(staffFile);
 		staff.addAll(yc.getStringList("staff").stream().map(s -> UUID.fromString(s)).collect(Collectors.toList()));

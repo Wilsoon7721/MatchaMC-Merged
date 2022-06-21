@@ -82,6 +82,26 @@ public class PlayerRegistrar extends CoreCommand implements Listener {
 		return false;
 	}
 
+	public UUID resolveUUIDFromName(String name) {
+		YamlConfiguration yc = YamlConfiguration.loadConfiguration(file);
+		for(String uuidKey : yc.getConfigurationSection("players").getKeys(false)) {
+			String nameValue = yc.getString("players." + uuidKey + ".name");
+			if(nameValue.isBlank())
+				continue;
+			if(!nameValue.equalsIgnoreCase(name))
+				continue;
+			return UUID.fromString(uuidKey);
+		}
+		return null;
+	}
+
+	public String getNameFromRegistrar(UUID uuid) {
+		YamlConfiguration yc = YamlConfiguration.loadConfiguration(file);
+		String suuid = uuid.toString();
+		String name = yc.getString("players." + suuid + ".name");
+		return name;
+	}
+
 	public void registerPlayer(Player player) {
 		YamlConfiguration yc = YamlConfiguration.loadConfiguration(file);
 		String uuid = player.getUniqueId().toString();
