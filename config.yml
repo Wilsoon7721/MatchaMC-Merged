@@ -10,4 +10,8 @@ banwave:
      exclusions: []
      
      
- notes:
+notes:
+
+
+# If any specific timezone has been set by the player, it will appear here.
+playerTimeZones:

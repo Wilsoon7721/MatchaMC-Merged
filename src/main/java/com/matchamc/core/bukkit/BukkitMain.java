@@ -31,6 +31,7 @@ import com.matchamc.core.bukkit.commands.SpeedCmd;
 import com.matchamc.core.bukkit.commands.TeleportCmd;
 import com.matchamc.core.bukkit.commands.TeleportHereCmd;
 import com.matchamc.core.bukkit.commands.TimeCmd;
+import com.matchamc.core.bukkit.commands.TimezoneCmd;
 import com.matchamc.core.bukkit.commands.WeatherCmd;
 import com.matchamc.core.bukkit.commands.WhitelistCmd;
 import com.matchamc.core.bukkit.commands.staff.NoteCmd;
@@ -47,6 +48,7 @@ import com.matchamc.core.bukkit.util.Notes;
 import com.matchamc.core.bukkit.util.PlayerRegistrar;
 import com.matchamc.core.bukkit.util.ServerWhitelist;
 import com.matchamc.core.bukkit.util.Staffs;
+import com.matchamc.core.bukkit.util.TimeZones;
 import com.matchamc.shared.MsgUtils;
 
 public class BukkitMain extends JavaPlugin implements PluginMessageListener {
@@ -60,6 +62,7 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 	private BanWave banwave;
 	private Chat chat = null;
 	private PlayerRegistrar registrar;
+	private TimeZones timezones;
 	private Notes notes;
 	private Messenger messenger;
 	private ServerWhitelist whitelist;
@@ -79,6 +82,7 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		messenger = new Messenger(this);
 		banwave = new BanWave(this, registrar, "staffcore.banwave");
 		notes = new Notes(this);
+		timezones = new TimeZones(this);
 		configurations.create("messages.yml");
 		Bukkit.getPluginManager().registerEvents(staffs, this);
 		getCommand("clearchat").setExecutor(new ClearChatCmd(this, "core.clearchat"));
@@ -99,6 +103,7 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		getCommand("skull").setExecutor(new SkullCmd(this, "core.skull"));
 		getCommand("teleport").setExecutor(new TeleportCmd(this, "core.teleport"));
 		getCommand("teleporthere").setExecutor(new TeleportHereCmd(this, "core.teleporthere"));
+		getCommand("timezone").setExecutor(new TimezoneCmd(this, timezones, "core.timezone"));
 		getCommand("time").setExecutor(new TimeCmd(this, "core.time"));
 		getCommand("weather").setExecutor(new WeatherCmd(this, "core.weather"));
 		registerCommandAndListener("whitelist", new WhitelistCmd(this, whitelist, "core.whitelist"));

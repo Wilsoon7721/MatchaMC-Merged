@@ -2,10 +2,12 @@ package com.matchamc.core.bukkit.util;
 
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import com.matchamc.core.bukkit.BukkitMain;
+import com.matchamc.shared.MsgUtils;
 
 public class Note {
 	private BukkitMain instance;
@@ -34,6 +36,7 @@ public class Note {
 		instance.getConfig().set("notes." + id + ".deleted", false);
 		instance.saveConfig();
 		instance.reloadConfig();
+		creator.sendMessage(MsgUtils.color("&eNote #" + id + " has been saved with content '" + this.content + "'"));
 	}
 
 	public Note(Notes notes, String creatorName, String creatorUUID, String content) {
@@ -54,6 +57,7 @@ public class Note {
 		instance.getConfig().set("notes." + id + ".deleted", false);
 		instance.saveConfig();
 		instance.reloadConfig();
+		Bukkit.getConsoleSender().sendMessage(MsgUtils.color("&eNote #" + id + " has been saved with content '" + this.content + "'"));
 	}
 
 	public Note(Notes notes, int id) {
@@ -66,6 +70,10 @@ public class Note {
 		this.creatorName = cfg.getString("notes." + id + ".creator.name");
 		this.creatorUUID = cfg.getString("notes." + id + ".creator.uuid");
 		this.deleted = cfg.getBoolean("notes." + id + ".deleted");
+	}
+
+	public void delete() {
+
 	}
 
 	public String getCreatorName() {
