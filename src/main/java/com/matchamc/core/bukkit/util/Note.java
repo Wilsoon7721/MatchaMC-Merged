@@ -72,8 +72,8 @@ public class Note {
 		this.deleted = cfg.getBoolean("notes." + id + ".deleted");
 	}
 
-	public void delete() {
-
+	public int getId() {
+		return id;
 	}
 
 	public String getCreatorName() {

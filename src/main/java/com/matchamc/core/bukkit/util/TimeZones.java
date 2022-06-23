@@ -32,7 +32,7 @@ public class TimeZones {
 		FileConfiguration config = instance.getConfig();
 		String s = config.getString("playerTimeZones." + uuid.toString());
 		if(s == null || s.isBlank())
-			return null;
+			return ZoneOffset.of("UTC");
 		return ZoneOffset.of(s);
 	}
 

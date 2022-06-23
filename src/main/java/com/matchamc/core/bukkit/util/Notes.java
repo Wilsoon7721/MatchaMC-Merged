@@ -1,7 +1,11 @@
 package com.matchamc.core.bukkit.util;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
@@ -53,6 +57,27 @@ public class Notes {
 		instance.reloadConfig();
 		sender.sendMessage(MsgUtils.color("&eNote #" + id + " has been deleted."));
 	}
+
+	public Collection<Note> getNotesByCreator(UUID uuid) {
+		Set<Note> notes = new HashSet<>();
+		for(String idKey : instance.getConfig().getConfigurationSection("notes").getKeys(false)) {
+			String noteUUID = instance.getConfig().getString("notes." + idKey + ".creator.uuid");
+			if(uuid.toString().equalsIgnoreCase(noteUUID))
+				notes.add(new Note(this, instance.getConfig().getInt("notes." + idKey + ".id")));
+		}
+		return notes;
+	}
+
+	public Collection<Note> getNotesByConsole() {
+		Set<Note> notes = new HashSet<>();
+		for(String idKey : instance.getConfig().getConfigurationSection("notes").getKeys(false)) {
+			String name = instance.getConfig().getString("notes." + idKey + ".creator.name");
+			if(name.equalsIgnoreCase("@CONSOLE"))
+				notes.add(new Note(this, instance.getConfig().getInt("notes." + idKey + ".id")));
+		}
+		return notes;
+	}
+
 
 	public int getNextAvailableId() {
 		try {

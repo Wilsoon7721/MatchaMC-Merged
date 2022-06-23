@@ -35,7 +35,7 @@ public class NoteCmd extends CoreCommand {
 		}
 		String note = ChatColor.stripColor(MsgUtils.color(String.join(" ", args).trim()));
 		if(!(sender instanceof Player)) {
-			notes.createNote("CONSOLE", note);
+			notes.createNote("@CONSOLE", note);
 			return true;
 		}
 		notes.createNote((Player) sender, note);
