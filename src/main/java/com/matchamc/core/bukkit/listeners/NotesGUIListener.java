@@ -6,11 +6,13 @@ import java.util.Arrays;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -62,32 +64,59 @@ public class NotesGUIListener implements Listener {
 		}
 		if(event.getCurrentItem().getType() == Material.BARRIER) {
 			// TODO Delete note
+			int id = Integer.parseInt(event.getView().getTitle().replaceAll("\\D*", ""));
+			Note note = new Note(notes, id);
+			boolean result = note.delete();
+			if(!result) {
+				event.getWhoClicked().sendMessage(MsgUtils.color("&cThis note is already deleted."));
+				return;
+			}
+			event.getWhoClicked().sendMessage(MsgUtils.color("&eThis note has been deleted. To restore or permanently delete it, you may use the command '/notes viewdeleted' to view your deleted notes."));
+			return;
 		}
 	}
 
 	private void openNoteManagementGUI(Player player, Note note) {
 		// 12 is where the sign is at
-		// 30 is where option 2 is at
+		// 30 is where option 3 is at
+		// 28 is where option 2 is at (if applicable)
 		// 26 is where option 1 is at
 		DateTimeFormatter usageFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm:ss").withZone(timezones.getEntry(player.getUniqueId()));
 		Inventory inv = Bukkit.createInventory(null, 54, "Manage Note #" + note.getId());
 		ItemStack sign = new ItemStack(Material.OAK_SIGN);
 		ItemStack back = new ItemStack(Material.ARROW);
-		ItemStack delete = new ItemStack(Material.BARRIER);
 		ItemMeta signmeta = sign.getItemMeta();
 		ItemMeta backmeta = back.getItemMeta();
-		ItemMeta deletemeta = delete.getItemMeta();
 		signmeta.setDisplayName(MsgUtils.color("&bNote: " + note.getContent()));
 		signmeta.setLore(Arrays.asList(MsgUtils.color("&7ID: &e" + note.getId()), MsgUtils.color("&7Created: &e" + usageFormatter.format(Instant.ofEpochMilli(note.getCreationTimeInMillis())))));
 		backmeta.setDisplayName("Back");
-		deletemeta.setDisplayName("Delete Note");
 		back.setItemMeta(backmeta);
 		sign.setItemMeta(signmeta);
-		delete.setItemMeta(deletemeta);
 		inv.setItem(12, sign);
 		inv.setItem(26, back);
-		inv.setItem(30, delete);
-		player.closeInventory();
-		player.openInventory(inv);
+		if(!note.isDeleted()) {
+			ItemStack delete = new ItemStack(Material.BARRIER);
+			ItemMeta deletemeta = delete.getItemMeta();
+			deletemeta.setDisplayName("Delete Note");
+			delete.setItemMeta(deletemeta);
+			inv.setItem(30, delete);
+			player.closeInventory();
+			player.openInventory(inv);
+			return;
+		}
+		ItemStack restore = new ItemStack(Material.GREEN_WOOL);
+		ItemStack permdelete = new ItemStack(Material.FLINT_AND_STEEL);
+		ItemMeta restoremeta = restore.getItemMeta();
+		ItemMeta permdeletemeta = permdelete.getItemMeta();
+		restoremeta.setDisplayName("Restore");
+		permdeletemeta.setDisplayName("Permanently Delete");
+		permdeletemeta.setLore(Arrays.asList(MsgUtils.color("&c&lWARNING: This action is irrevocable.")));
+		permdeletemeta.addEnchant(Enchantment.DURABILITY, 10, true);
+		permdeletemeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+		restore.setItemMeta(restoremeta);
+		permdelete.setItemMeta(permdeletemeta);
+		inv.setItem(28, permdelete);
+		inv.setItem(30, restore);
+		// TODO Listen for interaction with restore and perm delete - together iwth their actual actions
 	}
 }

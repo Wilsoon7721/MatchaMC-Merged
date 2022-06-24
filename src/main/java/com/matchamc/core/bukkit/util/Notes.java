@@ -33,6 +33,7 @@ public class Notes {
 		instance.getConfig().set("notes." + id + ".created", System.currentTimeMillis());
 		instance.getConfig().set("notes." + id + ".creator.name", creator.getName());
 		instance.getConfig().set("notes." + id + ".creator.uuid", creator.getUniqueId().toString());
+		instance.getConfig().set("notes." + id + ".deleted", false);
 		instance.saveConfig();
 		instance.reloadConfig();
 		creator.sendMessage(MsgUtils.color("&eNote #" + id + " has been saved with content '" + noteContent + "'"));
@@ -46,6 +47,7 @@ public class Notes {
 		instance.getConfig().set("notes." + id + ".created", System.currentTimeMillis());
 		instance.getConfig().set("notes." + id + ".creator.name", creatorName);
 		instance.getConfig().set("notes." + id + ".creator.uuid", "");
+		instance.getConfig().set("notes." + id + ".deleted", false);
 		instance.saveConfig();
 		instance.reloadConfig();
 		Bukkit.getConsoleSender().sendMessage(MsgUtils.color("&eNote #" + id + " has been saved with content '" + noteContent + "'"));

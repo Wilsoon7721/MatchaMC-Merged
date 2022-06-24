@@ -95,4 +95,16 @@ public class Note {
 	public boolean isDeleted() {
 		return deleted;
 	}
+
+	public boolean delete() {
+		this.deleted = true;
+		FileConfiguration cfg = instance.getConfig();
+		if(cfg.getBoolean("notes." + id + ".deleted"))
+			return false;
+		cfg.set("notes." + id + ".deleted", true);
+		cfg.set("notes." + id + ".deletedtimestamp", System.currentTimeMillis());
+		instance.saveConfig();
+		instance.reloadConfig();
+		return true;
+	}
 }

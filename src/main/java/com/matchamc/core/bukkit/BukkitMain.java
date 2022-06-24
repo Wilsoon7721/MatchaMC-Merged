@@ -114,7 +114,7 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		getCommand("banwave").setExecutor(banwave);
 		registerCommandAndListener("dbalerts", new AntiCheatDragbackHook(this, "staffcore.dbalerts"));
 		getCommand("note").setExecutor(new NoteCmd(this, notes, "staffcore.note"));
-		getCommand("notes").setExecutor(new NotesCmd(this, notes, "staffcore.notes"));
+		getCommand("notes").setExecutor(new NotesCmd(this, timezones, notes, "staffcore.notes"));
 		reloadMessages();
 	}
 

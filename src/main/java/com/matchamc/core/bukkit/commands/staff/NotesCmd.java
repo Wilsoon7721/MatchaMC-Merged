@@ -53,12 +53,18 @@ public class NotesCmd extends CoreCommand {
 			return true;
 		}
 		Player player = (Player) sender;
-		List<Note> playerNotes = notes.getNotesByCreator(player.getUniqueId()).stream().collect(Collectors.toList());
-		if(playerNotes.isEmpty()) {
-			sender.sendMessage(MsgUtils.color("&cYou do not have any notes saved."));
+		if(args.length == 0) {
+			displayNotesGUI(player);
 			return true;
 		}
-		displayGUI(player, playerNotes);
+		if(args[0].equalsIgnoreCase("viewdeleted")) {
+			List<Note> deletedNotes = notes.getNotesByCreator(player.getUniqueId()).stream().filter(n -> n.isDeleted()).collect(Collectors.toList());
+			if(deletedNotes.isEmpty()) {
+				sender.sendMessage(MsgUtils.color("&cYou do not have any deleted notes."));
+				return true;
+			}
+			displayDeletedNotesGUI(player);
+		}
 		return true;
 	}
 
@@ -67,11 +73,16 @@ public class NotesCmd extends CoreCommand {
 		return Collections.emptyList();
 	}
 
-	private void displayGUI(Player player, List<Note> notes) {
-		notes.sort(Comparator.comparing(Note::getCreationTimeInMillis));
+	private void displayNotesGUI(Player player) {
+		List<Note> playerNotes = notes.getNotesByCreator(player.getUniqueId()).stream().filter(n -> !n.isDeleted()).collect(Collectors.toList());
+		if(playerNotes.isEmpty()) {
+			player.sendMessage(MsgUtils.color("&cYou do not have any notes saved."));
+			return;
+		}
+		playerNotes.sort(Comparator.comparing(Note::getCreationTimeInMillis));
 		DateTimeFormatter usageFormatter = formatter.withZone(timezones.getEntry(player.getUniqueId()));
-		Inventory inv = Bukkit.createInventory(null, getInventorySize(notes.size()), "Your Notes");
-		for(Note note : notes) {
+		Inventory inv = Bukkit.createInventory(null, getInventorySize(playerNotes.size()), "Your Notes");
+		for(Note note : playerNotes) {
 			ItemStack item = new ItemStack(Material.OAK_SIGN);
 			ItemMeta meta = item.getItemMeta();
 			meta.setDisplayName(MsgUtils.color("&bNote: " + note.getContent()));
@@ -81,6 +92,25 @@ public class NotesCmd extends CoreCommand {
 		}
 		player.closeInventory();
 		Bukkit.getScheduler().runTask(instance, () -> player.openInventory(inv));
+	}
+
+	private void displayDeletedNotesGUI(Player player) {
+		List<Note> deletedNotes = notes.getNotesByCreator(player.getUniqueId()).stream().filter(Note::isDeleted).collect(Collectors.toList());
+		if(deletedNotes.isEmpty()) {
+			player.sendMessage(MsgUtils.color("&cYou do not have any deleted notes."));
+			return;
+		}
+		deletedNotes.sort(Comparator.comparing(Note::getCreationTimeInMillis));
+		DateTimeFormatter usageFormatter = formatter.withZone(timezones.getEntry(player.getUniqueId()));
+		Inventory inv = Bukkit.createInventory(null, getInventorySize(deletedNotes.size()), "Your Deleted Notes");
+		for(Note note : deletedNotes) {
+			ItemStack item = new ItemStack(Material.OAK_SIGN);
+			ItemMeta meta = item.getItemMeta();
+			meta.setDisplayName(MsgUtils.color("&cDeleted Note: " + note.getContent()));
+			meta.setLore(Arrays.asList(MsgUtils.color("&7ID: &e" + note.getId()), MsgUtils.color("&7Created: &e" + usageFormatter.format(Instant.ofEpochMilli(note.getCreationTimeInMillis())))));
+			item.setItemMeta(meta);
+			inv.addItem(item);
+		}
 	}
 
 	private int getInventorySize(int size) {
