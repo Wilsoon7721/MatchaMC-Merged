@@ -58,11 +58,6 @@ public class NotesCmd extends CoreCommand {
 			return true;
 		}
 		if(args[0].equalsIgnoreCase("viewdeleted")) {
-			List<Note> deletedNotes = notes.getNotesByCreator(player.getUniqueId()).stream().filter(n -> n.isDeleted()).collect(Collectors.toList());
-			if(deletedNotes.isEmpty()) {
-				sender.sendMessage(MsgUtils.color("&cYou do not have any deleted notes."));
-				return true;
-			}
 			displayDeletedNotesGUI(player);
 		}
 		return true;
@@ -100,7 +95,7 @@ public class NotesCmd extends CoreCommand {
 			player.sendMessage(MsgUtils.color("&cYou do not have any deleted notes."));
 			return;
 		}
-		deletedNotes.sort(Comparator.comparing(Note::getCreationTimeInMillis));
+		deletedNotes.sort(Comparator.comparing(Note::getDeletionTimeInMillis));
 		DateTimeFormatter usageFormatter = formatter.withZone(timezones.getEntry(player.getUniqueId()));
 		Inventory inv = Bukkit.createInventory(null, getInventorySize(deletedNotes.size()), "Your Deleted Notes");
 		for(Note note : deletedNotes) {
@@ -111,6 +106,8 @@ public class NotesCmd extends CoreCommand {
 			item.setItemMeta(meta);
 			inv.addItem(item);
 		}
+		player.closeInventory();
+		player.openInventory(inv);
 	}
 
 	private int getInventorySize(int size) {

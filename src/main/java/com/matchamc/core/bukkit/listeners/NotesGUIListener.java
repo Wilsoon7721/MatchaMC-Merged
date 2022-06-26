@@ -31,12 +31,14 @@ public class NotesGUIListener implements Listener {
 	}
 	@EventHandler
 	public void onNotesClick(InventoryClickEvent event) {
-		if(event.getClickedInventory() == null || !event.getView().getTitle().equalsIgnoreCase("Your Notes") || event.getCurrentItem() == null)
+		if(event.getClickedInventory() == null || event.getCurrentItem() == null)
+			return;
+		if(!event.getView().getTitle().equalsIgnoreCase("Your Notes") && !event.getView().getTitle().equalsIgnoreCase("Your Deleted Notes"))
 			return;
 		if(event.getCurrentItem().getType() != Material.OAK_SIGN)
 			return;
 		event.setCancelled(true);
-		String stringNoteId = event.getCurrentItem().getItemMeta().getLore().get(0).split(" ")[1];
+		String stringNoteId = event.getCurrentItem().getItemMeta().getLore().get(0).replaceAll("\\D*", "");
 		int noteId;
 		try {
 			noteId = Integer.parseInt(stringNoteId);
@@ -57,22 +59,40 @@ public class NotesGUIListener implements Listener {
 		if(event.getCurrentItem() == null)
 			return;
 		event.setCancelled(true);
-		if(event.getCurrentItem().getType() == Material.ARROW) {
+		int id = Integer.parseInt(event.getView().getTitle().replaceAll("\\D*", ""));
+		Note note = new Note(notes, id);
+		switch(event.getCurrentItem().getType()) {
+		case ARROW:
 			event.getWhoClicked().closeInventory();
 			((Player) event.getWhoClicked()).performCommand("notes");
-			return;
-		}
-		if(event.getCurrentItem().getType() == Material.BARRIER) {
-			// TODO Delete note
-			int id = Integer.parseInt(event.getView().getTitle().replaceAll("\\D*", ""));
-			Note note = new Note(notes, id);
+			break;
+		case BARRIER:
 			boolean result = note.delete();
 			if(!result) {
 				event.getWhoClicked().sendMessage(MsgUtils.color("&cThis note is already deleted."));
 				return;
 			}
+			event.getWhoClicked().closeInventory();
 			event.getWhoClicked().sendMessage(MsgUtils.color("&eThis note has been deleted. To restore or permanently delete it, you may use the command '/notes viewdeleted' to view your deleted notes."));
-			return;
+			break;
+		case GREEN_WOOL:
+			if(!note.isDeleted()) {
+				event.getWhoClicked().sendMessage(MsgUtils.color("&cAn internal error occurred. More details have been printed in the console."));
+				MsgUtils.sendBukkitConsoleMessage("&cAttempted to restore Note #" + note.getId() + ", but the note is not deleted.");
+				MsgUtils.sendBukkitConsoleMessage("&cThis indicates a problem with the GUI as it is not supposed to display the option to restore.");
+				return;
+			}
+			note.restore();
+			event.getWhoClicked().closeInventory();
+			event.getWhoClicked().sendMessage(MsgUtils.color("&eThis note has been restored."));
+			break;
+		case FLINT_AND_STEEL:
+			event.getWhoClicked().closeInventory();
+			note.destroyNote();
+			event.getWhoClicked().sendMessage(MsgUtils.color("&eThis note has been permanently deleted."));
+			break;
+		default:
+			break;
 		}
 	}
 
@@ -117,6 +137,7 @@ public class NotesGUIListener implements Listener {
 		permdelete.setItemMeta(permdeletemeta);
 		inv.setItem(28, permdelete);
 		inv.setItem(30, restore);
-		// TODO Listen for interaction with restore and perm delete - together iwth their actual actions
+		player.closeInventory();
+		player.openInventory(inv);
 	}
 }

@@ -120,6 +120,7 @@ public class PlayerRegistrar extends CoreCommand implements Listener {
 		YamlConfiguration yc = YamlConfiguration.loadConfiguration(file);
 		if(isRegistered(event.getPlayer().getUniqueId())) {
 			int count = yc.getInt("players." + event.getPlayer().getUniqueId().toString() + ".local-times-logged-in");
+			yc.set("players." + event.getPlayer().getUniqueId().toString() + ".name", event.getPlayer().getName()); // Update name changes
 			yc.set("players." + event.getPlayer().getUniqueId().toString() + ".local-times-logged-in", (count + 1));
 			try {
 				yc.save(file);

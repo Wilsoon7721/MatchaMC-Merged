@@ -37,6 +37,7 @@ import com.matchamc.core.bukkit.commands.WhitelistCmd;
 import com.matchamc.core.bukkit.commands.staff.NoteCmd;
 import com.matchamc.core.bukkit.commands.staff.NotesCmd;
 import com.matchamc.core.bukkit.commands.staff.SocialspyCmd;
+import com.matchamc.core.bukkit.listeners.NotesGUIListener;
 import com.matchamc.core.bukkit.util.AntiCheatDragbackHook;
 import com.matchamc.core.bukkit.util.AntiCheatHook;
 import com.matchamc.core.bukkit.util.AntiCheatTrigger;
@@ -115,6 +116,7 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		registerCommandAndListener("dbalerts", new AntiCheatDragbackHook(this, "staffcore.dbalerts"));
 		getCommand("note").setExecutor(new NoteCmd(this, notes, "staffcore.note"));
 		getCommand("notes").setExecutor(new NotesCmd(this, timezones, notes, "staffcore.notes"));
+		Bukkit.getPluginManager().registerEvents(new NotesGUIListener(notes, timezones), this);
 		reloadMessages();
 	}
 

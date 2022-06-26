@@ -17,6 +17,7 @@ public class Note {
 	private String content;
 	private long createdOnMillis;
 	private boolean deleted;
+	private long deletedMillis = -1L;
 
 	public Note(Notes notes, Player creator, String content) {
 		this.notes = notes;
@@ -34,6 +35,7 @@ public class Note {
 		instance.getConfig().set("notes." + id + ".creator.name", this.creatorName);
 		instance.getConfig().set("notes." + id + ".creator.uuid", this.creatorUUID);
 		instance.getConfig().set("notes." + id + ".deleted", false);
+		instance.getConfig().set("notes." + id + ".deletedtimestamp", -1);
 		instance.saveConfig();
 		instance.reloadConfig();
 		creator.sendMessage(MsgUtils.color("&eNote #" + id + " has been saved with content '" + this.content + "'"));
@@ -55,6 +57,7 @@ public class Note {
 		instance.getConfig().set("notes." + id + ".creator.name", this.creatorName);
 		instance.getConfig().set("notes." + id + ".creator.uuid", this.creatorUUID);
 		instance.getConfig().set("notes." + id + ".deleted", false);
+		instance.getConfig().set("notes." + id + ".deletedtimestamp", -1);
 		instance.saveConfig();
 		instance.reloadConfig();
 		Bukkit.getConsoleSender().sendMessage(MsgUtils.color("&eNote #" + id + " has been saved with content '" + this.content + "'"));
@@ -70,6 +73,8 @@ public class Note {
 		this.creatorName = cfg.getString("notes." + id + ".creator.name");
 		this.creatorUUID = cfg.getString("notes." + id + ".creator.uuid");
 		this.deleted = cfg.getBoolean("notes." + id + ".deleted");
+		if(deleted)
+			this.deletedMillis = cfg.getLong("notes." + id + ".deletedtimestamp");
 	}
 
 	public int getId() {
@@ -92,6 +97,12 @@ public class Note {
 		return createdOnMillis;
 	}
 
+	public long getDeletionTimeInMillis() {
+		if(isDeleted() && deletedMillis == -1L)
+			deletedMillis = instance.getConfig().getLong("notes." + id + ".deletedtimestamp");
+		return deletedMillis;
+	}
+
 	public boolean isDeleted() {
 		return deleted;
 	}
@@ -106,5 +117,23 @@ public class Note {
 		instance.saveConfig();
 		instance.reloadConfig();
 		return true;
+	}
+
+	public boolean restore() {
+		this.deleted = false;
+		FileConfiguration cfg = instance.getConfig();
+		if(!cfg.getBoolean("notes." + id + ".deleted"))
+			return false;
+		cfg.set("notes." + id + ".deleted", false);
+		cfg.set("notes." + id + ".deletedtimestamp", null);
+		instance.saveConfig();
+		instance.reloadConfig();
+		return true;
+	}
+
+	public void destroyNote() {
+		instance.getConfig().set("notes." + id, null);
+		instance.saveConfig();
+		instance.reloadConfig();
 	}
 }
