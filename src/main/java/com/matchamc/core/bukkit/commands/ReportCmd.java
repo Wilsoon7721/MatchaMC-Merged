@@ -1,5 +1,6 @@
 package com.matchamc.core.bukkit.commands;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -8,17 +9,22 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 
 import com.matchamc.core.bukkit.BukkitMain;
 import com.matchamc.core.bukkit.util.CoreCommand;
 import com.matchamc.core.bukkit.util.PlayerRegistrar;
+import com.matchamc.core.bukkit.util.Report;
+import com.matchamc.core.bukkit.util.Reports;
 import com.matchamc.shared.MsgUtils;
 
 public class ReportCmd extends CoreCommand {
+	private Reports reports;
 	private PlayerRegistrar registrar;
 
-	public ReportCmd(BukkitMain instance, PlayerRegistrar registrar, String permissionNode) {
+	public ReportCmd(BukkitMain instance, Reports reports, PlayerRegistrar registrar, String permissionNode) {
 		super(instance, permissionNode);
+		this.reports = reports;
 		this.registrar = registrar;
 	}
 
@@ -65,10 +71,14 @@ public class ReportCmd extends CoreCommand {
 			return true;
 		}
 		// TODO create report
+		String reason = String.join(" ", Arrays.copyOfRange(args, 1, args.length)).trim();
+		Report report = reports.createReport(reports.consoleUUID, againstUUID, reason, (!(sender instanceof Player)));
+		sender.sendMessage(MsgUtils.color("&eYou have created a report &a#" + report.getId() + " &eagainst &a" + registrar.getNameFromRegistrar(report.getAgainstUUID()) + " &efor &a" + report.getReason() + "&e."));
+		return true;
 	}
 
 	private void openReportGUI(Player player, UUID against) {
-		// TODO GUI
+		Inventory inv = Bukkit.createInventory(null);
 	}
 
 	@Override
