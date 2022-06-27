@@ -32,6 +32,7 @@ import com.matchamc.core.bukkit.commands.TeleportCmd;
 import com.matchamc.core.bukkit.commands.TeleportHereCmd;
 import com.matchamc.core.bukkit.commands.TimeCmd;
 import com.matchamc.core.bukkit.commands.TimezoneCmd;
+import com.matchamc.core.bukkit.commands.TogglePMCmd;
 import com.matchamc.core.bukkit.commands.WeatherCmd;
 import com.matchamc.core.bukkit.commands.WhitelistCmd;
 import com.matchamc.core.bukkit.commands.staff.NoteCmd;
@@ -106,6 +107,7 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		getCommand("teleporthere").setExecutor(new TeleportHereCmd(this, "core.teleporthere"));
 		getCommand("timezone").setExecutor(new TimezoneCmd(this, timezones, "core.timezone"));
 		getCommand("time").setExecutor(new TimeCmd(this, "core.time"));
+		getCommand("togglepm").setExecutor(new TogglePMCmd(this, messenger, "core.tpm"));
 		getCommand("weather").setExecutor(new WeatherCmd(this, "core.weather"));
 		registerCommandAndListener("whitelist", new WhitelistCmd(this, whitelist, "core.whitelist"));
 

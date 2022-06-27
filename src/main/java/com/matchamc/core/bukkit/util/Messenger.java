@@ -15,16 +15,18 @@ import com.matchamc.shared.MsgUtils;
 
 public class Messenger {
 	private BukkitMain instance;
+	private Set<UUID> privateMessagesDisabled = new HashSet<>();
 	private String sendingFormat, receivingFormat, socialSpyFormat;
 	private Set<UUID> socialspyEnabled = new HashSet<>();
 	private Map<UUID, UUID> lastMessagedPlayers = new HashMap<>();
+
 	public Messenger(BukkitMain instance) {
 		this.instance = instance;
 		this.sendingFormat = this.instance.messages().getString("commands.messaging.format.sending");
 		this.receivingFormat = this.instance.messages().getString("commands.messaging.format.receiving");
 		this.socialSpyFormat = this.instance.messages().getString("commands.socialspy.format");
 	}
-	
+
 	public void sendMessage(CommandSender fromPlayer, Player toPlayer, String message) {
 		// Send message to fromPlayer with the 'To (Player): (message)' format
 		// Send message to toPlayer with the 'From (Player): (message)' format
@@ -65,5 +67,17 @@ public class Messenger {
 			return state;
 		}
 		return state;
+	}
+
+	public boolean isPMDisabled(UUID uuid) {
+		return privateMessagesDisabled.contains(uuid);
+	}
+
+	public void setPMDisabled(UUID uuid, boolean state) {
+		if(state) {
+			privateMessagesDisabled.add(uuid);
+			return;
+		}
+		privateMessagesDisabled.remove(uuid);
 	}
 }
