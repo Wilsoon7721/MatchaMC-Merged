@@ -131,6 +131,6 @@ public class Report {
 	}
 
 	public static enum Status {
-		OPEN, CLOSED, RESOLVED;
+		RESOLVED, CLOSED, OPEN;
 	}
 }

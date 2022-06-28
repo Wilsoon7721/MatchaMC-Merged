@@ -1,6 +1,7 @@
 package com.matchamc.core.bukkit.commands;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -38,6 +39,26 @@ public class ReportCmd extends CoreCommand {
 			sender.sendMessage(BukkitMain.INSUFFICIENT_PARAMETERS_ERROR);
 			sender.sendMessage(MsgUtils.color("&cUsage: /report <player> <name>"));
 			return true;
+		}
+		if(sender instanceof Player) {
+			Player player = (Player) sender;
+			Collection<Report> playerReports = reports.getReportsByUUID(player.getUniqueId());
+			if(playerReports.isEmpty()) {
+				player.sendMessage(MsgUtils.color("&cYou do not have any reports."));
+				return true;
+			}
+			int count = playerReports.size();
+			if(count > 45) {
+				int c = reports.cleanUpReports(player.getUniqueId());
+				if(c == 0 || (count - c) > 45) {
+					player.sendMessage(MsgUtils.color("&cYou are unable to make a new report."));
+					player.sendMessage(MsgUtils.color("&cPlease wait for your old reports to be resolved before reporting again."));
+					return true;
+				}
+				player.sendMessage(MsgUtils.color("&eThe plugin has deleted &a" + c + " &eof your resolved/closed reports."));
+				player.sendMessage(MsgUtils.color("&ePlease retry the command again."));
+				return true;
+			}
 		}
 		if(args.length < 2) {
 			if(!(sender instanceof Player)) {

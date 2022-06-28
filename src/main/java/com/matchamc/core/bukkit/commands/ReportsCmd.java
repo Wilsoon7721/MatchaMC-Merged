@@ -1,6 +1,8 @@
 package com.matchamc.core.bukkit.commands;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -38,6 +40,17 @@ public class ReportsCmd extends CoreCommand {
 			consoleReports.stream().forEachOrdered(report -> sender.sendMessage(MsgUtils.color("&eReport ID &a#" + report.getId() + " &e| You reported &a" + registrar.getNameFromRegistrar(report.getAgainstUUID()) + " &efor &c" + report.getReason() + "&e.")));
 			return true;
 		}
+		Player player = (Player) sender;
+		if(staffs.isStaff(player)) {
+			reports.openStaffReportsGUI(player);
+			return true;
+		}
+		reports.openPlayerReportsGUI(player);
+		return true;
+	}
 
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+		return Collections.emptyList();
 	}
 }

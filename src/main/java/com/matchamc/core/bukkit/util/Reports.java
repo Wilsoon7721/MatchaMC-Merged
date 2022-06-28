@@ -104,6 +104,29 @@ public class Reports {
 		}
 	}
 
+	public int cleanUpReports(UUID uuid) {
+		Player player = Bukkit.getPlayer(uuid);
+		boolean verbose = false;
+		if(player != null)
+			verbose = true;
+		if(verbose)
+			player.sendMessage(MsgUtils.color("&ePlease wait while your old reports are being deleted..."));
+		int count = 0;
+		for(File file : reportsDirectory.listFiles()) {
+			YamlConfiguration yc = YamlConfiguration.loadConfiguration(file);
+			int id = yc.getInt("id");
+			String reporter = yc.getString("reporter");
+			String status = yc.getString("status");
+			if(reporter.equalsIgnoreCase(uuid.toString()) && !status.equalsIgnoreCase(Report.Status.OPEN.name())) {
+				if(file.delete()) {
+					count++;
+					MsgUtils.sendBukkitConsoleMessage("&c[Reports] Cleanup: Deleted Report ID #" + id + ".");
+				}
+			}
+		}
+		return count;
+	}
+
 	public void notifyReportMade(Report report) {
 		String reporterName = registrar.getNameFromRegistrar(report.getReporterUUID()), againstName = registrar.getNameFromRegistrar(report.getAgainstUUID());
 		for(Player player : Bukkit.getOnlinePlayers()) {
@@ -192,11 +215,19 @@ public class Reports {
 			return;
 		}
 		int count = playerReports.size();
-		if(count > 54) {
-			cleanUpReports();
+		if(count > 45) {
+			int c = cleanUpReports(player.getUniqueId());
+			if(c == 0 || (count - c) > 45) {
+				player.sendMessage(MsgUtils.color("&cYou are not able to make a new report."));
+				player.sendMessage(MsgUtils.color("&cPlease wait for your old reports to be resolved before making a new report."));
+				return;
+			}
+			player.sendMessage(MsgUtils.color("&eThe plugin has deleted &a" + c + " &eof your resolved/closed reports."));
+			player.sendMessage(MsgUtils.color("&ePlease retry the command again."));
+			return;
 		}
 		Inventory inv = Bukkit.createInventory(null, MathUtil.getInventorySize(playerReports.size()), "Your Reports");
-		playerReports.stream().forEachOrdered(report -> {
+		for(Report report : playerReports) {
 			String status = "", statusMessage = "";
 			switch(report.getStatus()) {
 			case OPEN:
@@ -223,11 +254,12 @@ public class Reports {
 				ItemStack item = new ItemBuilder(Material.PAPER).withDisplayName("&eReport #" + report.getId() + ": " + againstName).withLore(Arrays.asList("&eID: &a" + report.getId(), "&eReported Player: &a" + againstName, "&eReason: &a" + report.getReason(), "&eStatus: " + status, "&eMessage from Staff: &a" + statusMessage)).toItemStack();
 				inv.addItem(item);
 			}
-		});
+		}
+		;
 		player.openInventory(inv);
 	}
 
 	public void openStaffReportsGUI(Player player) {
-
+		// TODO Staff Reports GUI
 	}
 }
