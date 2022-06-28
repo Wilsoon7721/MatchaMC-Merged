@@ -12,7 +12,7 @@ public class Report {
 	private Reports reports;
 	private File file;
 	private int id;
-	private UUID reporter, against;
+	private UUID reporter, against, closer;
 	private String reason, statusMessage;
 	private long created;
 	private Status status;
@@ -97,6 +97,10 @@ public class Report {
 		this.status = status;
 	}
 
+	public void setReportClosedBy(UUID uuid) {
+		this.closer = uuid;
+	}
+
 	public void setStatusMessage(String message) {
 		statusMessage = message;
 	}
@@ -105,7 +109,8 @@ public class Report {
 		if(!file.exists())
 			try {
 				file.createNewFile();
-			} catch(IOException ex) {}
+			} catch(IOException ex) {
+			}
 		YamlConfiguration yc = YamlConfiguration.loadConfiguration(file);
 		yc.set("id", id);
 		yc.set("reporter", reporter.toString());
@@ -113,6 +118,7 @@ public class Report {
 		yc.set("reason", reason);
 		yc.set("created", created);
 		yc.set("status", status.toString().toUpperCase());
+		yc.set("closedby", closer.toString());
 		yc.set("status-message", statusMessage);
 		try {
 			yc.save(file);

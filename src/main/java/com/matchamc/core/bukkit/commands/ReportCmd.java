@@ -69,7 +69,6 @@ public class ReportCmd extends CoreCommand {
 			sender.sendMessage(MsgUtils.color("&cThis player has not joined the server before."));
 			return true;
 		}
-		// TODO create report
 		String reason = String.join(" ", Arrays.copyOfRange(args, 1, args.length)).trim();
 		Report report = reports.createReport(reports.consoleUUID, againstUUID, reason, (!(sender instanceof Player)));
 		sender.sendMessage(MsgUtils.color("&eYou have created a report &a#" + report.getId() + " &eagainst &a" + registrar.getNameFromRegistrar(report.getAgainstUUID()) + " &efor &a" + report.getReason() + "&e."));

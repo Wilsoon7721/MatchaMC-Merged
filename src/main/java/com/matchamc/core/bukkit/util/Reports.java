@@ -2,8 +2,11 @@ package com.matchamc.core.bukkit.util;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,12 +16,14 @@ import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.matchamc.core.bukkit.BukkitMain;
+import com.matchamc.shared.MathUtil;
 import com.matchamc.shared.MsgUtils;
 
 public class Reports {
@@ -29,7 +34,6 @@ public class Reports {
 	public UUID consoleUUID = UUID.fromString("5aa66c90-aee9-4bb1-987b-1b307d77e4ca");
 	public String notifyReportMadePermission = "staffcore.notify.reports.created";
 	public String notifyReportClosedPermission = "staffcore.notify.reports.closed";
-
 
 	public Reports(BukkitMain instance, PlayerRegistrar registrar) {
 		this.instance = instance;
@@ -49,6 +53,36 @@ public class Reports {
 		return new Report(this, id);
 	}
 
+	// Note: Follow ConsoleUUID
+	public Collection<Report> getReportsByUUID(UUID uuid) {
+		List<Report> reports = new ArrayList<>();
+		for(File file : getReportsDirectory().listFiles()) {
+			YamlConfiguration yc = YamlConfiguration.loadConfiguration(file);
+			String stringuuid = yc.getString("reporter");
+			if(!stringuuid.equalsIgnoreCase(uuid.toString()))
+				continue;
+			int id = yc.getInt("id");
+			Report report = new Report(this, id);
+			reports.add(report);
+		}
+		Collections.sort(reports, Comparator.comparing(Report::getId));
+		return reports;
+	}
+
+	public Collection<Report> getReportsByStatus(Report.Status status) {
+		List<Report> reports = new ArrayList<>();
+		for(File file : getReportsDirectory().listFiles()) {
+			YamlConfiguration yc = YamlConfiguration.loadConfiguration(file);
+			String stringstatus = yc.getString("status");
+			if(!stringstatus.equalsIgnoreCase(status.name()))
+				continue;
+			int id = yc.getInt("id");
+			Report report = new Report(this, id);
+			reports.add(report);
+		}
+		return reports;
+	}
+
 	public int getNextAvailableId() {
 		if(reportsDirectory.listFiles().length == 0)
 			return 1;
@@ -62,7 +96,7 @@ public class Reports {
 				}
 			})).map(File::getName).map(s -> s.replaceAll("\\D*", "")).map(Integer::parseInt).collect(Collectors.toList());
 			int highest = Collections.max(reportIds);
-			return (highest + 1);
+			return(highest + 1);
 		} catch(NumberFormatException ex) {
 			MsgUtils.sendBukkitConsoleMessage("&cFailed to get next available id from Reports.");
 			MsgUtils.sendBukkitConsoleMessage("&cConfiguration error - A Report ID is unable to parse through Integer#parseInt.");
@@ -73,9 +107,12 @@ public class Reports {
 	public void notifyReportMade(Report report) {
 		String reporterName = registrar.getNameFromRegistrar(report.getReporterUUID()), againstName = registrar.getNameFromRegistrar(report.getAgainstUUID());
 		for(Player player : Bukkit.getOnlinePlayers()) {
-			if(!player.hasPermission(notifyReportMadePermission)) continue;
-			if(report.isPrioritised()) player.sendMessage(MsgUtils.color("&c&l[REPORT CREATED] &c(ID #" + report.getId() + ") &6" + reporterName + " &chas reported &6" + againstName + " &cfor &6" + report.getReason() + "&c."));
-			else player.sendMessage(MsgUtils.color("&3[&bREPORT CREATED&3] &9(ID #" + report.getId() + ") &b" + reporterName + " &3has reported &b" + againstName + " &3for &b" + report.getReason() + "&3."));
+			if(!player.hasPermission(notifyReportMadePermission))
+				continue;
+			if(report.isPrioritised())
+				player.sendMessage(MsgUtils.color("&c&l[REPORT CREATED] &c(ID #" + report.getId() + ") &6" + reporterName + " &chas reported &6" + againstName + " &cfor &6" + report.getReason() + "&c."));
+			else
+				player.sendMessage(MsgUtils.color("&3[&bREPORT CREATED&3] &9(ID #" + report.getId() + ") &b" + reporterName + " &3has reported &b" + againstName + " &3for &b" + report.getReason() + "&3."));
 		}
 	}
 
@@ -145,5 +182,52 @@ public class Reports {
 		ItemStack renderhacks = new ItemBuilder(Material.COMPASS).withDisplayName("&cRender Hacks").withLore(Arrays.asList("&eE.g. ESPs (Player, Mob, Chest, Other), Fullbright")).toItemStack();
 		ItemStack otherhacks = new ItemBuilder(Material.BRICKS).withDisplayName("&cOther Cheats").withLore(Arrays.asList("&eHacks that are not listed here.")).toItemStack();
 		inv.addItem(new ItemStack[] { fly, xray, pvphacks, movementhacks, autohacks, teleporthacks, renderhacks, otherhacks });
+		player.openInventory(inv);
+	}
+
+	public void openPlayerReportsGUI(Player player) {
+		Collection<Report> playerReports = getReportsByUUID(player.getUniqueId());
+		if(playerReports.isEmpty()) {
+			player.sendMessage(MsgUtils.color("&cYou do not have any reports."));
+			return;
+		}
+		int count = playerReports.size();
+		if(count > 54) {
+			cleanUpReports();
+		}
+		Inventory inv = Bukkit.createInventory(null, MathUtil.getInventorySize(playerReports.size()), "Your Reports");
+		playerReports.stream().forEachOrdered(report -> {
+			String status = "", statusMessage = "";
+			switch(report.getStatus()) {
+			case OPEN:
+				status = MsgUtils.color("&aOPEN");
+				break;
+			case CLOSED:
+				status = MsgUtils.color("&c&lCLOSED");
+				statusMessage = report.getStatusMessage();
+				break;
+			case RESOLVED:
+				status = MsgUtils.color("&a&lRESOLVED");
+				statusMessage = report.getStatusMessage();
+				break;
+			default:
+				status = MsgUtils.color("&cINVALID");
+				statusMessage = "&7There is a configuration error in this report.";
+				break;
+			}
+			String againstName = registrar.getNameFromRegistrar(report.getAgainstUUID());
+			if(report.getStatus() == Report.Status.OPEN) {
+				ItemStack item = new ItemBuilder(Material.PAPER).withDisplayName("&eReport #" + report.getId() + ": " + againstName).withLore(Arrays.asList("&eID: &a" + report.getId(), "&eReported Player: &a" + againstName, "&eReason: &a" + report.getReason(), "&eStatus: " + status)).toItemStack();
+				inv.addItem(item);
+			} else {
+				ItemStack item = new ItemBuilder(Material.PAPER).withDisplayName("&eReport #" + report.getId() + ": " + againstName).withLore(Arrays.asList("&eID: &a" + report.getId(), "&eReported Player: &a" + againstName, "&eReason: &a" + report.getReason(), "&eStatus: " + status, "&eMessage from Staff: &a" + statusMessage)).toItemStack();
+				inv.addItem(item);
+			}
+		});
+		player.openInventory(inv);
+	}
+
+	public void openStaffReportsGUI(Player player) {
+
 	}
 }

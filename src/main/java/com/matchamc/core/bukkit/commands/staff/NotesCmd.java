@@ -23,6 +23,7 @@ import com.matchamc.core.bukkit.util.CoreCommand;
 import com.matchamc.core.bukkit.util.Note;
 import com.matchamc.core.bukkit.util.Notes;
 import com.matchamc.core.bukkit.util.TimeZones;
+import com.matchamc.shared.MathUtil;
 import com.matchamc.shared.MsgUtils;
 
 public class NotesCmd extends CoreCommand {
@@ -76,7 +77,7 @@ public class NotesCmd extends CoreCommand {
 		}
 		playerNotes.sort(Comparator.comparing(Note::getCreationTimeInMillis));
 		DateTimeFormatter usageFormatter = formatter.withZone(timezones.getEntry(player.getUniqueId()));
-		Inventory inv = Bukkit.createInventory(null, getInventorySize(playerNotes.size()), "Your Notes");
+		Inventory inv = Bukkit.createInventory(null, MathUtil.getInventorySize(playerNotes.size()), "Your Notes");
 		for(Note note : playerNotes) {
 			ItemStack item = new ItemStack(Material.OAK_SIGN);
 			ItemMeta meta = item.getItemMeta();
@@ -97,7 +98,7 @@ public class NotesCmd extends CoreCommand {
 		}
 		deletedNotes.sort(Comparator.comparing(Note::getDeletionTimeInMillis));
 		DateTimeFormatter usageFormatter = formatter.withZone(timezones.getEntry(player.getUniqueId()));
-		Inventory inv = Bukkit.createInventory(null, getInventorySize(deletedNotes.size()), "Your Deleted Notes");
+		Inventory inv = Bukkit.createInventory(null, MathUtil.getInventorySize(deletedNotes.size()), "Your Deleted Notes");
 		for(Note note : deletedNotes) {
 			ItemStack item = new ItemStack(Material.OAK_SIGN);
 			ItemMeta meta = item.getItemMeta();
@@ -109,12 +110,4 @@ public class NotesCmd extends CoreCommand {
 		player.closeInventory();
 		player.openInventory(inv);
 	}
-
-	private int getInventorySize(int size) {
-		if(size <= 0)
-			return 9;
-		int q = (int) Math.ceil(size / 9);
-		return q > 5 ? 54 : q * 9;
-	}
-
 }
