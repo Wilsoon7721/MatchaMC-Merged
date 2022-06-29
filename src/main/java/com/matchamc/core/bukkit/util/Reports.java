@@ -2,6 +2,7 @@ package com.matchamc.core.bukkit.util;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,19 +18,21 @@ import java.util.stream.Stream;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.matchamc.core.bukkit.BukkitMain;
-import com.matchamc.shared.MathUtil;
 import com.matchamc.shared.MsgUtils;
 
 public class Reports {
 	private BukkitMain instance;
 	private Map<UUID, UUID> queuedReports = new HashMap<>();
 	private PlayerRegistrar registrar;
+	private File reportStats;
 	private File reportsDirectory;
 	public UUID consoleUUID = UUID.fromString("5aa66c90-aee9-4bb1-987b-1b307d77e4ca");
 	public String notifyReportMadePermission = "staffcore.notify.reports.created";
@@ -38,9 +41,22 @@ public class Reports {
 	public Reports(BukkitMain instance, PlayerRegistrar registrar) {
 		this.instance = instance;
 		this.registrar = registrar;
+		reportStats = new File(this.instance.getDataFolder(), "reports_stats.yml");
 		reportsDirectory = new File(this.instance.getDataFolder(), "/reports/");
 		if(!reportsDirectory.exists())
 			reportsDirectory.mkdirs();
+		if(!reportStats.exists()) {
+			try {
+				reportStats.createNewFile();
+			} catch(IOException ex) {}
+			YamlConfiguration yc = YamlConfiguration.loadConfiguration(reportStats);
+			yc.set("total-reports", 0);
+			yc.createSection("reports");
+			try {
+				yc.save(reportStats);
+			} catch(IOException ex) {}
+			YamlConfiguration.loadConfiguration(reportStats);
+		}
 	}
 
 	public Report createReport(UUID reporter, UUID against, String reason, boolean priority) {
@@ -81,6 +97,23 @@ public class Reports {
 			reports.add(report);
 		}
 		return reports;
+	}
+
+	// TODO Run this method when a staff changes the status of a report.
+	public void updatePlayerReportStats(UUID playerUUID, Report.Status recentReportStatus) {
+		YamlConfiguration yc = YamlConfiguration.loadConfiguration(reportStats);
+		yc.set("reports." + playerUUID.toString() + ".total", yc.getInt("reports." + playerUUID.toString() + ".total") + 1);
+		if(recentReportStatus == Report.Status.RESOLVED)
+			yc.set("reports." + playerUUID.toString() + ".correct", yc.getInt("reports." + playerUUID.toString() + ".correct") + 1);
+		try {
+			yc.save(reportStats);
+		} catch(IOException ex) {
+			MsgUtils.sendBukkitConsoleMessage("&c[Reports] Player Reports: Failed to update report accuracy for " + playerUUID.toString() + " as the file could not be saved.");
+			ex.printStackTrace();
+			return;
+		}
+		YamlConfiguration.loadConfiguration(reportStats);
+		return;
 	}
 
 	public int getNextAvailableId() {
@@ -226,7 +259,7 @@ public class Reports {
 			player.sendMessage(MsgUtils.color("&ePlease retry the command again."));
 			return;
 		}
-		Inventory inv = Bukkit.createInventory(null, MathUtil.getInventorySize(playerReports.size()), "Your Reports");
+		Inventory inv = Bukkit.createInventory(null, 54, "Your Reports");
 		for(Report report : playerReports) {
 			String status = "", statusMessage = "";
 			switch(report.getStatus()) {
@@ -255,11 +288,33 @@ public class Reports {
 				inv.addItem(item);
 			}
 		}
-		;
+		ItemStack bsgp = new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).withDisplayName(MsgUtils.color(" ")).toItemStack();
+		for(int x = 45; x < 54; x++) {
+			inv.setItem(x, bsgp);
+		}
+		YamlConfiguration yc = YamlConfiguration.loadConfiguration(reportStats);
+		int correct = yc.getInt("reports." + player.getUniqueId().toString() + ".correct");
+		int total = yc.getInt("reports." + player.getUniqueId().toString() + ".total");
+		double accuracy = (correct / total) * 100;
+		String saccuracy;
+		List<String> lore;
+		if(accuracy >= 85) {
+			saccuracy = MsgUtils.color("&a" + accuracy);
+			lore = Arrays.asList(MsgUtils.color("&aGood job on reporting others accurately, keep "), MsgUtils.color("&aup the good work!"), MsgUtils.color("&aAccurate reports made: &e" + correct + "/" + total));
+		} else if(accuracy >= 50 && accuracy < 85) {
+			saccuracy = MsgUtils.color("&e" + accuracy);
+			lore = Arrays.asList(MsgUtils.color("&eSeems like some reports made by you were "), MsgUtils.color("&enot accurate, but you are almost there!"), MsgUtils.color("&aAccurate reports made: &e" + correct + "/" + total));
+		} else {
+			saccuracy = MsgUtils.color("&c" + accuracy);
+			lore = Arrays.asList(MsgUtils.color("&eSeems like some reports made by you were "), MsgUtils.color("&enot accurate, you can do better!"), MsgUtils.color("&aAccurate reports made: &e" + correct + "/" + total));
+		}
+		ItemStack iaccuracy = new ItemBuilder(Material.COMPASS).withDisplayName(MsgUtils.color("&eYour Report Accuracy: " + saccuracy + "%")).withLore(lore).withEnchant(Enchantment.DURABILITY, 1).withItemFlag(ItemFlag.HIDE_ENCHANTS).toItemStack();
+		inv.setItem(53, iaccuracy);
 		player.openInventory(inv);
 	}
 
 	public void openStaffReportsGUI(Player player) {
 		// TODO Staff Reports GUI
+		Inventory inv 
 	}
 }
