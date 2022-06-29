@@ -25,6 +25,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.matchamc.core.bukkit.BukkitMain;
+import com.matchamc.shared.MathUtil;
 import com.matchamc.shared.MsgUtils;
 
 import net.md_5.bungee.api.ChatColor;
@@ -63,7 +64,7 @@ public class PlayerRegistrar extends CoreCommand implements Listener {
 			sender.sendMessage(MsgUtils.color("&cNo login/logout records found for this player."));
 			return;
 		}
-		List<List<String>> parts = separateList(history, 8);
+		List<List<String>> parts = MathUtil.separateList(history, 8);
 		if(page > parts.size()) {
 			sender.sendMessage(MsgUtils.color("&cThere is no page " + page + " for this player."));
 			return;
@@ -230,14 +231,5 @@ public class PlayerRegistrar extends CoreCommand implements Listener {
 		if(args.length == 0)
 			return Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(s -> s.startsWith(args[0])).collect(Collectors.toList());
 		return Collections.emptyList();
-	}
-
-	private <T> List<List<T>> separateList(List<T> originalList, int length) {
-		List<List<T>> parts = new ArrayList<>();
-		int originalSize = originalList.size();
-		for(int i = 0; i < originalSize; i += length) {
-			parts.add(new ArrayList<T>(originalList.subList(i, Math.min(originalSize, i + length))));
-		}
-		return parts;
 	}
 }

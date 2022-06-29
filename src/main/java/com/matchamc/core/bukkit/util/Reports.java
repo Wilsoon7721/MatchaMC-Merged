@@ -21,11 +21,13 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.matchamc.core.bukkit.BukkitMain;
+import com.matchamc.shared.MathUtil;
 import com.matchamc.shared.MsgUtils;
 
 public class Reports {
@@ -227,7 +229,7 @@ public class Reports {
 			player.sendMessage(MsgUtils.color("&cUnable to continue with report: An internal error occurred."));
 			return;
 		}
-		String againstName = registrar.getNameFromRegistrar(queuedReports.get(player.getUniqueId()));
+		String againstName = registrar.getNameFromRegistrar(against);
 		Inventory inv = Bukkit.createInventory(null, 9, "Unfair Advantages - " + againstName);
 		ItemStack pvphacks = new ItemBuilder(Material.IRON_SWORD).withDisplayName("&cCombat Related Hacks").withLore(Arrays.asList("&eE.g. Killaura, TP-Aura, Aimbot, Autoclicker")).toItemStack();
 		ItemStack fly = new ItemBuilder(Material.FEATHER).withDisplayName("&cFly Hacks").withLore(Arrays.asList("&eE.g. Flight, CreativeFly, Jetpack etc.")).toItemStack();
@@ -237,8 +239,41 @@ public class Reports {
 		ItemStack teleporthacks = new ItemBuilder(Material.ENDER_PEARL).withDisplayName("&cTeleportation Hacks").withLore(Arrays.asList("&eE.g. ClickTP")).toItemStack();
 		ItemStack renderhacks = new ItemBuilder(Material.COMPASS).withDisplayName("&cRender Hacks").withLore(Arrays.asList("&eE.g. ESPs (Player, Mob, Chest, Other), Fullbright")).toItemStack();
 		ItemStack otherhacks = new ItemBuilder(Material.BRICKS).withDisplayName("&cOther Cheats").withLore(Arrays.asList("&eHacks that are not listed here.")).toItemStack();
+		ItemStack cancel = new ItemBuilder(Material.BARRIER).withDisplayName("Cancel").withLore(Arrays.asList("&eReturn to the report category menu")).toItemStack();
 		inv.addItem(new ItemStack[] { fly, xray, pvphacks, movementhacks, autohacks, teleporthacks, renderhacks, otherhacks });
+		inv.setItem(8, cancel);
 		player.openInventory(inv);
+	}
+
+	public void openChatOffencesGUI(Player player) {
+		UUID against = queuedReports.get(player.getUniqueId());
+		if(against == null) {
+			player.sendMessage(MsgUtils.color("&cUnable to continue with report: An internal error occurred."));
+			return;
+		}
+		String againstName = registrar.getNameFromRegistrar(against);
+		Inventory inv = Bukkit.createInventory(null, 9, "Chat Offences - " + againstName);
+		ItemStack swearing = new ItemBuilder(Material.PUFFERFISH).withDisplayName("&cSwearing").toItemStack();
+		ItemStack illictLinks = new ItemBuilder(Material.FIRE_CHARGE).withDisplayName("&cIllict Links").toItemStack();
+		ItemStack toxicity = new ItemBuilder(Material.SKELETON_SKULL).withDisplayName("&cToxic Behaviour").toItemStack();
+		ItemStack spam = new ItemBuilder(Material.MAP).withDisplayName("&cSpamming").toItemStack();
+		ItemStack chatTrolling = new ItemBuilder(Material.CREEPER_HEAD).withDisplayName("&cChat Trolling").toItemStack();
+		ItemStack advertising = new ItemBuilder(Material.PAPER).withDisplayName("&cAdvertising").toItemStack();
+		ItemStack cancel = new ItemBuilder(Material.BARRIER).withDisplayName("Cancel").withLore(Arrays.asList("&eReturn to the report category menu")).toItemStack();
+		inv.addItem(new ItemStack[] { swearing, illictLinks, toxicity, spam, chatTrolling, advertising });
+		inv.setItem(8, cancel);
+		player.openInventory(inv);
+	}
+
+	public void openOtherOffencesGUI(Player player) {
+		UUID against = queuedReports.get(player.getUniqueId());
+		if(against == null) {
+			player.sendMessage(MsgUtils.color("&cUnable to continue with report: An internal error occurred."));
+			return;
+		}
+		String againstName = registrar.getNameFromRegistrar(against);
+		Inventory inv = Bukkit.createInventory(null, 9, "Other Offences - " + againstName);
+		// TODO Other offences GUI
 	}
 
 	public void openPlayerReportsGUI(Player player) {
@@ -313,8 +348,73 @@ public class Reports {
 		player.openInventory(inv);
 	}
 
-	public void openStaffReportsGUI(Player player) {
+	public void openStaffReportsGUI(Player player, int page) {
+		InventoryView openInventory = player.getOpenInventory();
 		// TODO Staff Reports GUI
-		Inventory inv 
+		player.closeInventory();
+		List<Report> orderedReports = new ArrayList<>(getReportsByStatus(Report.Status.OPEN));
+		Collections.sort(orderedReports, Comparator.comparing(Report::getId));
+		List<List<Report>> parts = MathUtil.separateList(orderedReports, 45);
+		Inventory inv = Bukkit.createInventory(null, 54, "Player Reports (" + page + "/" + parts.size() + ")");
+		if(page > parts.size()) {
+			player.sendMessage(MsgUtils.color("&cThere is no page &e" + page + "&c."));
+			if(openInventory != null)
+				Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> player.openInventory(openInventory), 15L);
+			return;
+		}
+		if(orderedReports.size() > 45) {
+			parts.get((page - 1)).stream().forEachOrdered(report -> {
+				String status;
+				switch(report.getStatus()) {
+				case OPEN:
+					status = MsgUtils.color("&aOPEN");
+					break;
+				case CLOSED:
+					status = MsgUtils.color("&c&lCLOSED");
+					break;
+				case RESOLVED:
+					status = MsgUtils.color("&a&lRESOLVED");
+					break;
+				default:
+					status = MsgUtils.color("&cINVALID");
+					break;
+				}
+				String againstName = registrar.getNameFromRegistrar(report.getAgainstUUID());
+				ItemStack item = new ItemBuilder(Material.PAPER).withDisplayName("&eReport #" + report.getId() + ": " + againstName).withLore(Arrays.asList("&eID: &a" + report.getId(), "&eReported Player: &a" + againstName, "&eReason: &a" + report.getReason(), "&eStatus: " + status)).toItemStack();
+				inv.addItem(item);
+			});
+		} else {
+			orderedReports.stream().forEachOrdered(report -> {
+				String status;
+				switch(report.getStatus()) {
+				case OPEN:
+					status = MsgUtils.color("&aOPEN");
+					break;
+				case CLOSED:
+					status = MsgUtils.color("&c&lCLOSED");
+					break;
+				case RESOLVED:
+					status = MsgUtils.color("&a&lRESOLVED");
+					break;
+				default:
+					status = MsgUtils.color("&cINVALID");
+					break;
+				}
+				String againstName = registrar.getNameFromRegistrar(report.getAgainstUUID());
+				ItemStack item = new ItemBuilder(Material.PAPER).withDisplayName("&eReport #" + report.getId() + ": " + againstName).withLore(Arrays.asList("&eID: &a" + report.getId(), "&eReported Player: &a" + againstName, "&eReason: &a" + report.getReason(), "&eStatus: " + status)).toItemStack();
+				inv.addItem(item);
+			});
+		}
+		ItemStack bsgp = new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).withDisplayName(MsgUtils.color(" ")).toItemStack();
+		for(int x = 45; x < 54; x++) {
+			inv.setItem(x, bsgp);
+		}
+		// 48 is previous page
+		// 50 is next page
+		if(page != 1)
+			inv.setItem(48, new ItemBuilder(Material.ARROW).withDisplayName("&ePrevious Page").withLore(Arrays.asList("&eClick to go to page &a" + (page - 1))).toItemStack());
+		if(page != parts.size())
+			inv.setItem(50, new ItemBuilder(Material.ARROW).withDisplayName("&eNext Page").withLore(Arrays.asList("&eClick to go to page &a" + (page + 1))).toItemStack());
+		player.openInventory(inv);
 	}
 }

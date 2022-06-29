@@ -42,7 +42,7 @@ public class ReportsCmd extends CoreCommand {
 		}
 		Player player = (Player) sender;
 		if(staffs.isStaff(player)) {
-			reports.openStaffReportsGUI(player);
+			reports.openStaffReportsGUI(player, 1);
 			return true;
 		}
 		reports.openPlayerReportsGUI(player);
