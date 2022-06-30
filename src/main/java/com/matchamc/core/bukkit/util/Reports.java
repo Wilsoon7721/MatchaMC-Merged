@@ -50,13 +50,15 @@ public class Reports {
 		if(!reportStats.exists()) {
 			try {
 				reportStats.createNewFile();
-			} catch(IOException ex) {}
+			} catch(IOException ex) {
+			}
 			YamlConfiguration yc = YamlConfiguration.loadConfiguration(reportStats);
 			yc.set("total-reports", 0);
 			yc.createSection("reports");
 			try {
 				yc.save(reportStats);
-			} catch(IOException ex) {}
+			} catch(IOException ex) {
+			}
 			YamlConfiguration.loadConfiguration(reportStats);
 		}
 	}
@@ -178,6 +180,10 @@ public class Reports {
 		return reportsDirectory;
 	}
 
+	public Map<UUID, UUID> getQueuedReports() {
+		return queuedReports;
+	}
+
 	// GUIs
 	public void openReportReasonGUI(Player player, UUID against) {
 		queuedReports.put(player.getUniqueId(), against);
@@ -213,12 +219,11 @@ public class Reports {
 		ItemMeta glasspanemeta = glasspane.getItemMeta();
 		glasspanemeta.setDisplayName(" ");
 		glasspane.setItemMeta(glasspanemeta);
-		for(int i = 0; i < 9; i++) {
+		for(int i = 0; i < inv.getSize(); i++) {
 			if(inv.getItem(i) == null)
 				inv.setItem(i, glasspane);
 			continue;
 		}
-
 		player.openInventory(inv);
 	}
 
@@ -273,7 +278,15 @@ public class Reports {
 		}
 		String againstName = registrar.getNameFromRegistrar(against);
 		Inventory inv = Bukkit.createInventory(null, 9, "Other Offences - " + againstName);
-		// TODO Other offences GUI
+		ItemStack ddosDoxThreats = new ItemBuilder(Material.GUNPOWDER).withDisplayName("&cDDoS/DoX Threats").withLore(Arrays.asList("&ePlayer threatened to DDoS/DoX you or another player.")).toItemStack();
+		ItemStack inappropriatenameskin = new ItemBuilder(Material.NAME_TAG).withDisplayName("&cInappropriate Name/Skin").withLore(Arrays.asList("&ePlayer has an inappropriate name or is using a skin that depicts nudity or other inappropriate stuff.")).toItemStack();
+		ItemStack scamming = new ItemBuilder(Material.GOLD_INGOT).withDisplayName("&cScamming").withLore(Arrays.asList("&ePlayer scammed you of in-game money or stuff")).toItemStack();
+		ItemStack lagmachines = new ItemBuilder(Material.REDSTONE_TORCH).withDisplayName("&cLag Machines").withLore(Arrays.asList("&ePlayer is creating lag machines that contribute lag to the server, or causing fps spikes to occur.")).toItemStack();
+		ItemStack other = new ItemBuilder(Material.HEART_OF_THE_SEA).withDisplayName("Other").withLore(Arrays.asList("&ePlayer is breaking a network rule that is not listed here.", "&bThis will allow you to speak to a staff member.")).toItemStack();
+		ItemStack cancel = new ItemBuilder(Material.BARRIER).withDisplayName("Cancel").withLore(Arrays.asList("&eReturn to the report category menu")).toItemStack();
+		inv.addItem(new ItemStack[] { ddosDoxThreats, inappropriatenameskin, scamming, lagmachines, other });
+		inv.setItem(8, cancel);
+		player.openInventory(inv);
 	}
 
 	public void openPlayerReportsGUI(Player player) {
