@@ -2,6 +2,8 @@ package com.matchamc.core.bukkit.listeners;
 
 import java.util.UUID;
 
+import org.bukkit.conversations.Conversation;
+import org.bukkit.conversations.ConversationFactory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -11,6 +13,7 @@ import com.matchamc.core.bukkit.BukkitMain;
 import com.matchamc.core.bukkit.util.PlayerRegistrar;
 import com.matchamc.core.bukkit.util.Report;
 import com.matchamc.core.bukkit.util.Reports;
+import com.matchamc.core.conversation.OtherOffencePrompt;
 import com.matchamc.shared.MsgUtils;
 
 public class ReportsGUIListener implements Listener {
@@ -67,6 +70,7 @@ public class ReportsGUIListener implements Listener {
 		}
 		String againstName = registrar.getNameFromRegistrar(against), reason;
 		Report report;
+		event.getWhoClicked().closeInventory();
 		switch(event.getCurrentItem().getType()) {
 		case IRON_SWORD: // PvP Hacks
 			reason = "Unfair Advantage - PvP Related Hacks";
@@ -132,6 +136,7 @@ public class ReportsGUIListener implements Listener {
 		}
 		String againstName = registrar.getNameFromRegistrar(against), reason;
 		Report report;
+		event.getWhoClicked().closeInventory();
 		switch(event.getCurrentItem().getType()) {
 		case PUFFERFISH: // Swearing
 			reason = "Chat Offence - Swearing";
@@ -186,8 +191,40 @@ public class ReportsGUIListener implements Listener {
 		}
 		String againstName = registrar.getNameFromRegistrar(against), reason;
 		Report report;
+		event.getWhoClicked().closeInventory();
 		switch(event.getCurrentItem().getType()) {
-
+		case GUNPOWDER: // DDoS/DoX Threats
+			reason = "DDoS/DoX Threats";
+			report = reports.createReport(event.getWhoClicked().getUniqueId(), against, reason, false);
+			event.getWhoClicked().sendMessage(MsgUtils.color("&eReport #" + report.getId() + " | You have reported &a" + againstName + " &efor &a" + reason + "&e."));
+			break;
+		case NAME_TAG: // Inappropriate Name/Skin
+			reason = "Inappropriate Name/Skin";
+			report = reports.createReport(event.getWhoClicked().getUniqueId(), against, reason, false);
+			event.getWhoClicked().sendMessage(MsgUtils.color("&eReport #" + report.getId() + " | You have reported &a" + againstName + " &efor &a" + reason + "&e."));
+			break;
+		case GOLD_INGOT: // Scamming
+			reason = "Scamming";
+			report = reports.createReport(event.getWhoClicked().getUniqueId(), against, reason, false);
+			event.getWhoClicked().sendMessage(MsgUtils.color("&eReport #" + report.getId() + " | You have reported &a" + againstName + " &efor &a" + reason + "&e."));
+			break;
+		case REDSTONE_TORCH: // Lag Machines
+			reason = "Creating Lag Machines";
+			report = reports.createReport(event.getWhoClicked().getUniqueId(), against, reason, false);
+			event.getWhoClicked().sendMessage(MsgUtils.color("&eReport #" + report.getId() + " | You have reported &a" + againstName + " &efor &a" + reason + "&e."));
+			break;
+		case HEART_OF_THE_SEA: // Other offences
+			Player p = (Player) event.getWhoClicked();
+			ConversationFactory factory = new ConversationFactory(instance);
+			Conversation conv = factory.withFirstPrompt(new OtherOffencePrompt(reports, registrar, against, false)).buildConversation(p);
+			p.beginConversation(conv);
+			break;
+		case BARRIER:
+			event.getWhoClicked().closeInventory();
+			reports.openReportReasonGUI((Player) event.getWhoClicked(), against);
+			break;
+		default:
+			break;
 		}
 	}
 }

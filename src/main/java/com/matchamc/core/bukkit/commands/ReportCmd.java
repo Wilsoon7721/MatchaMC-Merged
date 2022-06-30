@@ -43,21 +43,23 @@ public class ReportCmd extends CoreCommand {
 		if(sender instanceof Player) {
 			Player player = (Player) sender;
 			Collection<Report> playerReports = reports.getReportsByUUID(player.getUniqueId());
-			if(playerReports.isEmpty()) {
-				player.sendMessage(MsgUtils.color("&cYou do not have any reports."));
+			if(reports.getCooldown().contains(player.getUniqueId())) {
+				player.sendMessage(MsgUtils.color("&cYou are unable to make a new report as you are on cooldown for 30 seconds."));
 				return true;
 			}
-			int count = playerReports.size();
-			if(count > 45) {
-				int c = reports.cleanUpReports(player.getUniqueId());
-				if(c == 0 || (count - c) > 45) {
-					player.sendMessage(MsgUtils.color("&cYou are unable to make a new report."));
-					player.sendMessage(MsgUtils.color("&cPlease wait for your old reports to be resolved before reporting again."));
+			if(!playerReports.isEmpty()) {
+				int count = playerReports.size();
+				if(count > 45) {
+					int c = reports.cleanUpReports(player.getUniqueId());
+					if(c == 0 || (count - c) > 45) {
+						player.sendMessage(MsgUtils.color("&cYou are unable to make a new report."));
+						player.sendMessage(MsgUtils.color("&cPlease wait for your old reports to be resolved before reporting again."));
+						return true;
+					}
+					player.sendMessage(MsgUtils.color("&eThe plugin has deleted &a" + c + " &eof your resolved/closed reports."));
+					player.sendMessage(MsgUtils.color("&ePlease retry the command again."));
 					return true;
 				}
-				player.sendMessage(MsgUtils.color("&eThe plugin has deleted &a" + c + " &eof your resolved/closed reports."));
-				player.sendMessage(MsgUtils.color("&ePlease retry the command again."));
-				return true;
 			}
 		}
 		if(args.length < 2) {

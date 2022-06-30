@@ -9,8 +9,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -33,6 +35,7 @@ import com.matchamc.shared.MsgUtils;
 public class Reports {
 	private BukkitMain instance;
 	private Map<UUID, UUID> queuedReports = new HashMap<>();
+	private Set<UUID> cooldown = new HashSet<>();
 	private PlayerRegistrar registrar;
 	private File reportStats;
 	private File reportsDirectory;
@@ -182,6 +185,17 @@ public class Reports {
 
 	public Map<UUID, UUID> getQueuedReports() {
 		return queuedReports;
+	}
+
+	public void setOnCooldown(UUID uuid) {
+		if(cooldown.contains(uuid))
+			return;
+		cooldown.add(uuid);
+		Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> cooldown.remove(uuid), 30 * 20L);
+	}
+
+	public Set<UUID> getCooldown() {
+		return cooldown;
 	}
 
 	// GUIs
