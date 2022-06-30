@@ -2,12 +2,14 @@ package com.matchamc.core.bukkit.listeners;
 
 import java.util.UUID;
 
+import org.bukkit.Material;
 import org.bukkit.conversations.Conversation;
 import org.bukkit.conversations.ConversationFactory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemStack;
 
 import com.matchamc.core.bukkit.BukkitMain;
 import com.matchamc.core.bukkit.util.PlayerRegistrar;
@@ -226,5 +228,32 @@ public class ReportsGUIListener implements Listener {
 		default:
 			break;
 		}
+	}
+
+	// /reports - Both player and staff
+	@EventHandler
+	public void onPlayerReportsClick(InventoryClickEvent event) {
+		if(!(event.getView().getTitle().equalsIgnoreCase("Your Reports")))
+			return;
+		if(event.getCurrentItem() == null)
+			return;
+		event.setCancelled(true);
+		if(event.getCurrentItem().getType() != Material.PAPER)
+			return;
+		ItemStack i = event.getCurrentItem();
+		int id = Integer.parseInt(i.getItemMeta().getLore().get(0).replaceAll("\\D*", ""));
+		Report report = reports.getReport(id);
+		// TODO Manage Player Report GUI (Player View)
+	}
+
+	@EventHandler
+	public void onStaffReportsClick(InventoryClickEvent event) {
+		if(!(event.getView().getTitle().startsWith("Player Reports (")))
+			return;
+		if(event.getCurrentItem() == null)
+			return;
+		// TODO Previous Page and Next Page
+
+		// TODO Manage Player Report GUI (Staff View)
 	}
 }

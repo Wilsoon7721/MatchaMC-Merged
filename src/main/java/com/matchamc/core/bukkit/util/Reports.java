@@ -407,7 +407,7 @@ public class Reports {
 					break;
 				}
 				String againstName = registrar.getNameFromRegistrar(report.getAgainstUUID());
-				ItemStack item = new ItemBuilder(Material.PAPER).withDisplayName("&eReport #" + report.getId() + ": " + againstName).withLore(Arrays.asList("&eID: &a" + report.getId(), "&eReported Player: &a" + againstName, "&eReason: &a" + report.getReason(), "&eStatus: " + status)).toItemStack();
+				ItemStack item = new ItemBuilder(Material.PAPER).withDisplayName("&eReport #" + report.getId() + ": " + againstName).withLore(Arrays.asList("&eID: &a" + report.getId(), "&eReporter: &a" + registrar.getNameFromRegistrar(report.getReporterUUID()), "&eReported Player: &a" + againstName, "&eReason: &a" + report.getReason(), "&eStatus: " + status)).toItemStack();
 				inv.addItem(item);
 			});
 		} else {
@@ -428,7 +428,7 @@ public class Reports {
 					break;
 				}
 				String againstName = registrar.getNameFromRegistrar(report.getAgainstUUID());
-				ItemStack item = new ItemBuilder(Material.PAPER).withDisplayName("&eReport #" + report.getId() + ": " + againstName).withLore(Arrays.asList("&eID: &a" + report.getId(), "&eReported Player: &a" + againstName, "&eReason: &a" + report.getReason(), "&eStatus: " + status)).toItemStack();
+				ItemStack item = new ItemBuilder(Material.PAPER).withDisplayName("&eReport #" + report.getId() + ": " + againstName).withLore(Arrays.asList("&eID: &a" + report.getId(), "&eReporter: &a" + registrar.getNameFromRegistrar(report.getReporterUUID()), "&eReported Player: &a" + againstName, "&eReason: &a" + report.getReason(), "&eStatus: " + status)).toItemStack();
 				inv.addItem(item);
 			});
 		}
