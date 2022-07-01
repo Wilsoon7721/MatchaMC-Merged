@@ -37,15 +37,17 @@ public class Reports {
 	private Map<UUID, UUID> queuedReports = new HashMap<>();
 	private Set<UUID> cooldown = new HashSet<>();
 	private PlayerRegistrar registrar;
+	private Staffs staffs;
 	private File reportStats;
 	private File reportsDirectory;
 	public UUID consoleUUID = UUID.fromString("5aa66c90-aee9-4bb1-987b-1b307d77e4ca");
 	public String notifyReportMadePermission = "staffcore.notify.reports.created";
 	public String notifyReportClosedPermission = "staffcore.notify.reports.closed";
 
-	public Reports(BukkitMain instance, PlayerRegistrar registrar) {
+	public Reports(BukkitMain instance, Staffs staffs, PlayerRegistrar registrar) {
 		this.instance = instance;
 		this.registrar = registrar;
+		this.staffs = staffs;
 		reportStats = new File(this.instance.getDataFolder(), "reports_stats.yml");
 		reportsDirectory = new File(this.instance.getDataFolder(), "/reports/");
 		if(!reportsDirectory.exists())
@@ -443,5 +445,40 @@ public class Reports {
 		if(page != parts.size())
 			inv.setItem(50, new ItemBuilder(Material.ARROW).withDisplayName("&eNext Page").withLore(Arrays.asList("&eClick to go to page &a" + (page + 1))).toItemStack());
 		player.openInventory(inv);
+	}
+
+	public void openManageReportGUI(Player player, Report report) {
+		Inventory inv = Bukkit.createInventory(null, 54, "Manage Report #" + report.getId() + ".");
+		if(!report.getReporterUUID().toString().equalsIgnoreCase(player.getUniqueId().toString()) && !staffs.isStaff(player)) {
+			if(player.getOpenInventory() != null)
+				player.closeInventory();
+			player.sendMessage(MsgUtils.color("&cYou are not authorised to manage this report."));
+		}
+		String status;
+		switch(report.getStatus()) {
+		case OPEN:
+			status = MsgUtils.color("&aOPEN");
+			break;
+		case CLOSED:
+			status = MsgUtils.color("&c&lCLOSED");
+			break;
+		case RESOLVED:
+			status = MsgUtils.color("&a&lRESOLVED");
+			break;
+		default:
+			status = MsgUtils.color("&cINVALID");
+			break;
+		}
+		String againstName = registrar.getNameFromRegistrar(report.getAgainstUUID());
+		if(player.getUniqueId().toString().equalsIgnoreCase(report.getReporterUUID().toString())) {
+			ItemStack reportItem = new ItemBuilder(Material.PAPER).withDisplayName("&eReport #" + report.getId() + ": " + againstName).withLore(Arrays.asList("&eID: &a" + report.getId(), "&eReported Player: &a" + againstName, "&eReason: &a" + report.getReason(), "&eStatus: " + status)).toItemStack();
+			inv.setItem(13, reportItem);
+			// TODO Other buttons such as requesting immediate help
+		} else {
+			ItemStack reportItem = new ItemBuilder(Material.PAPER).withDisplayName("&eReport #" + report.getId() + ": " + againstName).withLore(Arrays.asList("&eID: &a" + report.getId(), "&eReporter: &a" + registrar.getNameFromRegistrar(report.getReporterUUID()), "&eReported Player: &a" + againstName, "&eReason: &a" + report.getReason(), "&eStatus: " + status)).toItemStack();
+			inv.setItem(13, reportItem);
+			// TODO Staff buttons maybe?
+		}
+
 	}
 }
