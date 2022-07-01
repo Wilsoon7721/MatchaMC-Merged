@@ -14,18 +14,25 @@ import org.bukkit.inventory.ItemStack;
 import com.matchamc.core.bukkit.BukkitMain;
 import com.matchamc.core.bukkit.util.PlayerRegistrar;
 import com.matchamc.core.bukkit.util.Report;
+import com.matchamc.core.bukkit.util.Report.Status;
 import com.matchamc.core.bukkit.util.Reports;
+import com.matchamc.core.bukkit.util.Staffs;
 import com.matchamc.core.conversation.OtherOffencePrompt;
+import com.matchamc.core.conversation.StatusMessagePrompt;
 import com.matchamc.shared.MsgUtils;
+
+import net.md_5.bungee.api.ChatColor;
 
 public class ReportsGUIListener implements Listener {
 	private BukkitMain instance;
 	private Reports reports;
+	private Staffs staffs;
 	private PlayerRegistrar registrar;
 
-	public ReportsGUIListener(BukkitMain instance, Reports reports, PlayerRegistrar registrar) {
+	public ReportsGUIListener(BukkitMain instance, Staffs staffs, Reports reports, PlayerRegistrar registrar) {
 		this.instance = instance;
 		this.reports = reports;
+		this.staffs = staffs;
 		this.registrar = registrar;
 	}
 
@@ -243,7 +250,7 @@ public class ReportsGUIListener implements Listener {
 		ItemStack i = event.getCurrentItem();
 		int id = Integer.parseInt(i.getItemMeta().getLore().get(0).replaceAll("\\D*", ""));
 		Report report = reports.getReport(id);
-		// TODO Manage Player Report GUI (Player View)
+		reports.openManageReportGUI((Player) event.getWhoClicked(), report);
 	}
 
 	@EventHandler
@@ -252,8 +259,66 @@ public class ReportsGUIListener implements Listener {
 			return;
 		if(event.getCurrentItem() == null)
 			return;
-		// TODO Previous Page and Next Page
+		Player p = (Player) event.getWhoClicked();
+		event.setCancelled(true);
+		if(event.getCurrentItem().getType() == Material.ARROW) {
+			int page = Integer.parseInt(ChatColor.stripColor(event.getView().getTitle()).split("/")[0].replaceAll("\\D*", ""));
+			if(ChatColor.stripColor(event.getCurrentItem().getItemMeta().getDisplayName()).equalsIgnoreCase("Previous Page")) {
+				if(page == 1)
+					return;
+				reports.openStaffReportsGUI(p, (page - 1));
+				return;
+			}
+			if(ChatColor.stripColor(event.getCurrentItem().getItemMeta().getDisplayName()).equalsIgnoreCase("Next Page")) {
+				reports.openStaffReportsGUI(p, (page + 1));
+				return;
+			}
+		}
+		if(event.getCurrentItem().getType() != Material.PAPER)
+			return;
+		int id = Integer.parseInt(event.getCurrentItem().getItemMeta().getLore().get(0).replaceAll("\\D*", ""));
+		Report report = reports.getReport(id);
+		reports.openManageReportGUI(p, report);
+	}
 
-		// TODO Manage Player Report GUI (Staff View)
+	@EventHandler
+	public void onManageReportClick(InventoryClickEvent event) {
+		if(!(event.getView().getTitle().startsWith("Manage Report #")))
+			return;
+		if(event.getCurrentItem() == null)
+			return;
+		event.setCancelled(true);
+		int id = Integer.parseInt(event.getView().getTitle().replaceAll("\\D*", ""));
+		Report report = reports.getReport(id);
+		Material type = event.getCurrentItem().getType();
+		if(type == Material.BARRIER) {
+			event.getWhoClicked().closeInventory();
+			if(staffs.isStaff((Player) event.getWhoClicked()))
+				reports.openStaffReportsGUI((Player) event.getWhoClicked(), 1);
+			else
+				reports.openPlayerReportsGUI((Player) event.getWhoClicked());
+			return;
+		}
+		if(type == Material.RED_STAINED_GLASS) {
+			event.getWhoClicked().closeInventory();
+			// TODO ask for help
+			return;
+		}
+		ConversationFactory factory = new ConversationFactory(instance);
+		if(type == Material.RED_WOOL) {
+			Conversation conv = factory.withFirstPrompt(new StatusMessagePrompt(report, Status.CLOSED)).buildConversation((Player) event.getWhoClicked());
+			((Player) event.getWhoClicked()).beginConversation(conv);
+			return;
+		}
+		if(type == Material.GREEN_WOOL) {
+			Conversation conv = factory.withFirstPrompt(new StatusMessagePrompt(report, Status.RESOLVED)).buildConversation((Player) event.getWhoClicked());
+			((Player) event.getWhoClicked()).beginConversation(conv);
+			return;
+		}
+		if(type == Material.DIAMOND) {
+			// TODO Report followup
+			// GUI that contains stuff like teleport to player etc.
+		}
 	}
 }
+

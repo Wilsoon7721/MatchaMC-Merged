@@ -448,11 +448,12 @@ public class Reports {
 	}
 
 	public void openManageReportGUI(Player player, Report report) {
-		Inventory inv = Bukkit.createInventory(null, 54, "Manage Report #" + report.getId() + ".");
+		Inventory inv = Bukkit.createInventory(null, 54, "Manage Report #" + report.getId());
 		if(!report.getReporterUUID().toString().equalsIgnoreCase(player.getUniqueId().toString()) && !staffs.isStaff(player)) {
 			if(player.getOpenInventory() != null)
 				player.closeInventory();
 			player.sendMessage(MsgUtils.color("&cYou are not authorised to manage this report."));
+			return;
 		}
 		String status;
 		switch(report.getStatus()) {
@@ -473,12 +474,39 @@ public class Reports {
 		if(player.getUniqueId().toString().equalsIgnoreCase(report.getReporterUUID().toString())) {
 			ItemStack reportItem = new ItemBuilder(Material.PAPER).withDisplayName("&eReport #" + report.getId() + ": " + againstName).withLore(Arrays.asList("&eID: &a" + report.getId(), "&eReported Player: &a" + againstName, "&eReason: &a" + report.getReason(), "&eStatus: " + status)).toItemStack();
 			inv.setItem(13, reportItem);
-			// TODO Other buttons such as requesting immediate help
+			// 29 is back, 33 is request help
+			ItemStack back = new ItemBuilder(Material.BARRIER).withDisplayName("&eBack").withLore(Arrays.asList("&eReturn to the reports list")).toItemStack();
+			ItemStack help = new ItemBuilder(Material.RED_STAINED_GLASS).withDisplayName("&eRequest for help").withLore(Arrays.asList("&eTalk to a staff member regarding this report.")).toItemStack();
+			inv.setItem(29, back);
+			inv.setItem(33, help);
 		} else {
 			ItemStack reportItem = new ItemBuilder(Material.PAPER).withDisplayName("&eReport #" + report.getId() + ": " + againstName).withLore(Arrays.asList("&eID: &a" + report.getId(), "&eReporter: &a" + registrar.getNameFromRegistrar(report.getReporterUUID()), "&eReported Player: &a" + againstName, "&eReason: &a" + report.getReason(), "&eStatus: " + status)).toItemStack();
 			inv.setItem(13, reportItem);
-			// TODO Staff buttons maybe?
 		}
-
+		if(staffs.isStaff(player)) {
+			ItemStack reportFollowup = new ItemBuilder(Material.DIAMOND).withDisplayName("&bReport Followup").toItemStack();
+			ItemStack switchClosed = new ItemBuilder(Material.RED_WOOL).withDisplayName("&eSet this report to &cClosed").withLore(Arrays.asList("&eSet this report status to &cClosed")).toItemStack();
+			ItemStack switchResolved = new ItemBuilder(Material.GREEN_WOOL).withDisplayName("&eSet this report to &aResolved").withLore(Arrays.asList("&eSet this report status to &aResolved")).toItemStack();
+			switch(report.getStatus()) {
+			case OPEN:
+				inv.setItem(48, switchClosed);
+				inv.setItem(50, switchResolved);
+				break;
+			case CLOSED:
+				inv.setItem(49, switchResolved);
+				break;
+			case RESOLVED:
+				inv.setItem(49, switchClosed);
+				break;
+			}
+			inv.setItem(53, reportFollowup);
+			ItemStack bsgp = new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).withDisplayName(MsgUtils.color(" ")).toItemStack();
+			for(int x = 0; x < 54; x++) {
+				if(inv.getItem(x) != null)
+					continue;
+				inv.setItem(x, bsgp);
+			}
+		}
+		player.openInventory(inv);
 	}
 }

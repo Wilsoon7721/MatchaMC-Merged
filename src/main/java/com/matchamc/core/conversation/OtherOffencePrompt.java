@@ -33,6 +33,11 @@ public class OtherOffencePrompt extends StringPrompt {
 	@Override
 	public Prompt acceptInput(ConversationContext context, String input) {
 		Player player = (Player) context.getForWhom();
+		if(input.equalsIgnoreCase("cancel")) {
+			player.sendMessage(MsgUtils.color("&cAction cancelled."));
+			reports.getQueuedReports().remove(player.getUniqueId());
+			return Prompt.END_OF_CONVERSATION;
+		}
 		Report report = reports.createReport(player.getUniqueId(), against, input, priority);
 		String againstName = registrar.getNameFromRegistrar(against);
 		player.sendMessage(MsgUtils.color("&eReport #" + report.getId() + " | You have reported &a" + againstName + " &efor &a" + input + "&e."));

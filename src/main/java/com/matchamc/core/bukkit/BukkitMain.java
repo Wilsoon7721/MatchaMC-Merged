@@ -119,6 +119,7 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		getCommand("note").setExecutor(new NoteCmd(this, notes, "staffcore.note"));
 		getCommand("notes").setExecutor(new NotesCmd(this, timezones, notes, "staffcore.notes"));
 		Bukkit.getPluginManager().registerEvents(new NotesGUIListener(notes, timezones), this);
+		// TODO Register Reports
 		reloadMessages();
 	}
 
