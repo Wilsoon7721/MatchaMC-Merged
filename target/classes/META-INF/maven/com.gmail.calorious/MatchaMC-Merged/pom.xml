@@ -49,6 +49,12 @@
     		<version>${javacord.version}</version>
     		<type>pom</type>
 		</dependency>
+		<dependency>
+            <groupId>com.github.LeonMangler</groupId>
+            <artifactId>SuperVanish</artifactId>
+            <version>6.2.6-4</version>
+            <scope>provided</scope>
+        </dependency>
    </dependencies>
    <build>
     <plugins>

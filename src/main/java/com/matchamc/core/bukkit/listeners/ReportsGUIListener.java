@@ -301,7 +301,7 @@ public class ReportsGUIListener implements Listener {
 		}
 		if(type == Material.RED_STAINED_GLASS) {
 			event.getWhoClicked().closeInventory();
-			// TODO ask for help
+			event.getWhoClicked().sendMessage(MsgUtils.color("&eTo speak to a staff member about this report, please contact any of the online staff and quote Report ID &a#" + report.getId() + "&e."));
 			return;
 		}
 		ConversationFactory factory = new ConversationFactory(instance);
@@ -318,7 +318,19 @@ public class ReportsGUIListener implements Listener {
 		if(type == Material.DIAMOND) {
 			// TODO Report followup
 			// GUI that contains stuff like teleport to player etc.
+			event.getWhoClicked().closeInventory();
+			reports.openReportFollowupGUI((Player) event.getWhoClicked());
+			return;
 		}
+	}
+
+	@EventHandler
+	public void onReportFollowupClick(InventoryClickEvent event) {
+		if(!(event.getView().getTitle().equalsIgnoreCase("Player Action Menu")))
+			return;
+		if(event.getCurrentItem() == null)
+			return;
+
 	}
 }
 

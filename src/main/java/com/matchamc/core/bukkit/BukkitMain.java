@@ -68,6 +68,7 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 	private Notes notes;
 	private Messenger messenger;
 	private ServerWhitelist whitelist;
+	private boolean vanishAPI;
 
 	@Override
 	public void onEnable() {
@@ -77,6 +78,8 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		saveDefaultConfig();
 		reloadConfig();
 		instance = this;
+		if(Bukkit.getPluginManager().getPlugin("SuperVanish") != null)
+			vanishAPI = true;
 		configurations = new Configurations(this);
 		staffs = new Staffs(this, configurations);
 		registrar = new PlayerRegistrar(this, configurations, "staffcore.logininfo");
@@ -237,5 +240,9 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		if(Bukkit.getVersion().contains("1.21"))
 			return "1.21";
 		return "[Unknown Version!]";
+	}
+
+	public boolean useSV() {
+		return vanishAPI;
 	}
 }

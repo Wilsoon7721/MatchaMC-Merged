@@ -509,4 +509,8 @@ public class Reports {
 		}
 		player.openInventory(inv);
 	}
+
+	public void openReportFollowupGUI(Player player) {
+		Inventory inv = Bukkit.createInventory(null, 9, "Player Action Menu");
+	}
 }
