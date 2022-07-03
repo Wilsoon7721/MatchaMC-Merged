@@ -2,9 +2,13 @@ package com.matchamc.core.bukkit.listeners;
 
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.conversations.Conversation;
+import org.bukkit.conversations.ConversationContext;
 import org.bukkit.conversations.ConversationFactory;
+import org.bukkit.conversations.Prompt;
+import org.bukkit.conversations.StringPrompt;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,6 +25,7 @@ import com.matchamc.core.conversation.OtherOffencePrompt;
 import com.matchamc.core.conversation.StatusMessagePrompt;
 import com.matchamc.shared.MsgUtils;
 
+import de.myzelyam.api.vanish.VanishAPI;
 import net.md_5.bungee.api.ChatColor;
 
 public class ReportsGUIListener implements Listener {
@@ -319,18 +324,82 @@ public class ReportsGUIListener implements Listener {
 			// TODO Report followup
 			// GUI that contains stuff like teleport to player etc.
 			event.getWhoClicked().closeInventory();
-			reports.openReportFollowupGUI((Player) event.getWhoClicked());
+			reports.openReportFollowupGUI((Player) event.getWhoClicked(), report);
 			return;
 		}
 	}
 
 	@EventHandler
 	public void onReportFollowupClick(InventoryClickEvent event) {
-		if(!(event.getView().getTitle().equalsIgnoreCase("Player Action Menu")))
+		if(!(event.getView().getTitle().startsWith("Player Action Menu | #")))
 			return;
 		if(event.getCurrentItem() == null)
 			return;
+		int id = Integer.parseInt(event.getView().getTitle().replaceAll("\\D*", ""));
+		event.setCancelled(true);
+		Player player = (Player) event.getWhoClicked();
+		Report report = reports.getReport(id);
+		switch(event.getCurrentItem().getType()) {
+		case ENDER_PEARL:
+			Player target = Bukkit.getPlayer(report.getAgainstUUID());
+			if(target == null) {
+				player.sendMessage(MsgUtils.color("&cThis option is not available, see below for details:"));
+				player.sendMessage(BukkitMain.PLAYER_OFFLINE);
+				return;
+			}
+			if(!VanishAPI.isInvisible(player)) {
+				ConversationFactory factory = new ConversationFactory(instance);
+				StringPrompt prompt = new StringPrompt() {
 
+					@Override
+					public String getPromptText(ConversationContext context) {
+						return "Are you sure you want to teleport while unvanished? (Y/N)";
+					}
+
+					@Override
+					public Prompt acceptInput(ConversationContext context, String input) {
+						switch(input.toUpperCase()) {
+						case "Y":
+						case "YE":
+						case "YES":
+							player.teleport(target);
+							player.sendMessage(MsgUtils.color("&eYou have been teleported to &a" + target.getName() + "&e."));
+							break;
+						case "N":
+						case "NO":
+							if(!VanishAPI.isInvisible(player)) {
+								VanishAPI.hidePlayer(player);
+								player.sendMessage(MsgUtils.color("&eYou vanished."));
+							} else
+								player.sendMessage(MsgUtils.color("&eYou have already vanished."));
+							player.teleport(target);
+							player.sendMessage(MsgUtils.color("&eYou have teleported to &a" + target.getName() + "&e."));
+							break;
+						default:
+							((Player) context.getForWhom()).sendMessage(MsgUtils.color("&cInvalid input given."));
+							return this;
+						}
+						return Prompt.END_OF_CONVERSATION;
+					}
+
+				};
+				Conversation conv = factory.withFirstPrompt(prompt).buildConversation(player);
+				conv.begin();
+				return;
+			}
+			player.teleport(target);
+			player.sendMessage(MsgUtils.color("&eYou have teleported to &a" + target.getName() + "&e."));
+			break;
+		case STONE_AXE:
+			// TODO Punishment Menu
+			break;
+		case BARRIER:
+			player.closeInventory();
+			Bukkit.getScheduler().runTask(instance, () -> reports.openManageReportGUI(player, report));
+			break;
+		default:
+			return;
+		}
 	}
 }
 

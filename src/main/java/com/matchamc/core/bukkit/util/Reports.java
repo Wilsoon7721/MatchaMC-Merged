@@ -510,7 +510,18 @@ public class Reports {
 		player.openInventory(inv);
 	}
 
-	public void openReportFollowupGUI(Player player) {
-		Inventory inv = Bukkit.createInventory(null, 9, "Player Action Menu");
+	public void openReportFollowupGUI(Player player, Report report) {
+		Inventory inv = Bukkit.createInventory(null, 9, "Player Action Menu | #" + report.getId());
+		ItemStack tp = new ItemBuilder(Material.ENDER_PEARL).withDisplayName("&eTeleport to Reported Player").toItemStack();
+		ItemStack punish = new ItemBuilder(Material.STONE_AXE).withDisplayName("&ePunish this player").toItemStack();
+		ItemStack cancel = new ItemBuilder(Material.BARRIER).withDisplayName("&eBack").toItemStack();
+		inv.addItem(new ItemStack[] { tp, punish });
+		inv.setItem(8, cancel);
+		ItemStack bsgp = new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).withDisplayName(" ").toItemStack();
+		for(int x = 0; x < 9; x++) {
+			if(inv.getItem(x) == null)
+				inv.setItem(x, bsgp);
+		}
+		player.openInventory(inv);
 	}
 }

@@ -167,7 +167,14 @@ public class Chat extends CoreCommand implements Listener {
 			}
 		}
 	}
-	private void setPlayerChannel(Player player, Channel channel) {
+
+	public Channel getPlayerChannel(Player player) {
+		if(playerChannels.containsKey(player.getUniqueId()))
+			return playerChannels.get(player.getUniqueId());
+		return Channel.ALL;
+	}
+
+	public void setPlayerChannel(Player player, Channel channel) {
 		if(playerChannels.containsKey(player.getUniqueId()))
 			playerChannels.remove(player.getUniqueId());
 		playerChannels.put(player.getUniqueId(), channel);

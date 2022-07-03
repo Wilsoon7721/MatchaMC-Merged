@@ -6,10 +6,13 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -103,6 +106,22 @@ public class PlayerRegistrar extends CoreCommand implements Listener {
 		return name;
 	}
 
+	public Collection<UUID> getAllUUIDsMatchingName(String query, boolean exactMatch) {
+		Collection<UUID> uuids = new HashSet<>();
+		YamlConfiguration yc = YamlConfiguration.loadConfiguration(file);
+		for(String key : yc.getConfigurationSection("players").getKeys(false)) {
+			if(exactMatch) {
+				if(yc.getString("players." + key + ".name").equalsIgnoreCase(query))
+					uuids.add(UUID.fromString(key));
+			} else {
+				String s = yc.getString("players." + key + ".name");
+				if(s.toLowerCase().contains(query.toLowerCase()))
+					uuids.add(UUID.fromString(key));
+			}
+		}
+		return uuids;
+	}
+
 	public void registerPlayer(Player player) {
 		YamlConfiguration yc = YamlConfiguration.loadConfiguration(file);
 		String uuid = player.getUniqueId().toString();
@@ -114,6 +133,16 @@ public class PlayerRegistrar extends CoreCommand implements Listener {
 			yc.save(file);
 		} catch(IOException ex) {}
 		YamlConfiguration.loadConfiguration(file);
+	}
+
+	public Collection<String> getAllRegisteredPlayerNames() {
+		Set<String> c = new HashSet<>();
+		YamlConfiguration yc = YamlConfiguration.loadConfiguration(file);
+		for(String key : yc.getConfigurationSection("players").getKeys(false)) {
+			String s = yc.getString("players." + key + ".name");
+			c.add(s);
+		}
+		return c;
 	}
 
 	@EventHandler
