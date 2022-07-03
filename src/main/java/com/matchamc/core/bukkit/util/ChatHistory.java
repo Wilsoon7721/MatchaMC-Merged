@@ -1,11 +1,14 @@
 package com.matchamc.core.bukkit.util;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -81,6 +85,59 @@ public class ChatHistory extends CoreCommand implements Listener {
 	}
 
 	// TODO Other methods to retrieve chat history of player
+
+	public Map<Long, String> getPlayerChatHistory(UUID playerUUID) {
+		File playerFile = new File(historyDirectory, playerUUID.toString() + ".txt");
+		if(!(playerFile.exists()))
+			return null;
+		Map<Long, String> map = new HashMap<>();
+		try(BufferedReader reader = new BufferedReader(new FileReader(playerFile))) {
+			String line;
+			while((line = reader.readLine()) != null) {
+				String[] t = line.split("|");
+				Long millis = Long.parseLong(t[0].trim());
+				if(t.length > 2) {
+					// message contains '|' also
+					String msg = String.join(" ", Arrays.copyOfRange(t, 1, t.length)).trim();
+					map.put(millis, msg);
+					continue;
+				}
+				String msg = t[1].trim();
+				map.put(millis, msg);
+			}
+		} catch(IOException ex) {
+			ex.printStackTrace();
+			return null;
+		}
+		return map;
+	}
+
+	public Map<Long, String> getPlayerChatHistory(UUID playerUUID, long durationInMillis) {
+		long start = System.currentTimeMillis() - durationInMillis;
+		File playerFile = new File(historyDirectory, playerUUID.toString() + ".txt");
+		if(!(playerFile.exists()))
+			return null;
+		Map<Long, String> map = new HashMap<>();
+		try(BufferedReader reader = new BufferedReader(new FileReader(playerFile))) {
+			String line;
+			while((line = reader.readLine()) != null) {
+				String[] t = line.split("|");
+				Long millis = Long.parseLong(t[0].trim());
+				if(t.length > 2) {
+					// message contains '|' also
+					String msg = String.join(" ", Arrays.copyOfRange(t, 1, t.length)).trim();
+					map.put(millis, msg);
+					continue;
+				}
+				String msg = t[1].trim();
+				map.put(millis, msg);
+			}
+		} catch(IOException ex) {
+			ex.printStackTrace();
+			return null;
+		}
+		return map.entrySet().stream().filter(e -> (e.getKey() > start)).sorted(Map.Entry.comparingByKey()).collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+	}
 
 	public void saveData() {
 		for(Entry<UUID, ArrayList<String>> entry : history.entrySet()) {
