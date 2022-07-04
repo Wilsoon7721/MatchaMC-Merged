@@ -26,6 +26,8 @@ import com.matchamc.core.bukkit.commands.OverrideCmd;
 import com.matchamc.core.bukkit.commands.PlayerTimeCmd;
 import com.matchamc.core.bukkit.commands.PlayerWeatherCmd;
 import com.matchamc.core.bukkit.commands.ReplyCmd;
+import com.matchamc.core.bukkit.commands.ReportCmd;
+import com.matchamc.core.bukkit.commands.ReportsCmd;
 import com.matchamc.core.bukkit.commands.SkullCmd;
 import com.matchamc.core.bukkit.commands.SpeedCmd;
 import com.matchamc.core.bukkit.commands.TeleportCmd;
@@ -39,6 +41,7 @@ import com.matchamc.core.bukkit.commands.staff.NoteCmd;
 import com.matchamc.core.bukkit.commands.staff.NotesCmd;
 import com.matchamc.core.bukkit.commands.staff.SocialspyCmd;
 import com.matchamc.core.bukkit.listeners.NotesGUIListener;
+import com.matchamc.core.bukkit.listeners.ReportsGUIListener;
 import com.matchamc.core.bukkit.util.AntiCheatDragbackHook;
 import com.matchamc.core.bukkit.util.AntiCheatHook;
 import com.matchamc.core.bukkit.util.AntiCheatTrigger;
@@ -49,6 +52,7 @@ import com.matchamc.core.bukkit.util.Configurations;
 import com.matchamc.core.bukkit.util.Messenger;
 import com.matchamc.core.bukkit.util.Notes;
 import com.matchamc.core.bukkit.util.PlayerRegistrar;
+import com.matchamc.core.bukkit.util.Reports;
 import com.matchamc.core.bukkit.util.ServerWhitelist;
 import com.matchamc.core.bukkit.util.Staffs;
 import com.matchamc.core.bukkit.util.TimeZones;
@@ -66,6 +70,7 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 	private Chat chat = null;
 	private ChatHistory chatHistory;
 	private PlayerRegistrar registrar;
+	private Reports reports;
 	private TimeZones timezones;
 	private Notes notes;
 	private Messenger messenger;
@@ -88,7 +93,8 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		whitelist = new ServerWhitelist(this, staffs);
 		messenger = new Messenger(this);
 		banwave = new BanWave(this, registrar, "staffcore.banwave");
-		chatHistory = new ChatHistory(this, staffs, registrar, chat, "staffcore.chathistory");
+		chatHistory = new ChatHistory(this, registrar, chat, "staffcore.chathistory");
+		reports = new Reports(this, staffs, registrar);
 		notes = new Notes(this);
 		timezones = new TimeZones(this);
 		configurations.create("messages.yml");
@@ -121,12 +127,14 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		Bukkit.getPluginManager().registerEvents(new AntiCheatTrigger(), this);
 		registerCommandAndListener("alerts", new AntiCheatHook(this, banwave, "staffcore.alerts"));
 		getCommand("banwave").setExecutor(banwave);
+		registerCommandAndListener("chathistory", chatHistory);
 		registerCommandAndListener("dbalerts", new AntiCheatDragbackHook(this, "staffcore.dbalerts"));
 		getCommand("note").setExecutor(new NoteCmd(this, notes, "staffcore.note"));
 		getCommand("notes").setExecutor(new NotesCmd(this, timezones, notes, "staffcore.notes"));
 		Bukkit.getPluginManager().registerEvents(new NotesGUIListener(notes, timezones), this);
-		registerCommandAndListener("chathistory", chatHistory);
-		// TODO Register Reports
+		getCommand("report").setExecutor(new ReportCmd(this, reports, registrar, "staffcore.report"));
+		getCommand("reports").setExecutor(new ReportsCmd(this, registrar, staffs, reports, "staffcore.reports"));
+		Bukkit.getPluginManager().registerEvents(new ReportsGUIListener(this, staffs, reports, registrar), this);
 		reloadMessages();
 	}
 

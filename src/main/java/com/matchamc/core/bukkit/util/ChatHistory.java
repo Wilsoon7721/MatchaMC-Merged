@@ -7,10 +7,14 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,16 +38,14 @@ import com.matchamc.shared.MsgUtils;
 
 public class ChatHistory extends CoreCommand implements Listener {
 	private Chat chat;
-	private Staffs staffs;
 	private PlayerRegistrar registrar;
 	private File historyDirectory;
 	private Map<UUID, ArrayList<String>> history = new HashMap<>();
 	private Collection<String> c;
 
-	public ChatHistory(BukkitMain instance, Staffs staffs, PlayerRegistrar registrar, Chat chat, String permissionNode) {
+	public ChatHistory(BukkitMain instance, PlayerRegistrar registrar, Chat chat, String permissionNode) {
 		super(instance, permissionNode);
 		this.registrar = registrar;
-		this.staffs = staffs;
 		this.chat = chat;
 		historyDirectory = new File(this.instance.getDataFolder(), "/chathistory/");
 		if(!(historyDirectory.exists()))
@@ -59,7 +61,7 @@ public class ChatHistory extends CoreCommand implements Listener {
 		}
 		if(args.length == 0) {
 			sender.sendMessage(BukkitMain.INSUFFICIENT_PARAMETERS_ERROR);
-			sender.sendMessage(MsgUtils.color("&cUsage: /chathistory <player>"));
+			sender.sendMessage(MsgUtils.color("&cUsage: /chathistory <player> [duration]"));
 			return true;
 		}
 		String username = args[0];
@@ -69,12 +71,86 @@ public class ChatHistory extends CoreCommand implements Listener {
 			return true;
 		}
 		UUID result = results.iterator().next();
+		String name = registrar.getNameFromRegistrar(result);
 		if(!registrar.isRegistered(result)) {
 			sender.sendMessage(MsgUtils.color("&cA severe internal error has occurred."));
 			MsgUtils.sendBukkitConsoleMessage("&c[MatchaMC] ChatHistory - Severe error: PlayerRegistrar#getAllUUIDsMatchingName found this result &e" + result.toString() + " &cbut PlayerRegistrar#isRegistered could not verify this player's registration. (Where did the UUID come from?)");
 			return true;
 		}
-		// TODO get player chat history
+		if(args.length == 1) {
+			// REVERSED ASCENDING (DESCENDING) - Latest to Oldest Message
+			Map<Long, String> chatHistory = getPlayerChatHistory(result);
+			if(chatHistory.size() == 0) {
+				sender.sendMessage(MsgUtils.color("&cThis player has no chat records."));
+				return true;
+			}
+			sender.sendMessage(MsgUtils.color("&eChat History records for &a" + name));
+			sender.sendMessage(MsgUtils.color("&7&m-------------------------------"));
+			Instant currentTime = Instant.ofEpochMilli(System.currentTimeMillis());
+			chatHistory.entrySet().stream().forEachOrdered(entry -> {
+				Instant messageTime = Instant.ofEpochMilli(entry.getKey());
+				String msg = entry.getValue();
+				long seconds = ChronoUnit.SECONDS.between(messageTime, currentTime);
+				long minutes = ChronoUnit.MINUTES.between(messageTime, currentTime);
+				long hours = ChronoUnit.HOURS.between(messageTime, currentTime);
+				long days = ChronoUnit.DAYS.between(messageTime, currentTime);
+				long weeks = ChronoUnit.WEEKS.between(messageTime, currentTime);
+				long months = ChronoUnit.MONTHS.between(messageTime, currentTime);
+				long years = ChronoUnit.YEARS.between(messageTime, currentTime);
+				if(seconds < 60)
+					sender.sendMessage(MsgUtils.color("&e" + seconds + " &asecond(s) ago &e| &a\"" + msg + "\""));
+				else if(seconds > 60 && minutes < 60)
+					sender.sendMessage(MsgUtils.color("&e" + minutes + " &aminute(s) ago &e| &a\"" + msg + "\""));
+				else if(minutes > 60 && hours < 24)
+					sender.sendMessage(MsgUtils.color("&e" + hours + " &ahour(s) ago &e| &a\"" + msg + "\""));
+				else if(hours > 24 & days < 7)
+					sender.sendMessage(MsgUtils.color("&e" + days + " &aday(s) ago &e| &a\"" + msg + "\""));
+				else if(days > 7 && weeks < 4)
+					sender.sendMessage(MsgUtils.color("&e" + weeks + " &aweek(s) ago &e| &a\"" + msg + "\""));
+				else if(weeks > 4 && months < 12)
+					sender.sendMessage(MsgUtils.color("&e" + months + " &amonth(s) ago &e| &a\"" + msg + "\""));
+				else
+					sender.sendMessage(MsgUtils.color("&e" + years + " &ayear(s) ago &e| &a\"" + msg + "\""));
+			});
+			return true;
+		}
+		String sduration = args[1];
+		Duration duration = Duration.parse("PT" + sduration.toUpperCase());
+		sender.sendMessage(MsgUtils.color("&eChat History records for &a" + name));
+		sender.sendMessage(MsgUtils.color("&eFilter: [Sent within the last &a" + duration.toMinutes() + " &eminutes]"));
+		sender.sendMessage(MsgUtils.color("&7&m-------------------------------"));
+		Map<Long, String> chatHistory = getPlayerChatHistory(result, duration);
+		if(chatHistory.size() == 0) {
+			sender.sendMessage(MsgUtils.color("&cThis player has no chat records within the specified time frame."));
+			return true;
+		}
+		Instant currentTime = Instant.ofEpochMilli(System.currentTimeMillis());
+		chatHistory.entrySet().stream().forEachOrdered(entry -> {
+			Instant messageTime = Instant.ofEpochMilli(entry.getKey());
+			String msg = entry.getValue();
+			long seconds = ChronoUnit.SECONDS.between(messageTime, currentTime);
+			long minutes = ChronoUnit.MINUTES.between(messageTime, currentTime);
+			long hours = ChronoUnit.HOURS.between(messageTime, currentTime);
+			long days = ChronoUnit.DAYS.between(messageTime, currentTime);
+			long weeks = ChronoUnit.WEEKS.between(messageTime, currentTime);
+			long months = ChronoUnit.MONTHS.between(messageTime, currentTime);
+			long years = ChronoUnit.YEARS.between(messageTime, currentTime);
+			if(seconds < 60)
+				sender.sendMessage(MsgUtils.color("&e" + seconds + " &asecond(s) ago &e| &a\"" + msg + "\""));
+			else if(seconds > 60 && minutes < 60)
+				sender.sendMessage(MsgUtils.color("&e" + minutes + " &aminute(s) ago &e| &a\"" + msg + "\""));
+			else if(minutes > 60 && hours < 24)
+				sender.sendMessage(MsgUtils.color("&e" + hours + " &ahour(s) ago &e| &a\"" + msg + "\""));
+			else if(hours > 24 & days < 7)
+				sender.sendMessage(MsgUtils.color("&e" + days + " &aday(s) ago &e| &a\"" + msg + "\""));
+			else if(days > 7 && weeks < 4)
+				sender.sendMessage(MsgUtils.color("&e" + weeks + " &aweek(s) ago &e| &a\"" + msg + "\""));
+			else if(weeks > 4 && months < 12)
+				sender.sendMessage(MsgUtils.color("&e" + months + " &amonth(s) ago &e| &a\"" + msg + "\""));
+			else
+				sender.sendMessage(MsgUtils.color("&e" + years + " &ayear(s) ago &e| &a\"" + msg + "\""));
+		});
+		return true;
 	}
 
 	@Override
@@ -109,11 +185,12 @@ public class ChatHistory extends CoreCommand implements Listener {
 			ex.printStackTrace();
 			return null;
 		}
-		return map;
+		// Latest to Oldest message
+		return map.entrySet().stream().sorted(Map.Entry.comparingByKey(Comparator.reverseOrder())).collect(Collectors.toMap(Entry::getKey, Entry::getValue));
 	}
 
-	public Map<Long, String> getPlayerChatHistory(UUID playerUUID, long durationInMillis) {
-		long start = System.currentTimeMillis() - durationInMillis;
+	public Map<Long, String> getPlayerChatHistory(UUID playerUUID, Duration duration) {
+		long start = System.currentTimeMillis() - duration.toMillis();
 		File playerFile = new File(historyDirectory, playerUUID.toString() + ".txt");
 		if(!(playerFile.exists()))
 			return null;
@@ -136,7 +213,8 @@ public class ChatHistory extends CoreCommand implements Listener {
 			ex.printStackTrace();
 			return null;
 		}
-		return map.entrySet().stream().filter(e -> (e.getKey() > start)).sorted(Map.Entry.comparingByKey()).collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+		// Latest to Oldest message
+		return map.entrySet().stream().filter(e -> (e.getKey() > start)).sorted(Map.Entry.comparingByKey(Comparator.reverseOrder())).collect(Collectors.toMap(Entry::getKey, Entry::getValue));
 	}
 
 	public void saveData() {
