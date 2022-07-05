@@ -12,23 +12,26 @@ import com.matchamc.shared.MsgUtils;
 import litebans.api.Database;
 
 public class Punishment {
-	public static boolean cancel = false;
+	public Punishment punishmentInstance;
 	private BukkitMain instance;
 	private PlayerRegistrar registrar;
 	private Type type;
 	private UUID executor, punished;
 	private String reason;
 	private Duration duration;
+	private boolean cancelled;
 	private boolean executed = false;
 
 	public Punishment(BukkitMain instance, PlayerRegistrar registrar, Type type, UUID executor, UUID punished, String reason, Duration duration) {
 		// specify null duration for forever
+		this.punishmentInstance = this;
 		this.instance = instance;
 		this.registrar = registrar;
 		this.type = type;
 		this.executor = executor;
 		this.punished = punished;
 		this.reason = reason;
+		this.cancelled = false;
 		this.duration = duration;
 	}
 
@@ -40,12 +43,12 @@ public class Punishment {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
-					Punishment.cancel = database.isPlayerBanned(punished, null);
+					punishmentInstance.setCancelled(database.isPlayerBanned(punished, null));
 				}
 			}.runTaskAsynchronously(instance);
-			if(Punishment.cancel) {
+			if(cancelled) {
 				Bukkit.getPlayer(executor).sendMessage(MsgUtils.color("&cThis player is already banned."));
-				Punishment.cancel = false;
+				cancelled = false;
 				return;
 			}
 			if(duration == null)
@@ -57,12 +60,12 @@ public class Punishment {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
-					Punishment.cancel = database.isPlayerMuted(punished, null);
+					punishmentInstance.setCancelled(database.isPlayerMuted(punished, null));
 				}
 			}.runTaskAsynchronously(instance);
-			if(Punishment.cancel) {
+			if(cancelled) {
 				Bukkit.getPlayer(executor).sendMessage(MsgUtils.color("&cThis player is already muted."));
-				Punishment.cancel = false;
+				cancelled = false;
 				return;
 			}
 			if(duration == null)
@@ -119,6 +122,10 @@ public class Punishment {
 
 	public void setDuration(Duration duration) {
 		this.duration = duration;
+	}
+
+	public void setCancelled(boolean cancel) {
+		cancelled = cancel;
 	}
 
 	public static enum Type {
