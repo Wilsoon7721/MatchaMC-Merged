@@ -41,6 +41,7 @@ import com.matchamc.core.bukkit.commands.staff.NoteCmd;
 import com.matchamc.core.bukkit.commands.staff.NotesCmd;
 import com.matchamc.core.bukkit.commands.staff.PunishCmd;
 import com.matchamc.core.bukkit.commands.staff.SocialspyCmd;
+import com.matchamc.core.bukkit.commands.staff.StaffRandomTPCmd;
 import com.matchamc.core.bukkit.listeners.NotesGUIListener;
 import com.matchamc.core.bukkit.listeners.ReportsGUIListener;
 import com.matchamc.core.bukkit.util.AntiCheatDragbackHook;
@@ -136,11 +137,12 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		getCommand("note").setExecutor(new NoteCmd(this, notes, "staffcore.note"));
 		getCommand("notes").setExecutor(new NotesCmd(this, timezones, notes, "staffcore.notes"));
 		Bukkit.getPluginManager().registerEvents(new NotesGUIListener(notes, timezones), this);
+		getCommand("punish").setExecutor(new PunishCmd(this, punishments, registrar, "staffcore.punish"));
+		Bukkit.getPluginManager().registerEvents(punishments, this);
 		getCommand("report").setExecutor(new ReportCmd(this, reports, registrar, "staffcore.report"));
 		getCommand("reports").setExecutor(new ReportsCmd(this, registrar, staffs, reports, "staffcore.reports"));
 		Bukkit.getPluginManager().registerEvents(new ReportsGUIListener(this, staffs, reports, registrar), this);
-		getCommand("punish").setExecutor(new PunishCmd(this, punishments, registrar, "staffcore.punish"));
-		Bukkit.getPluginManager().registerEvents(punishments, this);
+		getCommand("srtp").setExecutor(new StaffRandomTPCmd(this, staffs, "staffcore.randomteleport"));
 		reloadMessages();
 	}
 

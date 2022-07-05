@@ -42,6 +42,7 @@ public class Punishments implements Listener {
 
 	// GUIs
 	public void openPunishmentGUI(Player player, UUID punished) {
+		// TODO BAN/KICK/MUTE REASON GUIs from REPORTS
 		String punishedName = registrar.getNameFromRegistrar(punished);
 		Inventory inv = Bukkit.createInventory(null, 9, "Issue Punishment: " + punishedName);
 		if(player.hasPermission(permissionBan)) {

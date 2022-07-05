@@ -110,6 +110,7 @@ public class BanWave extends CoreCommand {
 			sender.sendMessage(MsgUtils.color("&eThe following players are queued for the next banwave: &c" + players));
 			sender.sendMessage(MsgUtils.color("&eThe next banwave will execute in &7" + seconds[0] + " seconds&e."));
 			break;
+		case "next":
 		case "nextwave":
 			sender.sendMessage(MsgUtils.color("&eNext banwave executes in &7" + seconds[0] + " seconds&e."));
 			sender.sendMessage(MsgUtils.color("&7The next banwave contains &e" + banWavePlayers.size() + " players&7."));
