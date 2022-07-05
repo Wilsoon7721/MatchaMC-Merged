@@ -10,9 +10,11 @@ import com.matchamc.shared.MsgUtils;
 
 public class PunishmentReasonPrompt extends StringPrompt {
 	private Punishment punishment;
+	private Prompt nextPrompt;
 
-	public PunishmentReasonPrompt(Punishment punishment) {
+	public PunishmentReasonPrompt(Punishment punishment, Prompt nextPrompt) {
 		this.punishment = punishment;
+		this.nextPrompt = nextPrompt;
 	}
 
 	@Override
@@ -24,6 +26,6 @@ public class PunishmentReasonPrompt extends StringPrompt {
 	public Prompt acceptInput(ConversationContext context, String input) {
 		punishment.setReason(input);
 		((Player) context.getForWhom()).sendMessage(MsgUtils.color("&eSet the reason for this punishment to &a'" + input + "'&e."));
-		return new PunishmentDurationPrompt(punishment);
+		return nextPrompt;
 	}
 }

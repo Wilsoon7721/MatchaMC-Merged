@@ -5,15 +5,22 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.conversations.Conversation;
+import org.bukkit.conversations.ConversationFactory;
+import org.bukkit.conversations.Prompt;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.matchamc.core.bukkit.BukkitMain;
+import com.matchamc.core.bukkit.util.Punishment.Type;
+import com.matchamc.core.conversation.PunishmentDurationPrompt;
+import com.matchamc.core.conversation.PunishmentReasonPrompt;
 
-public class Punishments {
+public class Punishments implements Listener {
 	public static final String PLUGIN_PUNISHMENT_NAME = "MatchaMC Punishments (%executor%)";
 	public static final UUID PLUGIN_PUNISHMENT_UUID = UUID.fromString("740c1ecf-8cde-4c24-8b02-9ffbc76ff7f2");
 	private BukkitMain instance;
@@ -69,15 +76,31 @@ public class Punishments {
 		if(event.getCurrentItem() == null)
 			return;
 		event.setCancelled(true);
+		String punishedName = event.getView().getTitle().split(" ")[2];
+		UUID punished = registrar.resolveUUIDFromName(punishedName);
+		ConversationFactory factory = new ConversationFactory(instance);
+		Punishment punishment;
+		Conversation conv;
 		switch(event.getCurrentItem().getType()) {
 		case DIAMOND_AXE:
-
+			punishment = createPunishment(Type.BAN, event.getWhoClicked().getUniqueId(), punished, null, null);
+			conv = factory.withFirstPrompt(new PunishmentReasonPrompt(punishment, new PunishmentDurationPrompt(punishment))).buildConversation((Player) event.getWhoClicked());
+			((Player) event.getWhoClicked()).beginConversation(conv);
 			break;
 		case IRON_BOOTS:
+			punishment = createPunishment(Type.KICK, event.getWhoClicked().getUniqueId(), punished, null, null);
+			conv = factory.withFirstPrompt(new PunishmentReasonPrompt(punishment, Prompt.END_OF_CONVERSATION)).buildConversation((Player) event.getWhoClicked());
+			((Player) event.getWhoClicked()).beginConversation(conv);
 			break;
 		case INK_SAC:
+			punishment = createPunishment(Type.MUTE, event.getWhoClicked().getUniqueId(), punished, null, null);
+			conv = factory.withFirstPrompt(new PunishmentReasonPrompt(punishment, new PunishmentDurationPrompt(punishment))).buildConversation((Player) event.getWhoClicked());
+			((Player) event.getWhoClicked()).beginConversation(conv);
 			break;
 		case PAPER:
+			punishment = createPunishment(Type.WARN, event.getWhoClicked().getUniqueId(), punished, null, null);
+			conv = factory.withFirstPrompt(new PunishmentReasonPrompt(punishment, Prompt.END_OF_CONVERSATION)).buildConversation((Player) event.getWhoClicked());
+			((Player) event.getWhoClicked()).beginConversation(conv);
 			break;
 		default:
 			break;

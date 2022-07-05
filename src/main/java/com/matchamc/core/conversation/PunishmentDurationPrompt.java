@@ -32,7 +32,7 @@ public class PunishmentDurationPrompt extends StringPrompt {
 		try {
 			Duration duration = Duration.parse("PT" + input);
 			punishment.setDuration(duration);
-			((Player) context.getForWhom()).sendMessage(MsgUtils.color("&eSuccessfully set the duration for this punishment to &a" + duration.to));
+			((Player) context.getForWhom()).sendMessage(MsgUtils.color("&eSuccessfully set the duration for this punishment to &a" + duration.toMinutes() + " &eminutes."));
 		} catch(DateTimeParseException ex) {
 			((Player) context.getForWhom()).sendMessage(MsgUtils.color("&cThe duration you specified was invalid."));
 			return this;

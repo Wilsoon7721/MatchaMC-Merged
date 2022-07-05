@@ -39,6 +39,7 @@ import com.matchamc.core.bukkit.commands.WeatherCmd;
 import com.matchamc.core.bukkit.commands.WhitelistCmd;
 import com.matchamc.core.bukkit.commands.staff.NoteCmd;
 import com.matchamc.core.bukkit.commands.staff.NotesCmd;
+import com.matchamc.core.bukkit.commands.staff.PunishCmd;
 import com.matchamc.core.bukkit.commands.staff.SocialspyCmd;
 import com.matchamc.core.bukkit.listeners.NotesGUIListener;
 import com.matchamc.core.bukkit.listeners.ReportsGUIListener;
@@ -52,6 +53,7 @@ import com.matchamc.core.bukkit.util.Configurations;
 import com.matchamc.core.bukkit.util.Messenger;
 import com.matchamc.core.bukkit.util.Notes;
 import com.matchamc.core.bukkit.util.PlayerRegistrar;
+import com.matchamc.core.bukkit.util.Punishments;
 import com.matchamc.core.bukkit.util.Reports;
 import com.matchamc.core.bukkit.util.ServerWhitelist;
 import com.matchamc.core.bukkit.util.Staffs;
@@ -70,6 +72,7 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 	private Chat chat = null;
 	private ChatHistory chatHistory;
 	private PlayerRegistrar registrar;
+	private Punishments punishments;
 	private Reports reports;
 	private TimeZones timezones;
 	private Notes notes;
@@ -95,6 +98,7 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		banwave = new BanWave(this, registrar, "staffcore.banwave");
 		chatHistory = new ChatHistory(this, registrar, chat, "staffcore.chathistory");
 		reports = new Reports(this, staffs, registrar);
+		punishments = new Punishments(this, registrar);
 		notes = new Notes(this);
 		timezones = new TimeZones(this);
 		configurations.create("messages.yml");
@@ -135,6 +139,8 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		getCommand("report").setExecutor(new ReportCmd(this, reports, registrar, "staffcore.report"));
 		getCommand("reports").setExecutor(new ReportsCmd(this, registrar, staffs, reports, "staffcore.reports"));
 		Bukkit.getPluginManager().registerEvents(new ReportsGUIListener(this, staffs, reports, registrar), this);
+		getCommand("punish").setExecutor(new PunishCmd(this, punishments, registrar, "staffcore.punish"));
+		Bukkit.getPluginManager().registerEvents(punishments, this);
 		reloadMessages();
 	}
 
