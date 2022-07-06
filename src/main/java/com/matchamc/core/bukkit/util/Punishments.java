@@ -1,6 +1,7 @@
 package com.matchamc.core.bukkit.util;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -72,10 +73,20 @@ public class Punishments implements Listener {
 
 	public void openPunishmentCategoryGUI(Player player, Punishment punishment) {
 		String punishedName = registrar.getNameFromRegistrar(punishment.getPunished());
-		Inventory inv = Bukkit.createInventory(null, 9, "Punishment Catgory: " + punishedName);
-		ItemStack modifications = new ItemBuilder(Material.NETHERITE_SWORD).withDisplayName("&cBlacklisted Modifications").toItemStack();
-		ItemStack chat = new ItemBuilder(Material.PAPER).withDisplayName("&cChat Offences").toItemStack();
-
+		Inventory inv = Bukkit.createInventory(null, 9, "Punishment Category: " + punishedName);
+		ItemStack modifications = new ItemBuilder(Material.NETHERITE_SWORD).withDisplayName("&cBlacklisted Modifications").withLore(Arrays.asList("&eE.g. Killaura, Aimbot, AutoClicker etc.")).toItemStack();
+		ItemStack chat = new ItemBuilder(Material.PAPER).withDisplayName("&cChat Offences").withLore(Arrays.asList("&eE.g. Spamming, Swearing, Advertising, Toxic Behaviour etc.")).toItemStack();
+		ItemStack other = new ItemBuilder(Material.BEDROCK).withDisplayName("&cOther").withLore(Arrays.asList("&eE.g. DDOS/DoX Threats, Inappropriate Name/Skin, Scamming, Lag Machines etc.")).toItemStack();
+		ItemStack bsgp = new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).withDisplayName(" ").toItemStack();
+		inv.setItem(2, modifications);
+		inv.setItem(4, chat);
+		inv.setItem(6, other);
+		for(int i = 0; i < 9; i++) {
+			if(inv.getItem(i) == null)
+				inv.setItem(i, bsgp);
+			continue;
+		}
+		player.openInventory(inv);
 	}
 
 	@EventHandler
@@ -110,6 +121,24 @@ public class Punishments implements Listener {
 			punishment = createPunishment(Type.WARN, event.getWhoClicked().getUniqueId(), punished, null, null);
 			conv = factory.withFirstPrompt(new PunishmentReasonPrompt(punishment, Prompt.END_OF_CONVERSATION)).buildConversation((Player) event.getWhoClicked());
 			((Player) event.getWhoClicked()).beginConversation(conv);
+			break;
+		default:
+			break;
+		}
+	}
+
+	@EventHandler
+	public void onPunishmentGUICategoryClick(InventoryClickEvent event) {
+		if(!event.getView().getTitle().startsWith("Punishment Category: "))
+			return;
+		if(event.getCurrentItem() == null)
+			return;
+		switch(event.getCurrentItem().getType()) {
+		case NETHERITE_SWORD: // modifications
+			break;
+		case PAPER: // chat
+			break;
+		case BEDROCK: // others
 			break;
 		default:
 			break;

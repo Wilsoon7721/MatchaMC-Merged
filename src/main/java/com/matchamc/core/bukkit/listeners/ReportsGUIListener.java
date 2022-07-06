@@ -311,18 +311,18 @@ public class ReportsGUIListener implements Listener {
 		}
 		ConversationFactory factory = new ConversationFactory(instance);
 		if(type == Material.RED_WOOL) {
+			event.getWhoClicked().closeInventory();
 			Conversation conv = factory.withFirstPrompt(new StatusMessagePrompt(report, Status.CLOSED)).buildConversation((Player) event.getWhoClicked());
 			((Player) event.getWhoClicked()).beginConversation(conv);
 			return;
 		}
 		if(type == Material.GREEN_WOOL) {
+			event.getWhoClicked().closeInventory();
 			Conversation conv = factory.withFirstPrompt(new StatusMessagePrompt(report, Status.RESOLVED)).buildConversation((Player) event.getWhoClicked());
 			((Player) event.getWhoClicked()).beginConversation(conv);
 			return;
 		}
 		if(type == Material.DIAMOND) {
-			// TODO Report followup
-			// GUI that contains stuff like teleport to player etc.
 			event.getWhoClicked().closeInventory();
 			reports.openReportFollowupGUI((Player) event.getWhoClicked(), report);
 			return;
