@@ -70,6 +70,14 @@ public class Punishments implements Listener {
 		player.openInventory(inv);
 	}
 
+	public void openPunishmentCategoryGUI(Player player, Punishment punishment) {
+		String punishedName = registrar.getNameFromRegistrar(punishment.getPunished());
+		Inventory inv = Bukkit.createInventory(null, 9, "Punishment Catgory: " + punishedName);
+		ItemStack modifications = new ItemBuilder(Material.NETHERITE_SWORD).withDisplayName("&cBlacklisted Modifications").toItemStack();
+		ItemStack chat = new ItemBuilder(Material.PAPER).withDisplayName("&cChat Offences").toItemStack();
+
+	}
+
 	@EventHandler
 	public void onPunishmentGUIClick(InventoryClickEvent event) {
 		if(!event.getView().getTitle().startsWith("Issue Punishment: "))

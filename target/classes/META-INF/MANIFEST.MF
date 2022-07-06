@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Built-By: wilso
-Build-Jdk: 16.0.1
+Built-By: Wilson Oon
+Build-Jdk: 16
 Created-By: Maven Integration for Eclipse
 
