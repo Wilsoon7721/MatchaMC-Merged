@@ -21,7 +21,7 @@ import com.matchamc.core.bukkit.util.Report;
 import com.matchamc.core.bukkit.util.Report.Status;
 import com.matchamc.core.bukkit.util.Reports;
 import com.matchamc.core.bukkit.util.Staffs;
-import com.matchamc.core.conversation.OtherOffencePrompt;
+import com.matchamc.core.conversation.ReportOtherOffencePrompt;
 import com.matchamc.core.conversation.StatusMessagePrompt;
 import com.matchamc.shared.MsgUtils;
 
@@ -230,7 +230,7 @@ public class ReportsGUIListener implements Listener {
 		case HEART_OF_THE_SEA: // Other offences
 			Player p = (Player) event.getWhoClicked();
 			ConversationFactory factory = new ConversationFactory(instance);
-			Conversation conv = factory.withFirstPrompt(new OtherOffencePrompt(reports, registrar, against, false)).buildConversation(p);
+			Conversation conv = factory.withFirstPrompt(new ReportOtherOffencePrompt(reports, registrar, against, false)).buildConversation(p);
 			p.beginConversation(conv);
 			break;
 		case BARRIER:

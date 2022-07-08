@@ -12,13 +12,13 @@ import com.matchamc.core.bukkit.util.Report;
 import com.matchamc.core.bukkit.util.Reports;
 import com.matchamc.shared.MsgUtils;
 
-public class OtherOffencePrompt extends StringPrompt {
+public class ReportOtherOffencePrompt extends StringPrompt {
 	private Reports reports;
 	private PlayerRegistrar registrar;
 	private UUID against;
 	private boolean priority;
 
-	public OtherOffencePrompt(Reports reports, PlayerRegistrar registrar, UUID against, boolean priority) {
+	public ReportOtherOffencePrompt(Reports reports, PlayerRegistrar registrar, UUID against, boolean priority) {
 		this.reports = reports;
 		this.registrar = registrar;
 		this.against = against;

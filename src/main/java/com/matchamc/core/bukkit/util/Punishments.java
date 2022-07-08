@@ -22,6 +22,7 @@ import org.bukkit.inventory.ItemStack;
 import com.matchamc.core.bukkit.BukkitMain;
 import com.matchamc.core.bukkit.util.Punishment.Type;
 import com.matchamc.core.conversation.PunishmentDurationPrompt;
+import com.matchamc.core.conversation.PunishmentOtherOffencePrompt;
 import com.matchamc.core.conversation.PunishmentReasonPrompt;
 import com.matchamc.shared.MsgUtils;
 
@@ -226,7 +227,7 @@ public class Punishments implements Listener {
 	}
 
 	@EventHandler
-	public void onUnfairAdvantagesGUIClick(InventoryClickEvent event) {
+	public void onUnfairAdvantagesGUIInteract(InventoryClickEvent event) {
 		if(!event.getView().getTitle().startsWith("Unfair Advantages: "))
 			return;
 		if(event.getCurrentItem() == null)
@@ -246,7 +247,177 @@ public class Punishments implements Listener {
 			MsgUtils.sendBukkitConsoleMessage("&c[MatchaMC - Punishments] The plugin was unable to find the Punishment object in the map >> All PunishmentData objects did not match the given arguments.");
 			return;
 		}
-		// TODO Click Events
+		String reason;
+		event.getWhoClicked().closeInventory();
+		switch(event.getCurrentItem().getType()) {
+		case IRON_SWORD: // PvP Hacks
+			reason = "Unfair Advantage - PvP Related Hacks";
+			punishment.setReason(reason);
+			punishment.executePunishment();
+			break;
+		case FEATHER: // Fly
+			reason = "Unfair Advantage - Fly Related Hacks";
+			punishment.setReason(reason);
+			punishment.executePunishment();
+			break;
+		case DIAMOND_ORE: // Xray
+			reason = "Unfair Advantage - Xray";
+			punishment.setReason(reason);
+			punishment.executePunishment();
+			break;
+		case SUGAR: // movement hacks
+			reason = "Unfair Advantage - Movement Hacks";
+			punishment.setReason(reason);
+			punishment.executePunishment();
+			break;
+		case MUSHROOM_STEW: // auto hacks
+			reason = "Unfair Advantage - Auto Hacks";
+			punishment.setReason(reason);
+			punishment.executePunishment();
+			break;
+		case ENDER_PEARL: // teleport hacks
+			reason = "Unfair Advantage - Teleport Hacks";
+			punishment.setReason(reason);
+			punishment.executePunishment();
+			break;
+		case COMPASS: // render hacks
+			reason = "Unfair Advantage - Render Hacks";
+			punishment.setReason(reason);
+			punishment.executePunishment();
+			break;
+		case BRICKS: // Other hacks
+			reason = "Unfair Advantage - Other Hacks";
+			punishment.setReason(reason);
+			punishment.executePunishment();
+			break;
+		case BARRIER: // Cancel
+			event.getWhoClicked().closeInventory();
+			openPunishmentCategoryGUI((Player) event.getWhoClicked(), punishment);
+			break;
+		default:
+			break;
+		}
 	}
 
+	@EventHandler
+	public void onChatOffencesGUIClick(InventoryClickEvent event) {
+		if(!event.getView().getTitle().startsWith("Chat Offences: "))
+			return;
+		if(event.getCurrentItem() == null)
+			return;
+		event.setCancelled(true);
+		Player player = (Player) event.getWhoClicked();
+		UUID punished = registrar.resolveUUIDFromName(event.getView().getTitle().split(" ")[2]);
+		Punishment punishment = null;
+		for(Entry<PunishmentData, Punishment> entry : punishments.entrySet()) {
+			PunishmentData data = entry.getKey();
+			if(data.getPunishmentExecutor().toString().equals(event.getWhoClicked().getUniqueId().toString()) && data.getPunished().toString().equals(punished.toString()))
+				punishment = entry.getValue();
+			continue;
+		}
+		if(punishment == null) {
+			event.getWhoClicked().sendMessage(MsgUtils.color("&cAn internal error occurred."));
+			MsgUtils.sendBukkitConsoleMessage("&c[MatchaMC - Punishments] The plugin was unable to find the Punishment object in the map >> All PunishmentData objects did not match the given arguments.");
+			return;
+		}
+		String reason;
+		event.getWhoClicked().closeInventory();
+		switch(event.getCurrentItem().getType()) {
+		case PUFFERFISH: // Swearing
+			reason = "Chat Offence - Swearing";
+			punishment.setReason(reason);
+			punishment.executePunishment();
+			break;
+		case FIRE_CHARGE: // Illict links
+			reason = "Chat Offence - Illict Links";
+			punishment.setReason(reason);
+			punishment.executePunishment();
+			break;
+		case SKELETON_SKULL: // Toxicity
+			reason = "Chat Offence - Toxicity";
+			punishment.setReason(reason);
+			punishment.executePunishment();
+			break;
+		case MAP: // Spam
+			reason = "Chat Offence - Spamming";
+			punishment.setReason(reason);
+			punishment.executePunishment();
+			break;
+		case CREEPER_HEAD: // Chat Trolling
+			reason = "Chat Offence - Chat Trolling";
+			punishment.setReason(reason);
+			punishment.executePunishment();
+			break;
+		case PAPER: // Advertisingg
+			reason = "Chat Offence - Advertising";
+			punishment.setReason(reason);
+			punishment.executePunishment();
+			break;
+		case BARRIER: // Cancel
+			event.getWhoClicked().closeInventory();
+			openPunishmentCategoryGUI(player, punishment);
+			break;
+		default:
+			break;
+		}
+	}
+
+	@EventHandler
+	public void onOtherOffencesGUIClick(InventoryClickEvent event) {
+		if(!event.getView().getTitle().startsWith("Other Offences: "))
+			return;
+		if(event.getCurrentItem() == null)
+			return;
+		event.setCancelled(true);
+		Player player = (Player) event.getWhoClicked();
+		UUID punished = registrar.resolveUUIDFromName(event.getView().getTitle().split(" ")[2]);
+		Punishment punishment = null;
+		for(Entry<PunishmentData, Punishment> entry : punishments.entrySet()) {
+			PunishmentData data = entry.getKey();
+			if(data.getPunishmentExecutor().toString().equals(event.getWhoClicked().getUniqueId().toString()) && data.getPunished().toString().equals(punished.toString()))
+				punishment = entry.getValue();
+			continue;
+		}
+		if(punishment == null) {
+			event.getWhoClicked().sendMessage(MsgUtils.color("&cAn internal error occurred."));
+			MsgUtils.sendBukkitConsoleMessage("&c[MatchaMC - Punishments] The plugin was unable to find the Punishment object in the map >> All PunishmentData objects did not match the given arguments.");
+			return;
+		}
+		String reason;
+		event.getWhoClicked().closeInventory();
+		switch(event.getCurrentItem().getType()) {
+		case GUNPOWDER: // DDoS/DoX Threats
+			reason = "DDoS/DoX Threats";
+			punishment.setReason(reason);
+			punishment.executePunishment();
+			break;
+		case NAME_TAG: // Inappropriate Name/Skin
+			reason = "Inappropriate Name/Skin";
+			punishment.setReason(reason);
+			punishment.executePunishment();
+			break;
+		case GOLD_INGOT: // Scamming
+			reason = "Scamming";
+			punishment.setReason(reason);
+			punishment.executePunishment();
+			break;
+		case REDSTONE_TORCH: // Lag Machines
+			reason = "Creating Lag Machines";
+			punishment.setReason(reason);
+			punishment.executePunishment();
+			break;
+		case HEART_OF_THE_SEA: // Other offences
+			Player p = (Player) event.getWhoClicked();
+			ConversationFactory factory = new ConversationFactory(instance);
+			Conversation conv = factory.withFirstPrompt(new PunishmentOtherOffencePrompt(punishment)).buildConversation(p);
+			p.beginConversation(conv);
+			break;
+		case BARRIER:
+			event.getWhoClicked().closeInventory();
+			openPunishmentCategoryGUI(player, punishment);
+			break;
+		default:
+			break;
+		}
+	}
 }
