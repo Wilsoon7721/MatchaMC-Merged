@@ -16,7 +16,8 @@ public class Punishment {
 	private BukkitMain instance;
 	private PlayerRegistrar registrar;
 	private Type type;
-	private UUID executor, punished;
+	private UUID executor;
+	private String punished;
 	private String reason;
 	private Duration duration;
 	private boolean cancelled;
@@ -29,7 +30,7 @@ public class Punishment {
 		this.registrar = registrar;
 		this.type = type;
 		this.executor = executor;
-		this.punished = punished;
+		this.punished = punished.toString();
 		this.reason = reason;
 		this.cancelled = false;
 		this.duration = duration;
@@ -43,7 +44,7 @@ public class Punishment {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
-					punishmentInstance.setCancelled(database.isPlayerBanned(punished, null));
+					punishmentInstance.setCancelled(database.isPlayerBanned(UUID.fromString(punished), null));
 				}
 			}.runTaskAsynchronously(instance);
 			if(cancelled) {
@@ -56,11 +57,27 @@ public class Punishment {
 			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban " + punished + "-s " + duration.toDays() + "d " + reason + " " + additional_arguments);
 			executed = true;
 			break;
+		case IPBAN:
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					punishmentInstance.setCancelled(database.isPlayerBanned(null, punished));
+				}
+			}.runTaskAsynchronously(instance);
+			if(cancelled) {
+				Bukkit.getPlayer(executor).sendMessage(MsgUtils.color("&This IP is already banned."));
+				cancelled = false;
+				return;
+			}
+			if(duration == null)
+				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban " + punished + "-s " + reason + " " + additional_arguments);
+			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban " + punished + "-s " + duration.toDays() + "d " + reason + " " + additional_arguments);
+			break;
 		case MUTE:
 			new BukkitRunnable() {
 				@Override
 				public void run() {
-					punishmentInstance.setCancelled(database.isPlayerMuted(punished, null));
+					punishmentInstance.setCancelled(database.isPlayerMuted(UUID.fromString(punished), null));
 				}
 			}.runTaskAsynchronously(instance);
 			if(cancelled) {
@@ -72,6 +89,22 @@ public class Punishment {
 				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mute " + punished + "-s " + reason + " " + additional_arguments);
 			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mute " + punished + "-s " + duration.toDays() + "d " + reason + " " + additional_arguments);
 			executed = true;
+			break;
+		case IPMUTE:
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					punishmentInstance.setCancelled(database.isPlayerMuted(null, punished));
+				}
+			}.runTaskAsynchronously(instance);
+			if(cancelled) {
+				Bukkit.getPlayer(executor).sendMessage(MsgUtils.color("&cThis player is already muted."));
+				cancelled = false;
+				return;
+			}
+			if(duration == null)
+				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mute " + punished + "-s " + reason + " " + additional_arguments);
+			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mute " + punished + "-s " + duration.toDays() + "d " + reason + " " + additional_arguments);
 			break;
 		case WARN:
 			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "warn -s " + punished + " " + reason + " " + additional_arguments);
@@ -92,7 +125,7 @@ public class Punishment {
 		return executor;
 	}
 
-	public UUID getPunished() {
+	public String getPunished() {
 		return punished;
 	}
 
@@ -112,7 +145,7 @@ public class Punishment {
 		this.executor = executor;
 	}
 
-	public void setPunished(UUID punished) {
+	public void setPunished(String punished) {
 		this.punished = punished;
 	}
 
@@ -129,6 +162,6 @@ public class Punishment {
 	}
 
 	public static enum Type {
-		BAN, MUTE, KICK, WARN;
+		BAN, IPBAN, MUTE, IPMUTE, KICK, WARN;
 	}
 }

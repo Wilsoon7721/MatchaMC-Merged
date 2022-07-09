@@ -160,8 +160,6 @@ public class ChatHistory extends CoreCommand implements Listener {
 		return Collections.emptyList();
 	}
 
-	// TODO Other methods to retrieve chat history of player
-
 	public Map<Long, String> getPlayerChatHistory(UUID playerUUID) {
 		File playerFile = new File(historyDirectory, playerUUID.toString() + ".txt");
 		if(!(playerFile.exists()))

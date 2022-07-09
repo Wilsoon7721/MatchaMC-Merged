@@ -51,6 +51,7 @@ import com.matchamc.core.bukkit.util.BanWave;
 import com.matchamc.core.bukkit.util.Chat;
 import com.matchamc.core.bukkit.util.ChatHistory;
 import com.matchamc.core.bukkit.util.Configurations;
+import com.matchamc.core.bukkit.util.FreezeManager;
 import com.matchamc.core.bukkit.util.Messenger;
 import com.matchamc.core.bukkit.util.Notes;
 import com.matchamc.core.bukkit.util.PlayerRegistrar;
@@ -134,6 +135,7 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		getCommand("banwave").setExecutor(banwave);
 		registerCommandAndListener("chathistory", chatHistory);
 		registerCommandAndListener("dbalerts", new AntiCheatDragbackHook(this, "staffcore.dbalerts"));
+		registerCommandAndListener("freeze", new FreezeManager(this, registrar, "staffcore.freeze"));
 		getCommand("note").setExecutor(new NoteCmd(this, notes, "staffcore.note"));
 		getCommand("notes").setExecutor(new NotesCmd(this, timezones, notes, "staffcore.notes"));
 		Bukkit.getPluginManager().registerEvents(new NotesGUIListener(notes, timezones), this);
@@ -141,7 +143,7 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		Bukkit.getPluginManager().registerEvents(punishments, this);
 		getCommand("report").setExecutor(new ReportCmd(this, reports, registrar, "staffcore.report"));
 		getCommand("reports").setExecutor(new ReportsCmd(this, registrar, staffs, reports, "staffcore.reports"));
-		Bukkit.getPluginManager().registerEvents(new ReportsGUIListener(this, staffs, reports, registrar), this);
+		Bukkit.getPluginManager().registerEvents(new ReportsGUIListener(this, staffs, reports, punishments, registrar), this);
 		getCommand("srtp").setExecutor(new StaffRandomTPCmd(this, staffs, "staffcore.randomteleport"));
 		reloadMessages();
 	}

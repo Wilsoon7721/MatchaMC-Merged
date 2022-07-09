@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.matchamc.core.bukkit.BukkitMain;
 import com.matchamc.core.bukkit.util.PlayerRegistrar;
+import com.matchamc.core.bukkit.util.Punishments;
 import com.matchamc.core.bukkit.util.Report;
 import com.matchamc.core.bukkit.util.Report.Status;
 import com.matchamc.core.bukkit.util.Reports;
@@ -32,12 +33,14 @@ public class ReportsGUIListener implements Listener {
 	private BukkitMain instance;
 	private Reports reports;
 	private Staffs staffs;
+	private Punishments punishments;
 	private PlayerRegistrar registrar;
 
-	public ReportsGUIListener(BukkitMain instance, Staffs staffs, Reports reports, PlayerRegistrar registrar) {
+	public ReportsGUIListener(BukkitMain instance, Staffs staffs, Reports reports, Punishments punishments, PlayerRegistrar registrar) {
 		this.instance = instance;
 		this.reports = reports;
 		this.staffs = staffs;
+		this.punishments = punishments;
 		this.registrar = registrar;
 	}
 
@@ -312,13 +315,13 @@ public class ReportsGUIListener implements Listener {
 		ConversationFactory factory = new ConversationFactory(instance);
 		if(type == Material.RED_WOOL) {
 			event.getWhoClicked().closeInventory();
-			Conversation conv = factory.withFirstPrompt(new StatusMessagePrompt(report, Status.CLOSED)).buildConversation((Player) event.getWhoClicked());
+			Conversation conv = factory.withFirstPrompt(new StatusMessagePrompt(reports, report, Status.CLOSED)).buildConversation((Player) event.getWhoClicked());
 			((Player) event.getWhoClicked()).beginConversation(conv);
 			return;
 		}
 		if(type == Material.GREEN_WOOL) {
 			event.getWhoClicked().closeInventory();
-			Conversation conv = factory.withFirstPrompt(new StatusMessagePrompt(report, Status.RESOLVED)).buildConversation((Player) event.getWhoClicked());
+			Conversation conv = factory.withFirstPrompt(new StatusMessagePrompt(reports, report, Status.RESOLVED)).buildConversation((Player) event.getWhoClicked());
 			((Player) event.getWhoClicked()).beginConversation(conv);
 			return;
 		}
@@ -341,6 +344,7 @@ public class ReportsGUIListener implements Listener {
 		Report report = reports.getReport(id);
 		switch(event.getCurrentItem().getType()) {
 		case ENDER_PEARL:
+			player.closeInventory();
 			Player target = Bukkit.getPlayer(report.getAgainstUUID());
 			if(target == null) {
 				player.sendMessage(MsgUtils.color("&cThis option is not available, see below for details:"));
@@ -391,7 +395,8 @@ public class ReportsGUIListener implements Listener {
 			player.sendMessage(MsgUtils.color("&eYou have teleported to &a" + target.getName() + "&e."));
 			break;
 		case STONE_AXE:
-			// TODO Punishment Menu
+			player.closeInventory();
+			punishments.openPunishmentGUI(player, report.getAgainstUUID());
 			break;
 		case BARRIER:
 			player.closeInventory();

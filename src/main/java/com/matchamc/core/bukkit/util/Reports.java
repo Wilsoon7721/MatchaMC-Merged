@@ -379,7 +379,6 @@ public class Reports {
 
 	public void openStaffReportsGUI(Player player, int page) {
 		InventoryView openInventory = player.getOpenInventory();
-		// TODO Staff Reports GUI
 		player.closeInventory();
 		List<Report> orderedReports = new ArrayList<>(getReportsByStatus(Report.Status.OPEN));
 		Collections.sort(orderedReports, Comparator.comparing(Report::getId));

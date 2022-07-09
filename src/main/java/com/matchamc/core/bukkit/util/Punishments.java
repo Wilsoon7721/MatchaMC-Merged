@@ -32,12 +32,13 @@ public class Punishments implements Listener {
 	private BukkitMain instance;
 	private PlayerRegistrar registrar;
 	private Map<PunishmentData, Punishment> punishments = new HashMap<>();
-	private String permissionBan, permissionMute, permissionKick, permissionWarn;
+	private String permissionBan, permissionIpBan, permissionMute, permissionKick, permissionWarn;
 
 	public Punishments(BukkitMain instance, PlayerRegistrar registrar) {
 		this.instance = instance;
 		this.registrar = registrar;
 		permissionBan = "staffcore.punish.ban";
+		permissionIpBan = "staffcore.punish.ipban";
 		permissionMute = "staffcore.punish.mute";
 		permissionKick = "staffcore.punish.kick";
 		permissionWarn = "staffcore.punish.warn";
@@ -57,12 +58,15 @@ public class Punishments implements Listener {
 
 	// GUIs
 	public void openPunishmentGUI(Player player, UUID punished) {
-		// TODO BAN/KICK/MUTE REASON GUIs from REPORTS
 		String punishedName = registrar.getNameFromRegistrar(punished);
 		Inventory inv = Bukkit.createInventory(null, 9, "Issue Punishment: " + punishedName);
 		if(player.hasPermission(permissionBan)) {
 			ItemStack banItem = new ItemBuilder(Material.DIAMOND_AXE).withDisplayName("&cBan player").toItemStack();
 			inv.addItem(banItem);
+		}
+		if(player.hasPermission(permissionIpBan)) {
+			ItemStack ipBanItem = new ItemBuilder(Material.BEDROCK).withDisplayName("&cIP-Ban player").toItemStack();
+			inv.addItem(ipBanItem);
 		}
 		if(player.hasPermission(permissionKick)) {
 			ItemStack kickItem = new ItemBuilder(Material.IRON_BOOTS).withDisplayName("&cKick player").toItemStack();
@@ -86,7 +90,7 @@ public class Punishments implements Listener {
 	}
 
 	public void openPunishmentCategoryGUI(Player player, Punishment punishment) {
-		String punishedName = registrar.getNameFromRegistrar(punishment.getPunished());
+		String punishedName = registrar.getNameFromRegistrar(UUID.fromString(punishment.getPunished()));
 		Inventory inv = Bukkit.createInventory(null, 9, "Punishment Category: " + punishedName);
 		ItemStack modifications = new ItemBuilder(Material.NETHERITE_SWORD).withDisplayName("&cUnfair Advantages").withLore(Arrays.asList("&eE.g. Killaura, Aimbot, AutoClicker etc.")).toItemStack();
 		ItemStack chat = new ItemBuilder(Material.PAPER).withDisplayName("&cChat Offences").withLore(Arrays.asList("&eE.g. Spamming, Swearing, Advertising, Toxic Behaviour etc.")).toItemStack();
@@ -104,7 +108,7 @@ public class Punishments implements Listener {
 	}
 
 	public void openUnfairAdvantagesGUI(Player player, Punishment punishment) {
-		String punishedName = registrar.getNameFromRegistrar(punishment.getPunished());
+		String punishedName = registrar.getNameFromRegistrar(UUID.fromString(punishment.getPunished()));
 		Inventory inv = Bukkit.createInventory(null, 9, "Unfair Advantages: " + punishedName);
 		ItemStack pvphacks = new ItemBuilder(Material.IRON_SWORD).withDisplayName("&cCombat Related Hacks").withLore(Arrays.asList("&eE.g. Killaura, TP-Aura, Aimbot, Autoclicker")).toItemStack();
 		ItemStack fly = new ItemBuilder(Material.FEATHER).withDisplayName("&cFly Hacks").withLore(Arrays.asList("&eE.g. Flight, CreativeFly, Jetpack etc.")).toItemStack();
@@ -121,7 +125,7 @@ public class Punishments implements Listener {
 	}
 
 	public void openChatOffencesGUI(Player player, Punishment punishment) {
-		String punishedName = registrar.getNameFromRegistrar(punishment.getPunished());
+		String punishedName = registrar.getNameFromRegistrar(UUID.fromString(punishment.getPunished()));
 		Inventory inv = Bukkit.createInventory(null, 9, "Chat Offences: " + punishedName);
 		ItemStack swearing = new ItemBuilder(Material.PUFFERFISH).withDisplayName("&cSwearing").toItemStack();
 		ItemStack illictLinks = new ItemBuilder(Material.FIRE_CHARGE).withDisplayName("&cIllict Links").toItemStack();
@@ -136,7 +140,7 @@ public class Punishments implements Listener {
 	}
 
 	public void openOtherOffencesGUI(Player player, Punishment punishment) {
-		String punishedName = registrar.getNameFromRegistrar(punishment.getPunished());
+		String punishedName = registrar.getNameFromRegistrar(UUID.fromString(punishment.getPunished()));
 		Inventory inv = Bukkit.createInventory(null, 9, "Other Offences: " + punishedName);
 		ItemStack ddosDoxThreats = new ItemBuilder(Material.GUNPOWDER).withDisplayName("&cDDoS/DoX Threats").withLore(Arrays.asList("&ePlayer threatened to DDoS/DoX you or another player.")).toItemStack();
 		ItemStack inappropriatenameskin = new ItemBuilder(Material.NAME_TAG).withDisplayName("&cInappropriate Name/Skin").withLore(Arrays.asList("&ePlayer has an inappropriate name or is using a skin that depicts nudity or other inappropriate stuff.")).toItemStack();
@@ -233,7 +237,6 @@ public class Punishments implements Listener {
 		if(event.getCurrentItem() == null)
 			return;
 		event.setCancelled(true);
-		Player player = (Player) event.getWhoClicked();
 		UUID punished = registrar.resolveUUIDFromName(event.getView().getTitle().split(" ")[2]);
 		Punishment punishment = null;
 		for(Entry<PunishmentData, Punishment> entry : punishments.entrySet()) {
