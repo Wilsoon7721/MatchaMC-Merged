@@ -4,3 +4,51 @@ version: 0.1
 description: Base plugin for server - Spigot/Paper
 softdepend: [LiteBans, AntiAura, SuperVanish]
 author: [Wilsoon, ironinventor]
+commands:
+     clearchat:
+         description: Clears the chat
+         usage: /<command>
+     mutechat:
+         description: Mutes the chat
+         usage: /<command>
+     socialspy:
+         description: Toggle SocialSpy
+         usage: /<command>
+     message:
+         description: Private Message a Player
+         usage: /<command> <player> <message>
+         aliases: [msg, w, whisper, pm]
+     nightvision:
+         description: Toggles Night Vision
+         usage: /<command>
+         aliases: [nv]
+     override:
+         description: Well...
+         usage: "Don't even bother."
+     playertime:
+         description: Player Time
+         usage: /<command> <time of day>
+         aliases: [ptime]
+     playerweather:
+         description: Player Weather
+         usage: /<command> <weather>
+         aliases: [pweather]
+     reply:
+         description: Reply to the last player that messaged you
+         usage: /<command> <message>
+         aliases: [r]
+     heal:
+         description: Heal a player
+         usage: /<command> <player>
+     feed:
+         description: Feed a player
+         usage: /<command> <player>
+     gamemode:
+         description: Sets the gamemode of a player
+         usage: /<command> <gamemode> <player>
+     god:
+         description: Sets the god status of a player
+         usage: /<command> <player>
+     logininfo:
+         description: Retrieves the login information of a player
+         usage: /<command> <player>
