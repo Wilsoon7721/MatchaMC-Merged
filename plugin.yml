@@ -52,3 +52,68 @@ commands:
      logininfo:
          description: Retrieves the login information of a player
          usage: /<command> <player>
+     speed:
+         description: Change the walk/fly speed of a player
+         usage: /<command> <walk/fly> <speed> <player>
+     skull:
+         description: Get the skull of a player
+         usage: /<command> <player>
+     teleport:
+         description: Teleport a player to a coordinate/another player
+         usage: /<command> <player/coordinates>
+         aliases: [tp]
+     teleporthere:
+         description: Teleport a player to your location
+         usage: /<command> <player>
+         aliases: [tphere]
+     timezone:
+         description: Sets your own personal timezone
+         usage: /<command> <timezone offset>
+         aliases: [tz]
+     time:
+         description: Changes the world time
+         usage: /<command> <time of day>
+     togglepm:
+         description: Toggles the ability to private message
+         usage: /<command>
+     weather:
+         description: Changes the world weather
+         usage: /<command> <weather>
+     whitelist:
+         description: Queries the whitelist to check/modify who can join the server while whitelisted
+         usage: /<command> <on/off/add/remove/view> <player>
+     # StaffCore commands
+     alerts:
+         description: Enables or disables the ability for you to view anticheat alerts
+         usage: /<command>
+     banwave:
+         description: Queries the banwave to check/modify who is queued for the next banwave
+         usage: /<command> <add/remove/list/nextwave> <name>
+     chathistory:
+         description: Queries a player's chat history
+         usage: /<command> <name>
+     dbalerts:
+         description: Enables or disables the ability for you to view anticheat dragback alerts
+         usage: /<command>
+     freeze:
+         description: Freeze/Unfreeze a player
+         usage: /<command> <player>
+     note:
+         desscription: Creates a note
+         usage: /<command> <note>
+     notes:
+         description: View your notes
+         usage: /<command>
+     punish:
+         description: Punish a player
+         usage: /<command> <player>
+     report:
+         description: Report a player
+         usage: /<command> <player>
+     reports:
+         description: View your reports / View all reports created by players
+         usage: /<command>
+     srtp:
+         description: Randomly teleport to a player
+         usage: /<command>
+         aliases: [staffrtp]

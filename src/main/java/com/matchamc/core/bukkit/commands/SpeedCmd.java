@@ -15,6 +15,7 @@ import com.matchamc.shared.MsgUtils;
 
 public class SpeedCmd extends CoreCommand {
 	private String permissionWalk, permissionFly, permissionOthers;
+
 	public SpeedCmd(BukkitMain instance, String permissionNode) {
 		super(instance, permissionNode);
 		this.permissionWalk = permissionNode + ".walk";
