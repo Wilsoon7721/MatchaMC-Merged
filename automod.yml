@@ -1,0 +1,4 @@
+# Modules list
+# Set to TRUE to enable the module, and FALSE to disable the module.
+modules:
+     caps: true
