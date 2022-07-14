@@ -63,6 +63,7 @@ import com.matchamc.core.bukkit.util.TimeZones;
 import com.matchamc.shared.MsgUtils;
 
 public class BukkitMain extends JavaPlugin implements PluginMessageListener {
+	// TODO IDEA: ADD SELF UPDATING // UPDATE CHECKER
 	public static final String CONSOLE_PLUGIN_NAME = "MatchaMC - Bukkit";
 	public static String NON_PLAYER_ERROR, NO_PERMISSION_ERROR, INSUFFICIENT_PARAMETERS_ERROR, PLAYER_OFFLINE, INSUFFICIENT_INVENTORY_SPACE;
 	private static Configurations configurations;
