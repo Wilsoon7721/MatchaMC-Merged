@@ -8,18 +8,24 @@ import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import com.matchamc.automod.shared.Module;
 import com.matchamc.core.bukkit.BukkitMain;
 import com.matchamc.core.bukkit.util.Configurations;
-import com.matchamc.shared.MsgUtils;
+import com.matchamc.core.bukkit.util.PlayerRegistrar;
+import com.matchamc.core.bukkit.util.Staffs;
 
 public class AutoMod {
 	private BukkitMain instance;
 	private File config;
+	private Staffs staffs;
+	private PlayerRegistrar registrar;
 	private Set<Module> activeModules = new HashSet<>();
 
-	public AutoMod(BukkitMain instance, Configurations configurations) {
+	public AutoMod(BukkitMain instance, Configurations configurations, Staffs staffs, PlayerRegistrar registrar) {
 		// TODO Spigot Sequence
 		this.instance = instance;
+		this.registrar = registrar;
+		this.staffs = staffs;
 		configurations = Objects.requireNonNull(configurations);
 		config = new File(this.instance.getDataFolder(), "automod.yml");
 		if(!config.exists())
@@ -40,12 +46,16 @@ public class AutoMod {
 		return activeModules;
 	}
 
+	public Staffs getStaffs() {
+		return staffs;
+	}
+
+	public PlayerRegistrar getPlayerRegistrar() {
+		return registrar;
+	}
+
 	@SuppressWarnings("unchecked")
-	public static <T> T getModuleAs(Module module, Class<T> clazz, boolean silent) {
-		if(module.getClass().isAssignableFrom(clazz))
-			return (T) module;
-		if(!silent)
-			MsgUtils.sendBukkitConsoleMessage("&c -- AutoMod: Could not get Module as " + clazz.getCanonicalName());
-		return null;
+	public static <T> T getModuleAs(Module module, Class<T> clazz) throws ClassCastException {
+		return (T) module;
 	}
 }

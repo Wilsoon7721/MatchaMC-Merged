@@ -9,6 +9,7 @@ public class CapsModule implements Module {
 	private int maxCaps;
 	private int maxWarns;
 	private String warnNotification;
+	private String bypassPermission = "automod.bypass.caps";
 
 	public void loadModule(boolean enabled, boolean replace, int maxCaps, int maxWarns, String warnNotification) {
 		this.enabled = enabled;
@@ -47,6 +48,16 @@ public class CapsModule implements Module {
 	@Override
 	public String getWarnNotification() {
 		return warnNotification;
+	}
+
+	@Override
+	public boolean isBypassable() {
+		return true;
+	}
+
+	@Override
+	public String getBypassPermission() {
+		return bypassPermission;
 	}
 
 }
