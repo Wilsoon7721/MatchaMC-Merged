@@ -35,6 +35,9 @@ public class CapsModule implements Module {
 		return false;
 	}
 
+	public int getCapsThreshold() {
+		return maxCaps;
+	}
 	public int capsCount(String message) {
 		return (int) message.codePoints().filter(c -> (c >= 65 && c <= 90)).count();
 	}

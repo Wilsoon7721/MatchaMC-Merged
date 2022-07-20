@@ -13,6 +13,7 @@ import com.matchamc.core.bukkit.BukkitMain;
 import com.matchamc.core.bukkit.util.Configurations;
 import com.matchamc.core.bukkit.util.PlayerRegistrar;
 import com.matchamc.core.bukkit.util.Staffs;
+import com.matchamc.shared.MsgUtils;
 
 public class AutoMod {
 	private BukkitMain instance;
@@ -40,6 +41,18 @@ public class AutoMod {
 		// load all enabled onnes
 		// add to activeModules
 
+	}
+
+	public String getMessage(String key, String[][] placeholders) {
+		// Key starts with messages.(key)
+		YamlConfiguration yc = YamlConfiguration.loadConfiguration(config);
+		String msg = yc.getString("messages." + key);
+		if(placeholders == null)
+			return MsgUtils.color(msg);
+		for(String[] placeholder : placeholders) {
+			msg = msg.replace("%" + placeholder[0] + "%", placeholder[1]);
+		}
+		return MsgUtils.color(msg);
 	}
 
 	public Set<Module> getActiveModules() {

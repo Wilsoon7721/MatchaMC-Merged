@@ -1,5 +1,7 @@
 package com.matchamc.automod.bukkit;
 
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -35,15 +37,26 @@ public class ModuleListeners implements Listener {
 			return;
 		ChatPlayer chatPlayer = ChatPlayer.getChatPlayer(event.getPlayer().getUniqueId());
 		String msg = ChatColor.stripColor(event.getMessage());
+		int capsCount = capsModule.capsCount(msg);
 		if(!capsModule.meetsCondition(chatPlayer, msg))
 			return;
 		event.setCancelled(true);
-		// TODO
-		// check if CapsModule#isReplace active
+		String[][] placeholders = { { "player", event.getPlayer().getName() }, { "caps", String.valueOf(capsCount) }, { "threshold", String.valueOf(capsModule.getCapsThreshold()) } };
+		autoMod.getStaffs().getAllStaff().stream().map(Bukkit::getPlayer).filter(player -> (player != null)).forEach(staff -> staff.sendMessage(autoMod.getMessage("caps.staff_notification", placeholders)));
+		String warningMessage = autoMod.getMessage("caps.warning", null);
 		if(capsModule.isReplace()) {
-			String msg = 
+			Player player = chatPlayer.toBukkitPlayer();
+			if(player == null)
+				return;
+			player.sendMessage(warningMessage);
+			if(event.isCancelled()) return; // do not send any message
+			String formattedMessage = event.getMessage().toLowerCase();
+			player.chat(formattedMessage);
+			return;
 		}
-		// send warning message
-		// resend message after replacing
+		Player player = chatPlayer.toBukkitPlayer();
+		if(player == null)
+			return;
+		player.sendMessage(warningMessage);
 	}
 }

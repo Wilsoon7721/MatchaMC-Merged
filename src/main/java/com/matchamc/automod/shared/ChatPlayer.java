@@ -6,6 +6,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
 import net.md_5.bungee.api.ChatColor;
 
 public class ChatPlayer {
@@ -99,5 +102,9 @@ public class ChatPlayer {
 		}
 		offline = false;
 		offlinePlayers.remove(this);
+	}
+
+	public Player toBukkitPlayer() {
+		return Bukkit.getPlayer(uuid);
 	}
 }
