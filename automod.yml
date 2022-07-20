@@ -1,4 +1,15 @@
 # Modules list
 # Set to TRUE to enable the module, and FALSE to disable the module.
 modules:
-     caps: true
+     caps:
+         enabled: true
+         # Should the plugin replace upper case letters to lower case once the threshold is met?
+         # TRUE: The plugin will resend the message after text has been set to lowercase.
+         # FALSE: The plugin will prevent the message from being sent.
+         replace: true
+         max_caps: 12
+
+messages:
+     caps:
+         warning: "&cPlease do not use excessive caps."
+         staff_notification: "&e%player% &cfailed &bCaps &c(%caps% > %threshold%)"

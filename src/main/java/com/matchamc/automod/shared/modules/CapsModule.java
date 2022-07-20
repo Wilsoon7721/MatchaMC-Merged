@@ -35,6 +35,10 @@ public class CapsModule implements Module {
 		return false;
 	}
 
+	public int capsCount(String message) {
+		return (int) message.codePoints().filter(c -> (c >= 65 && c <= 90)).count();
+	}
+
 	@Override
 	public int getMaxWarnings() {
 		return maxWarns;

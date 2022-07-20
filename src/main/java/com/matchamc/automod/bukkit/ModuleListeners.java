@@ -5,8 +5,11 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
+import com.matchamc.automod.shared.ChatPlayer;
 import com.matchamc.automod.shared.Module;
 import com.matchamc.automod.shared.modules.CapsModule;
+
+import net.md_5.bungee.api.ChatColor;
 
 public class ModuleListeners implements Listener {
 	private AutoMod autoMod;
@@ -28,8 +31,19 @@ public class ModuleListeners implements Listener {
 	public void onPlayerCapsChat(AsyncPlayerChatEvent event) {
 		if(capsModule == null)
 			return;
-		if(autoMod.getStaffs().isStaff(event.getPlayer().getUniqueId()))
+		if(event.getPlayer().hasPermission(capsModule.getBypassPermission()))
 			return;
-
+		ChatPlayer chatPlayer = ChatPlayer.getChatPlayer(event.getPlayer().getUniqueId());
+		String msg = ChatColor.stripColor(event.getMessage());
+		if(!capsModule.meetsCondition(chatPlayer, msg))
+			return;
+		event.setCancelled(true);
+		// TODO
+		// check if CapsModule#isReplace active
+		if(capsModule.isReplace()) {
+			String msg = 
+		}
+		// send warning message
+		// resend message after replacing
 	}
 }
