@@ -62,3 +62,7 @@ messages:
          warning: "&cPlease do not use blacklisted words."
          filtered_message: "&cYour message has been filtered."
          staff_notification: "&e%player% &cfailed &bBlacklist &c(Message: %message%)"
+     flood:
+         warning: "&cPlease do not excessively repeat characters."
+         filtered_message: "&cYour message has been shortened."
+         staff_notification: "&e%player% &cfailed &bFlood &c(Message: %message%)"

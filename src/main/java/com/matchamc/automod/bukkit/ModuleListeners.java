@@ -11,6 +11,7 @@ import com.matchamc.automod.shared.ChatPlayer;
 import com.matchamc.automod.shared.Module;
 import com.matchamc.automod.shared.modules.BlacklistModule;
 import com.matchamc.automod.shared.modules.CapsModule;
+import com.matchamc.automod.shared.modules.FloodModule;
 import com.matchamc.shared.MsgUtils;
 
 import net.md_5.bungee.api.ChatColor;
@@ -19,17 +20,24 @@ public class ModuleListeners implements Listener {
 	private AutoMod autoMod;
 	private CapsModule capsModule;
 	private BlacklistModule blacklistModule;
+	private FloodModule floodModule;
 
 	protected ModuleListeners(AutoMod autoMod) {
 		this.autoMod = autoMod;
 		for(Module module : autoMod.getActiveModules()) {
 			try {
 				capsModule = AutoMod.getModuleAs(module, CapsModule.class);
+				if(capsModule != null)
+					continue;
 				blacklistModule = AutoMod.getModuleAs(module, BlacklistModule.class);
+				if(blacklistModule != null)
+					continue;
+				floodModule = AutoMod.getModuleAs(module, FloodModule.class);
+				if(floodModule != null)
+					continue;
 			} catch(ClassCastException ex) {
 			}
 		}
-
 	}
 
 	// CapsModule
@@ -77,7 +85,7 @@ public class ModuleListeners implements Listener {
 		if(!blacklistModule.meetsCondition(chatPlayer, msg))
 			return;
 		event.setCancelled(true);
-		String[][] staffNotificationPlaceholders = { { "player", event.getPlayer().getName() }, { "message", blacklistModule.getPattern().matcher(msg).replaceAll("***") } };
+		String[][] staffNotificationPlaceholders = { { "player", event.getPlayer().getName() }, { "message", msg } };
 		String warningMessage = MsgUtils.color(autoMod.getMessage("blacklist.warning", null));
 		String filterMessage = MsgUtils.color(autoMod.getMessage("blacklist.filtered_message", null));
 		String staffNotification = MsgUtils.color(autoMod.getMessage("blacklist.staff_notification", staffNotificationPlaceholders));
@@ -89,5 +97,31 @@ public class ModuleListeners implements Listener {
 			event.getPlayer().chat(filteredMsg);
 		}
 		return;
+	}
+
+	// FloodModule
+	@EventHandler
+	public void onPlayerMessageFlood(AsyncPlayerChatEvent event) {
+		if(floodModule == null)
+			return;
+		if(event.getPlayer().hasPermission(floodModule.getBypassPermission()))
+			return;
+		ChatPlayer chatPlayer = ChatPlayer.getChatPlayer(event.getPlayer().getUniqueId());
+		String msg = ChatColor.stripColor(event.getMessage());
+		if(!(floodModule.meetsCondition(chatPlayer, msg)))
+			return;
+		event.setCancelled(true);
+		String[][] staffNotificationPlaceholders = { { "player", event.getPlayer().getName() }, { "message", msg } };
+		String warningMessage = MsgUtils.color(autoMod.getMessage("flood.warning", null));
+		String filterMessage = MsgUtils.color(autoMod.getMessage("flood.filtered_message", null));
+		String staffNotification = MsgUtils.color(autoMod.getMessage("flood.staff_notification", staffNotificationPlaceholders));
+		autoMod.getStaffs().getAllStaff().stream().map(Bukkit::getPlayer).filter(player -> (player != null)).forEach(staff -> staff.sendMessage(staffNotification));
+		event.getPlayer().sendMessage(warningMessage);
+		if(floodModule.isReplace()) {
+			String filteredMsg = floodModule.replace(msg);
+			event.getPlayer().sendMessage(filterMessage);
+			event.getPlayer().chat(filteredMsg);
+			return;
+		}
 	}
 }
