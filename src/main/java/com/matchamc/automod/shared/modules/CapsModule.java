@@ -8,15 +8,13 @@ public class CapsModule implements Module {
 	private boolean replace;
 	private int maxCaps;
 	private int maxWarns;
-	private String warnNotification;
 	private String bypassPermission = "automod.bypass.caps";
 
-	public void loadModule(boolean enabled, boolean replace, int maxCaps, int maxWarns, String warnNotification) {
+	public void loadModule(boolean enabled, boolean replace, int maxCaps, int maxWarns) {
 		this.enabled = enabled;
 		this.replace = replace;
 		this.maxCaps = maxCaps;
 		this.maxWarns = maxWarns;
-		this.warnNotification = warnNotification;
 	}
 
 	@Override
@@ -30,6 +28,8 @@ public class CapsModule implements Module {
 
 	@Override
 	public boolean meetsCondition(ChatPlayer player, String message) {
+		if(!enabled)
+			return false;
 		if(message.codePoints().filter(c -> (c >= 65 && c <= 90)).count() > maxCaps)
 			return true;
 		return false;
@@ -38,6 +38,7 @@ public class CapsModule implements Module {
 	public int getCapsThreshold() {
 		return maxCaps;
 	}
+
 	public int capsCount(String message) {
 		return (int) message.codePoints().filter(c -> (c >= 65 && c <= 90)).count();
 	}
@@ -50,11 +51,6 @@ public class CapsModule implements Module {
 	@Override
 	public String getModuleName() {
 		return "Caps";
-	}
-
-	@Override
-	public String getWarnNotification() {
-		return warnNotification;
 	}
 
 	@Override

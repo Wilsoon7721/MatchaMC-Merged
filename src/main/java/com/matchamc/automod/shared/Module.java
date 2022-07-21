@@ -13,6 +13,4 @@ public interface Module {
 	int getMaxWarnings();
 
 	String getModuleName();
-
-	String getWarnNotification();
 }
