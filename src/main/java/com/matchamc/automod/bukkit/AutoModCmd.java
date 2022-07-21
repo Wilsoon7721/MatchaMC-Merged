@@ -46,7 +46,7 @@ public class AutoModCmd extends CoreCommand {
 		case "modules":
 			switch(args[1].toLowerCase()) {
 			case "list":
-				sender.spigot().sendMessage(new ComponentBuilder("Available Modules: ").color(ChatColor.YELLOW).append(new ComponentBuilder("Caps").color(ChatColor.AQUA).event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("ChatModule - Filters excessive capital letters"))).create()).create());
+				sender.spigot().sendMessage(new ComponentBuilder("Available Modules: ").color(ChatColor.YELLOW).append(new ComponentBuilder("Caps").color(ChatColor.AQUA).event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Chat Module - Filters excessive capital letters"))).create()).create());
 				//
 				break;
 			case "enable":

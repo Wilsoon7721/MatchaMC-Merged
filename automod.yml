@@ -13,3 +13,5 @@ messages:
      caps:
          warning: "&cPlease do not use excessive caps."
          staff_notification: "&e%player% &cfailed &bCaps &c(%caps% > %threshold%)"
+     blacklist:
+         warning: "&cPlease do not use blacklisted words."

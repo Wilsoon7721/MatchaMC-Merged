@@ -49,7 +49,8 @@ public class ModuleListeners implements Listener {
 			if(player == null)
 				return;
 			player.sendMessage(warningMessage);
-			if(event.isCancelled()) return; // do not send any message
+			if(event.isCancelled())
+				return; // do not send any message
 			String formattedMessage = event.getMessage().toLowerCase();
 			player.chat(formattedMessage);
 			return;
@@ -58,5 +59,11 @@ public class ModuleListeners implements Listener {
 		if(player == null)
 			return;
 		player.sendMessage(warningMessage);
+	}
+
+	// BlacklistModule
+	@EventHandler
+	public void onPlayerMessageBlacklisted(AsyncPlayerChatEvent event) {
+
 	}
 }
