@@ -207,6 +207,10 @@ public class BukkitMain extends JavaPlugin implements PluginMessageListener {
 		}
 	}
 
+	public Chat getChat() {
+		return chat;
+	}
+
 	public String formatNoPermsMsg(String permission) {
 		return MsgUtils.color(NO_PERMISSION_ERROR.replace("%permission%", permission));
 	}

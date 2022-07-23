@@ -53,7 +53,9 @@ modules:
          # Miscelaneous
          - (LiquidBounce)([ ])(Hacked)([ ])(Client)([ ])(by)([ ])(CCBlueX)
          - (WWE)([  ])(Client)
-  
+     cooldown:
+         # Set the chatting delay in seconds
+         delay: 3
 messages:
      caps:
          warning: "&cPlease do not use excessive caps."
@@ -66,3 +68,5 @@ messages:
          warning: "&cPlease do not excessively repeat characters."
          filtered_message: "&cYour message has been shortened."
          staff_notification: "&e%player% &cfailed &bFlood &c(Message: %message%)"
+     cooldown:
+         warning: "&cPlease wait %delay% second(s) before sending another message."

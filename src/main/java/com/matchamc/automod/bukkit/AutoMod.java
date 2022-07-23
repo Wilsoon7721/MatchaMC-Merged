@@ -59,6 +59,10 @@ public class AutoMod {
 		return activeModules;
 	}
 
+	public BukkitMain getBukkitInstance() {
+		return instance;
+	}
+
 	public Staffs getStaffs() {
 		return staffs;
 	}

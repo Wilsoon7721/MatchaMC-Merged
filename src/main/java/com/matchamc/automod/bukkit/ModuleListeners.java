@@ -11,6 +11,7 @@ import com.matchamc.automod.shared.ChatPlayer;
 import com.matchamc.automod.shared.Module;
 import com.matchamc.automod.shared.modules.BlacklistModule;
 import com.matchamc.automod.shared.modules.CapsModule;
+import com.matchamc.automod.shared.modules.CooldownModule;
 import com.matchamc.automod.shared.modules.FloodModule;
 import com.matchamc.shared.MsgUtils;
 
@@ -21,6 +22,7 @@ public class ModuleListeners implements Listener {
 	private CapsModule capsModule;
 	private BlacklistModule blacklistModule;
 	private FloodModule floodModule;
+	private CooldownModule cooldownModule;
 
 	protected ModuleListeners(AutoMod autoMod) {
 		this.autoMod = autoMod;
@@ -34,6 +36,9 @@ public class ModuleListeners implements Listener {
 					continue;
 				floodModule = AutoMod.getModuleAs(module, FloodModule.class);
 				if(floodModule != null)
+					continue;
+				cooldownModule = AutoMod.getModuleAs(module, CooldownModule.class);
+				if(cooldownModule != null)
 					continue;
 			} catch(ClassCastException ex) {
 			}
@@ -123,5 +128,19 @@ public class ModuleListeners implements Listener {
 			event.getPlayer().chat(filteredMsg);
 			return;
 		}
+	}
+
+	// CooldownModule
+	@EventHandler
+	public void onPlayerOnCooldown(AsyncPlayerChatEvent event) {
+		if(cooldownModule == null)
+			return;
+		if(event.getPlayer().hasPermission(cooldownModule.getBypassPermission()))
+			return;
+		ChatPlayer chatPlayer = ChatPlayer.getChatPlayer(event.getPlayer().getUniqueId());
+		if(cooldownModule.meetsCondition(chatPlayer, event.getMessage()))
+			return;
+		String[][] warningPlaceholders = { { "delay", String.valueOf(cooldownModule.getCooldown(event.getPlayer().getUniqueId())) } };
+		event.getPlayer().sendMessage(autoMod.getMessage("cooldown.warning", warningPlaceholders));
 	}
 }
