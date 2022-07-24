@@ -1,5 +1,11 @@
 package com.matchamc.core.bungee;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+
 import com.matchamc.core.bungee.commands.AlertCmd;
 import com.matchamc.core.bungee.commands.FindCmd;
 import com.matchamc.core.bungee.commands.SendCmd;
@@ -34,6 +40,8 @@ public class BungeeMain extends Plugin {
 		getProxy().getPluginManager().registerListener(this, chat);
 		getProxy().getPluginManager().registerListener(this, staffs);
 		getProxy().registerChannel("MatchaMC_ServerPlugin");
+		if(!new File(getDataFolder(), "config.yml").exists())
+			createFile("config.yml");
 		registerCommand(chat);
 		registerCommand(new ServerCmd());
 		registerCommand(new SendCmd());
@@ -45,6 +53,30 @@ public class BungeeMain extends Plugin {
 	public void onDisable() {
 		getProxy().unregisterChannel("MatchaMC_ServerPlugin");
 		staffs.commitNewStaffToFile();
+	}
+
+	public void createFile(String fileName) {
+		try {
+			File file = new File(getDataFolder(), fileName);
+			if(!file.exists()) {
+				String[] files = fileName.split("/");
+				InputStream stream = getClass().getClassLoader().getResourceAsStream(files[files.length - 1]);
+				File parentFile = file.getParentFile();
+				if(parentFile != null)
+					parentFile.mkdirs();
+				if(stream != null) {
+					Files.copy(stream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+					MsgUtils.sendBukkitConsoleMessage("&a[" + CONSOLE_PLUGIN_NAME + "] Successfully copied the file '" + file.getName() + "' from the JAR to the data folder.");
+					return;
+				} else {
+					file.createNewFile();
+					MsgUtils.sendBukkitConsoleMessage("&a[" + CONSOLE_PLUGIN_NAME + "] Successfully created the file '" + file.getName() + "'.");
+				}
+			}
+		} catch(IOException ex) {
+			MsgUtils.sendBukkitConsoleMessage("&c[" + CONSOLE_PLUGIN_NAME + "] Failed to create configuration file.");
+			ex.printStackTrace();
+		}
 	}
 
 	private void registerCommand(Command executor) {

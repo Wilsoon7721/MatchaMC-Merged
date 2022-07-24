@@ -13,8 +13,11 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.hover.content.Text;
 
 public class AutoModCmd extends CoreCommand {
-	public AutoModCmd(BukkitMain instance, String permissionNode) {
+	private AutoMod autoMod;
+
+	public AutoModCmd(AutoMod autoMod, BukkitMain instance, String permissionNode) {
 		super(instance, permissionNode);
+		this.autoMod = autoMod;
 	}
 
 	@Override
@@ -37,6 +40,11 @@ public class AutoModCmd extends CoreCommand {
 			if(args[0].equalsIgnoreCase("players")) {
 				sender.sendMessage(BukkitMain.INSUFFICIENT_PARAMETERS_ERROR);
 				sender.sendMessage(MsgUtils.color("&cUsage: /automod players <list/add/remove> [player]"));
+				return true;
+			}
+			if(args[0].equalsIgnoreCase("reload")) {
+				autoMod.reloadConfig();
+				sender.sendMessage(MsgUtils.color("&eAutoMod has been reloaded."));
 				return true;
 			}
 			sender.sendMessage(MsgUtils.color("&cUnrecognized option: " + args[0]));
@@ -92,6 +100,10 @@ public class AutoModCmd extends CoreCommand {
 				//
 				break;
 			}
+			return true;
+		case "reload":
+			autoMod.reloadConfig();
+			sender.sendMessage(MsgUtils.color("&eAutoMod has been reloaded."));
 			return true;
 		default:
 			sender.sendMessage(MsgUtils.color("&cUnrecognized option: " + args[0]));

@@ -1,6 +1,7 @@
 package com.matchamc.automod.bukkit;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -18,6 +19,7 @@ import com.matchamc.shared.MsgUtils;
 public class AutoMod {
 	private BukkitMain instance;
 	private File config;
+	private YamlConfiguration yc;
 	private Staffs staffs;
 	private PlayerRegistrar registrar;
 	private Set<Module> activeModules = new HashSet<>();
@@ -36,7 +38,7 @@ public class AutoMod {
 
 	public void initializeModules() {
 		YamlConfiguration yc = YamlConfiguration.loadConfiguration(config);
-		// get modules from it
+		// TODO get modules from it
 		// chcek if eabled
 		// load all enabled onnes
 		// add to activeModules
@@ -53,6 +55,23 @@ public class AutoMod {
 			msg = msg.replace("%" + placeholder[0] + "%", placeholder[1]);
 		}
 		return MsgUtils.color(msg);
+	}
+
+	public YamlConfiguration getConfig() {
+		yc = YamlConfiguration.loadConfiguration(config);
+		return yc;
+	}
+
+	public void reloadConfig() {
+		yc = YamlConfiguration.loadConfiguration(config);
+		try {
+			yc.save(config);
+		} catch(IOException ex) {
+			MsgUtils.sendBukkitConsoleMessage("&cAutoMod could not be reloaded.");
+			ex.printStackTrace();
+			return;
+		}
+		yc = YamlConfiguration.loadConfiguration(config);
 	}
 
 	public Set<Module> getActiveModules() {

@@ -1,3 +1,7 @@
+# Is this server connected to BungeeCord?
+# If set to true, spigot features that exist in bungee won't be active.
+bungee: false
+
 # Who can join the server while the server is whitelisted?
 whitelist:
      active: false
