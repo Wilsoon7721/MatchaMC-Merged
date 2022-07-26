@@ -48,6 +48,18 @@ public class VerifierModule implements Module {
 		return "Verifier";
 	}
 
+	public boolean isWhitelistNames() {
+		return whitelistNames;
+	}
+
+	public Pattern getExpressionsPattern() {
+		return pattern;
+	}
+
+	public Pattern getNamesPattern() {
+		return namesPattern;
+	}
+
 	private Pattern createPatternFromCollection(Collection<String> collection) {
 		if(collection.isEmpty())
 			return Pattern.compile("(?!x)x");
