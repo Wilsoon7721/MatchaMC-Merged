@@ -22,7 +22,7 @@ public class CooldownModule implements Module {
 		this.autoMod = autoMod;
 	}
 
-	public void loadData(int cooldownTime) {
+	public void loadModule(int cooldownTime) {
 		this.cooldownTime = cooldownTime;
 		new BukkitRunnable() {
 			@Override
@@ -35,7 +35,12 @@ public class CooldownModule implements Module {
 						cooldown.remove(entry.getKey());
 						continue;
 					}
-					cooldown.put(entry.getKey(), (value - 1));
+					int newValue = (value - 1);
+					cooldown.put(entry.getKey(), newValue);
+					if(newValue <= 0) {
+						cooldown.remove(entry.getKey());
+						continue;
+					}
 					continue;
 				}
 			}

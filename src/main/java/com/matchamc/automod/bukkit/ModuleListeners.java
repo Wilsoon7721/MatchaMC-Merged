@@ -1,5 +1,7 @@
 package com.matchamc.automod.bukkit;
 
+import java.util.regex.Pattern;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -13,6 +15,7 @@ import com.matchamc.automod.shared.modules.BlacklistModule;
 import com.matchamc.automod.shared.modules.CapsModule;
 import com.matchamc.automod.shared.modules.CooldownModule;
 import com.matchamc.automod.shared.modules.FloodModule;
+import com.matchamc.automod.shared.modules.VerifierModule;
 import com.matchamc.shared.MsgUtils;
 
 import net.md_5.bungee.api.ChatColor;
@@ -23,6 +26,7 @@ public class ModuleListeners implements Listener {
 	private BlacklistModule blacklistModule;
 	private FloodModule floodModule;
 	private CooldownModule cooldownModule;
+	private VerifierModule verifierModule;
 
 	protected ModuleListeners(AutoMod autoMod) {
 		this.autoMod = autoMod;
@@ -40,14 +44,29 @@ public class ModuleListeners implements Listener {
 				cooldownModule = AutoMod.getModuleAs(module, CooldownModule.class);
 				if(cooldownModule != null)
 					continue;
-
+				verifierModule = AutoMod.getModuleAs(module, VerifierModule.class);
+				if(verifierModule != null)
+					continue;
 			} catch(ClassCastException ex) {
 			}
 		}
 	}
 
-	// CapsModule
+	// VerifierModule (EVENTPRIORITY IS LOWEST TO ENSURE THAT MESSAGE IS FORMATTED BEFORE THE OTHER LISTENERS USE THE MESSAGE)
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void onPlayerMessageFormat(AsyncPlayerChatEvent event) {
+		if(verifierModule == null)
+			return;
+		String modifiedMessage = verifierModule.formatMessage(event.getMessage());
+		if(!verifierModule.isEnabled())
+			return;
+		Pattern pattern = verifierModule.getExpressionsPattern(), namesPattern = verifierModule.getNamesPattern();
+		modifiedMessage = pattern.matcher(namesPattern.matcher(modifiedMessage).replaceAll("")).replaceAll("").trim();
+		event.setMessage(modifiedMessage);
+	}
+
+	// CapsModule
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onPlayerCapsChat(AsyncPlayerChatEvent event) {
 		if(capsModule == null)
 			return;
@@ -80,7 +99,7 @@ public class ModuleListeners implements Listener {
 	}
 
 	// BlacklistModule
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onPlayerMessageBlacklisted(AsyncPlayerChatEvent event) {
 		if(blacklistModule == null)
 			return;
@@ -106,7 +125,7 @@ public class ModuleListeners implements Listener {
 	}
 
 	// FloodModule
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onPlayerMessageFlood(AsyncPlayerChatEvent event) {
 		if(floodModule == null)
 			return;
@@ -132,7 +151,7 @@ public class ModuleListeners implements Listener {
 	}
 
 	// CooldownModule
-	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
 	public void onPlayerOnCooldown(AsyncPlayerChatEvent event) {
 		if(cooldownModule == null)
 			return;

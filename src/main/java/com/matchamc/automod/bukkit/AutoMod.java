@@ -2,14 +2,20 @@ package com.matchamc.automod.bukkit;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import com.matchamc.automod.shared.Module;
+import com.matchamc.automod.shared.modules.BlacklistModule;
+import com.matchamc.automod.shared.modules.CapsModule;
+import com.matchamc.automod.shared.modules.CooldownModule;
+import com.matchamc.automod.shared.modules.VerifierModule;
 import com.matchamc.core.bukkit.BukkitMain;
 import com.matchamc.core.bukkit.util.Configurations;
 import com.matchamc.core.bukkit.util.PlayerRegistrar;
@@ -24,6 +30,8 @@ public class AutoMod {
 	private PlayerRegistrar registrar;
 	private Set<Module> activeModules = new HashSet<>();
 
+	// TODO Violations - Max Warns and actions
+	// TODO VerifierModule doesn't have the commands check
 	public AutoMod(BukkitMain instance, Configurations configurations, Staffs staffs, PlayerRegistrar registrar) {
 		// TODO Spigot Sequence
 		this.instance = instance;
@@ -33,16 +41,77 @@ public class AutoMod {
 		config = new File(this.instance.getDataFolder(), "automod.yml");
 		if(!config.exists())
 			configurations.create("automod.yml");
+		Bukkit.getPluginManager().registerEvents(new ModuleListeners(this), this.instance);
 		Bukkit.getScheduler().runTask(this.instance, () -> initializeModules());
 	}
 
 	public void initializeModules() {
 		YamlConfiguration yc = YamlConfiguration.loadConfiguration(config);
-		// TODO get modules from it
-		// chcek if eabled
-		// load all enabled onnes
-		// add to activeModules
-
+		for(String key : yc.getConfigurationSection("modules").getKeys(false).stream().map(s -> s.toLowerCase()).collect(Collectors.toSet())) {
+			boolean enabled = yc.getBoolean("modules." + key + ".enabled");
+			switch(key.toLowerCase()) {
+			case "caps":
+				if(!enabled)
+					continue;
+				CapsModule capsModule = new CapsModule();
+				boolean replace = yc.getBoolean("modules." + key + "replace");
+				int maxCaps = yc.getInt("modules." + key + ".max-caps");
+				capsModule.loadModule(enabled, replace, maxCaps, maxWarns);
+				activeModules.add(capsModule);
+				break;
+			case "verifier":
+				if(!enabled)
+					continue;
+				VerifierModule verifierModule = new VerifierModule();
+				boolean names = yc.getBoolean("modules." + key + ".names");
+				Collection<String> verifierExpressions = yc.getStringList("modules." + key + ".expressions");
+				if(verifierExpressions == null || verifierExpressions.isEmpty()) {
+					enabled = false;
+					MsgUtils.sendBukkitConsoleMessage("&c[AutoMod] VerifierModule: Expressions cannot be empty - Module disabled.");
+					continue;
+				}
+				Collection<String> commands = yc.getStringList("modules." + key + ".commands");
+				if(commands == null || commands.isEmpty())
+					commands = null; // TODO VerifierModule: If commands is null, check all commands
+				verifierModule.loadModule(enabled, names, commands, verifierExpressions, registrar.getAllRegisteredPlayerNames()); // WARNING: Unsafe method calling -- could possibly hang main thread.
+				activeModules.add(verifierModule);
+				break;
+			case "blacklist":
+				if(!enabled)
+					continue;
+				BlacklistModule blacklistModule = new BlacklistModule();
+				boolean filter = yc.getBoolean("modules." + key + ".filter");
+				Collection<String> blacklistExpressions = yc.getStringList("modules." + key + ".expressions");
+				if(blacklistExpressions == null || blacklistExpressions.isEmpty()) {
+					enabled = false;
+					MsgUtils.sendBukkitConsoleMessage("&c[AutoMod] BlacklistModule: Expressions cannot be empty - Module disabled.");
+					continue;
+				}
+				blacklistModule.loadModule(enabled, filter, maxWarns, blacklistExpressions.toArray(String[]::new));
+				activeModules.add(blacklistModule);
+				break;
+			case "cooldown":
+				if(!enabled)
+					continue;
+				CooldownModule cooldownModule = new CooldownModule(this);
+				int delaySeconds = yc.getInt("modules." + key + ".delay");
+				cooldownModule.loadModule(delaySeconds);
+				activeModules.add(cooldownModule);
+				break;
+			default:
+				MsgUtils.sendBukkitConsoleMessage("&c[AutoMod] Found an unknown key: &e" + key + "&c. Deleting...");
+				yc.set("modules." + key, null);
+				try {
+					yc.save(config);
+				} catch(IOException ex) {
+					MsgUtils.sendBukkitConsoleMessage("&cFailed to delete the unknown key.");
+					ex.printStackTrace();
+					return;
+				}
+				reloadConfig();
+				return;
+			}
+		}
 	}
 
 	public String getMessage(String key, String[][] placeholders) {
