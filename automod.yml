@@ -10,6 +10,30 @@ modules:
          # FALSE: The plugin will prevent the message from being sent.
          replace: true
          max_caps: 12
+     # This module prevents false positives by verifying messages and replacing regex expressions accordingly to prevent AutoMod from identifying false positives.
+     verifier:
+         enabled: true
+         # Should player names be replaced as well?
+         names: true
+         # Commands that should be checked.
+         # Set to [] to check all commands.
+         commands:
+             - /broadcast
+             - /msg
+             - /tell
+             - /r
+             - /reply
+             - /whisper
+             - /message
+             - /bc
+             - /tell
+         # Expressions that should be replaced.
+         # Setting this value to [] will disable the module.
+         expressions:
+             # Server Domains
+             - (yourserver)([.])(com)
+             # Long Youtube Links
+             - (youtube)([.])(com)(/watch)         
      blacklist:
          enabled: true
          # Should the plugin replace blacklisted characters with '*'?

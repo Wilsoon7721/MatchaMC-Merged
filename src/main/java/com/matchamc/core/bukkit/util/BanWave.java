@@ -30,7 +30,7 @@ public class BanWave extends CoreCommand {
 	public BanWave(BukkitMain instance, PlayerRegistrar registrar, String permissionNode) {
 		super(instance, permissionNode);
 		this.registrar = registrar;
-		duration = Duration.parse("PT" + this.instance.getConfig().getString("banwave.duration").toUpperCase());
+		duration = Duration.parse("PT" + this.instance.getConfig().getString("banwave.interval").toUpperCase());
 		seconds[0] = ((Long) duration.getSeconds()).intValue();
 		exclusions.addAll(this.instance.getConfig().getStringList("banwave.exclusions").stream().map(s -> UUID.fromString(s)).collect(Collectors.toSet()));
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(this.instance, () -> {

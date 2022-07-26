@@ -40,6 +40,7 @@ public class ModuleListeners implements Listener {
 				cooldownModule = AutoMod.getModuleAs(module, CooldownModule.class);
 				if(cooldownModule != null)
 					continue;
+
 			} catch(ClassCastException ex) {
 			}
 		}
@@ -79,7 +80,7 @@ public class ModuleListeners implements Listener {
 	}
 
 	// BlacklistModule
-	@EventHandler
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void onPlayerMessageBlacklisted(AsyncPlayerChatEvent event) {
 		if(blacklistModule == null)
 			return;
@@ -105,7 +106,7 @@ public class ModuleListeners implements Listener {
 	}
 
 	// FloodModule
-	@EventHandler
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void onPlayerMessageFlood(AsyncPlayerChatEvent event) {
 		if(floodModule == null)
 			return;
@@ -131,7 +132,7 @@ public class ModuleListeners implements Listener {
 	}
 
 	// CooldownModule
-	@EventHandler
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	public void onPlayerOnCooldown(AsyncPlayerChatEvent event) {
 		if(cooldownModule == null)
 			return;
