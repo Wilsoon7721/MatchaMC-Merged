@@ -10,6 +10,15 @@ modules:
          # FALSE: The plugin will prevent the message from being sent.
          replace: true
          max-caps: 12
+         # Amount of warnings before executing commands.
+         max-warns: 3
+         commands:
+             1: # First violation
+                 - "mute %player% 1h Excessive Caps -s"
+             2: # Second violation
+                 - "mute %player% 12h Excessive Caps -s"
+             3: # Third violation
+                 - "mute %player% Excessive Caps -s"
      # This module prevents false positives by verifying messages and replacing regex expressions accordingly to prevent AutoMod from identifying false positives.
      verifier:
          enabled: true
