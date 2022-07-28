@@ -7,6 +7,7 @@
        <spigot.version>1.18.2-R0.1-SNAPSHOT</spigot.version>
        <bungee.version>1.18-R0.1-SNAPSHOT</bungee.version>
        <javacord.version>3.4.0</javacord.version>
+       <mysql.version>6.0.6</mysql.version>
   </properties>
   <repositories>
         <repository>
@@ -61,7 +62,11 @@
  		    <version>0.3.5</version>
     		<scope>provided</scope>
 		</dependency>
-
+		<dependency>
+  		  <groupId>mysql</groupId>
+     	  <artifactId>mysql-connector-java</artifactId>
+    	  <version>${mysql.version}</version>
+		</dependency>
    </dependencies>
    <build>
     <plugins>
@@ -75,6 +80,12 @@
                 <artifact>org.javacord:javacord</artifact>
                 <includes>
                     <include>org/javacord/**</include>
+                </includes>
+             </filter>
+             <filter>
+                <artifact>mysql:mysql-connector-java</artifact>
+                <includes>
+                	<include>java/sql/**</include>
                 </includes>
              </filter>
           </filters>

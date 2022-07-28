@@ -25,12 +25,14 @@ import com.matchamc.shared.MsgUtils;
 public class AutoMod {
 	private BukkitMain instance;
 	private File config;
+	private File violationsDirectory;
 	private YamlConfiguration yc;
 	private Staffs staffs;
 	private PlayerRegistrar registrar;
 	private Set<Module> activeModules = new HashSet<>();
 
 	// TODO Violations - Max Warns and actions
+	// TODO Use MySQL Database for Violations logging
 	// TODO VerifierModule doesn't have the commands check
 	public AutoMod(BukkitMain instance, Configurations configurations, Staffs staffs, PlayerRegistrar registrar) {
 		// TODO Spigot Sequence
@@ -112,6 +114,10 @@ public class AutoMod {
 				return;
 			}
 		}
+	}
+
+	public JDBCDatabase getDatabase() {
+
 	}
 
 	public String getMessage(String key, String[][] placeholders) {
