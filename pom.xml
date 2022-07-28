@@ -62,11 +62,6 @@
  		    <version>0.3.5</version>
     		<scope>provided</scope>
 		</dependency>
-		<dependency>
-  		  <groupId>mysql</groupId>
-     	  <artifactId>mysql-connector-java</artifactId>
-    	  <version>${mysql.version}</version>
-		</dependency>
    </dependencies>
    <build>
     <plugins>
@@ -80,12 +75,6 @@
                 <artifact>org.javacord:javacord</artifact>
                 <includes>
                     <include>org/javacord/**</include>
-                </includes>
-             </filter>
-             <filter>
-                <artifact>mysql:mysql-connector-java</artifact>
-                <includes>
-                	<include>java/sql/**</include>
                 </includes>
              </filter>
           </filters>

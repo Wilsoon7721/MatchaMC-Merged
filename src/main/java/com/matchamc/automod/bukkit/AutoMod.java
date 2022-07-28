@@ -25,7 +25,7 @@ import com.matchamc.shared.MsgUtils;
 public class AutoMod {
 	private BukkitMain instance;
 	private File config;
-	private File violationsDirectory;
+	private Violations violations;
 	private YamlConfiguration yc;
 	private Staffs staffs;
 	private PlayerRegistrar registrar;
@@ -116,8 +116,8 @@ public class AutoMod {
 		}
 	}
 
-	public JDBCDatabase getDatabase() {
-
+	public Violations getViolations() {
+		return violations;
 	}
 
 	public String getMessage(String key, String[][] placeholders) {
