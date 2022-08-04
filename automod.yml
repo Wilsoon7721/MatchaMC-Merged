@@ -26,6 +26,7 @@ modules:
          names: true
          # Commands that should be checked.
          # Set to [] to check all commands.
+         # WARNING: This is not related to Violations, as there are no violations under Verifier.
          commands:
              - /broadcast
              - /msg
@@ -34,8 +35,8 @@ modules:
              - /reply
              - /whisper
              - /message
+             - /msg
              - /bc
-             - /tell
          # Expressions that should be replaced.
          # Setting this value to [] will disable the module.
          expressions:
@@ -88,6 +89,29 @@ modules:
          # Miscelaneous
          - (LiquidBounce)([ ])(Hacked)([ ])(Client)([ ])(by)([ ])(CCBlueX)
          - (WWE)([  ])(Client)
+         max-warns: 3
+         commands:
+             1:
+                 - "mute %player% 24h Swearing/Inappropriate Messages -s 
+             2:
+                 - "mute %player% 7d Swearing/Inappropriate Messages -s"
+             3:
+                 - "mute %player% Swearing/Inappropriate Messages -s"
+     flood:
+         enabled: true
+         # Should repetitive characters be replaced? (e.g. 'Hellooooooo' will be reduced to 'Helloo')
+         replace: true
+         pattern: "(\w)\1{5,}|(\w{28,})|([^\w{20,})|(^.{220,}$)"
+         max-warns: 2
+         commands: 
+             1: [] # Do nothing
+             2: []
+             3:
+                 - "warn %player% 30d Chat Flooding -s"
+             4:
+                 - "mute %player% 1h Chat Flooding -s"
+             5:
+                 - "mute %player% 24h Chat Flooding -s"
      cooldown:
          enabled: true
          # Set the chatting delay in seconds (decimals NOT accepted)

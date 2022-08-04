@@ -60,6 +60,10 @@ public class VerifierModule implements Module {
 		return whitelistNames;
 	}
 
+	public Collection<String> getCheckedCommands() {
+		return commands;
+	}
+
 	public Pattern getExpressionsPattern() {
 		return pattern;
 	}

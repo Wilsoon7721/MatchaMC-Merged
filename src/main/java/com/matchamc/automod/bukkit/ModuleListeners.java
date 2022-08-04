@@ -1,5 +1,6 @@
 package com.matchamc.automod.bukkit;
 
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
@@ -8,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
 import com.matchamc.automod.shared.ChatPlayer;
 import com.matchamc.automod.shared.Module;
@@ -63,6 +65,33 @@ public class ModuleListeners implements Listener {
 		Pattern pattern = verifierModule.getExpressionsPattern(), namesPattern = verifierModule.getNamesPattern();
 		modifiedMessage = pattern.matcher(namesPattern.matcher(modifiedMessage).replaceAll("")).replaceAll("").trim();
 		event.setMessage(modifiedMessage);
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void onPlayerCommandFormat(PlayerCommandPreprocessEvent event) {
+		if(verifierModule == null)
+			return;
+		String[] s = event.getMessage().split(" ");
+		String cmd = "/" + s[0];
+		if(!verifierModule.getCheckedCommands().contains(cmd))
+			return;
+		String msg;
+		Pattern pattern = verifierModule.getExpressionsPattern(), namesPattern = verifierModule.getNamesPattern();
+		if(cmd.equalsIgnoreCase("/whisper") || cmd.equalsIgnoreCase("/msg") || cmd.equalsIgnoreCase("/message") || cmd.equalsIgnoreCase("/tell")) {
+			msg = String.join(" ", Arrays.copyOfRange(s, 1, s.length)).trim();
+			String modifiedMessage = verifierModule.formatMessage(msg);
+			modifiedMessage = pattern.matcher(namesPattern.matcher(modifiedMessage).replaceAll("")).replaceAll("").trim();
+			event.setMessage(s[0] + " " + s[1] + " " + modifiedMessage);
+			return;
+		}
+		if(cmd.equalsIgnoreCase("/r") || cmd.equalsIgnoreCase("/reply") || cmd.equalsIgnoreCase("/bc") || cmd.equalsIgnoreCase("/broadcast")) {
+			msg = String.join(" ", s).trim();
+			String modifiedMessage;
+			modifiedMessage = verifierModule.formatMessage(msg);
+			modifiedMessage = pattern.matcher(namesPattern.matcher(modifiedMessage).replaceAll("")).replaceAll("").trim();
+			event.setMessage(s[0] + " " + modifiedMessage);
+			return;
+		}
 	}
 
 	// CapsModule

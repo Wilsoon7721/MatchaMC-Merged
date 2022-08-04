@@ -18,6 +18,10 @@ public class Violations {
 		this.autoMod = autoMod;
 	}
 
+	public AutoMod getInstance() {
+		return autoMod;
+	}
+
 	public Set<Violation> getViolations(UUID uuid, Module module) {
 		Set<Violation> violations = playerViolations.get(uuid);
 		if(violations.isEmpty())
@@ -47,9 +51,9 @@ public class Violations {
 	}
 
 	private void sql(SQLException ex) {
-		MsgUtils.sendBukkitConsoleMessage("&c[Violations - Database] Encountered an SQL Exception");
-		MsgUtils.sendBukkitConsoleMessage("&c  - Error Message: " + ex.getMessage());
-		MsgUtils.sendBukkitConsoleMessage("&c  - Error Code: " + ex.getErrorCode());
-		MsgUtils.sendBukkitConsoleMessage("&c  - SQL State: " + ex.getSQLState());
+		MsgUtils.sendBukkitConsoleMessage("&c[Violations - Database] Encountered an SQL Exception!");
+		MsgUtils.sendBukkitConsoleMessage("&c  |- Error Message: " + ex.getMessage());
+		MsgUtils.sendBukkitConsoleMessage("&c  |- Error Code: " + ex.getErrorCode());
+		MsgUtils.sendBukkitConsoleMessage("&c  |- SQL State: " + ex.getSQLState());
 	}
 }
