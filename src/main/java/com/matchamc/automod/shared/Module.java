@@ -1,5 +1,7 @@
 package com.matchamc.automod.shared;
 
+import java.util.Map;
+
 public interface Module {
 
 	boolean isEnabled();
@@ -13,4 +15,6 @@ public interface Module {
 	int getMaxWarnings();
 
 	String getModuleName();
+
+	Map<Integer, String> getActionCommands();
 }

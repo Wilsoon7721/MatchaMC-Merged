@@ -125,6 +125,7 @@ public class ModuleListeners implements Listener {
 		if(player == null)
 			return;
 		player.sendMessage(warningMessage);
+
 	}
 
 	// BlacklistModule

@@ -1,5 +1,6 @@
 package com.matchamc.automod.shared.modules;
 
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -12,12 +13,14 @@ public class BlacklistModule implements Module {
 	private boolean filter;
 	private int maxWarns;
 	private Pattern pattern;
+	private Map<Integer, String> actionCommands;
 	private String bypassPermission = "automod.bypass.blacklist";
 
-	public void loadModule(boolean enabled, boolean filter, int maxWarns, String[] patterns) {
+	public void loadModule(boolean enabled, boolean filter, int maxWarns, String[] patterns, Map<Integer, String> actionCommands) {
 		this.enabled = enabled;
 		this.filter = filter;
 		this.maxWarns = maxWarns;
+		this.actionCommands = actionCommands;
 		String patternString = "";
 		byte b;
 		int i;
@@ -71,5 +74,9 @@ public class BlacklistModule implements Module {
 
 	public Pattern getPattern() {
 		return pattern;
+	}
+
+	public Map<Integer, String> getActionCommands() {
+		return actionCommands;
 	}
 }

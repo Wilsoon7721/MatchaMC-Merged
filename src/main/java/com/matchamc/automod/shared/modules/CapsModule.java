@@ -1,5 +1,7 @@
 package com.matchamc.automod.shared.modules;
 
+import java.util.Map;
+
 import com.matchamc.automod.shared.ChatPlayer;
 import com.matchamc.automod.shared.Module;
 
@@ -8,13 +10,15 @@ public class CapsModule implements Module {
 	private boolean replace;
 	private int maxCaps;
 	private int maxWarns;
+	private Map<Integer, String> actionCommands;
 	private String bypassPermission = "automod.bypass.caps";
 
-	public void loadModule(boolean enabled, boolean replace, int maxCaps, int maxWarns) {
+	public void loadModule(boolean enabled, boolean replace, int maxCaps, int maxWarns, Map<Integer, String> actionCommands) {
 		this.enabled = enabled;
 		this.replace = replace;
 		this.maxCaps = maxCaps;
 		this.maxWarns = maxWarns;
+		this.actionCommands = actionCommands;
 	}
 
 	@Override
@@ -61,6 +65,10 @@ public class CapsModule implements Module {
 	@Override
 	public String getBypassPermission() {
 		return bypassPermission;
+	}
+
+	public Map<Integer, String> getActionCommands() {
+		return actionCommands;
 	}
 
 }

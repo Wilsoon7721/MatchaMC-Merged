@@ -1,5 +1,6 @@
 package com.matchamc.automod.shared.modules;
 
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -13,8 +14,9 @@ public class FloodModule implements Module {
 	private int maxWarns;
 	private String bypassPermission = "automod.bypass.flood";
 	private Pattern pattern;
+	private Map<Integer, String> actionCommands;
 
-	public void loadModule(boolean enabled, boolean replace, int maxWarns, String pattern) {
+	public void loadModule(boolean enabled, boolean replace, int maxWarns, String pattern, Map<Integer, String> actionCommands) {
 		this.enabled = enabled;
 		this.replace = replace;
 		this.maxWarns = maxWarns;
@@ -24,6 +26,7 @@ public class FloodModule implements Module {
 			MsgUtils.sendBukkitConsoleMessage("AutoMod - FloodModule: Failed to load module - The pattern could not be compiled.");
 			ex.printStackTrace();
 		}
+		this.actionCommands = actionCommands;
 		return;
 	}
 
@@ -63,5 +66,10 @@ public class FloodModule implements Module {
 
 	public String replace(String msg) {
 		return MsgUtils.color(pattern.matcher(msg).replaceAll(""));
+	}
+
+	@Override
+	public Map<Integer, String> getActionCommands() {
+		return actionCommands;
 	}
 }

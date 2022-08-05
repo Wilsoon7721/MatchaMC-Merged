@@ -1,6 +1,7 @@
 package com.matchamc.automod.shared.modules;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
@@ -103,5 +104,10 @@ public class CooldownModule implements Module {
 		if(!cooldown.containsKey(uuid))
 			return;
 		cooldown.remove(uuid);
+	}
+
+	@Override
+	public Map<Integer, String> getActionCommands() {
+		return null;
 	}
 }

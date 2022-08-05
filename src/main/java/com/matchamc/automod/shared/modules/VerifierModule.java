@@ -2,6 +2,7 @@ package com.matchamc.automod.shared.modules;
 
 import java.text.Normalizer;
 import java.util.Collection;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import com.matchamc.automod.shared.ChatPlayer;
@@ -54,6 +55,11 @@ public class VerifierModule implements Module {
 	@Override
 	public String getModuleName() {
 		return "Verifier";
+	}
+
+	@Override
+	public Map<Integer, String> getActionCommands() {
+		return null;
 	}
 
 	public boolean isWhitelistNames() {
